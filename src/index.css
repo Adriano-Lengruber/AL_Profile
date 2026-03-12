@@ -1,0 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 225 30% 6%;
+    --foreground: 210 40% 96%;
+    --card: 225 30% 8%;
+    --card-foreground: 210 40% 96%;
+    --popover: 225 30% 8%;
+    --popover-foreground: 210 40% 96%;
+    --primary: 38 60% 58%;
+    --primary-foreground: 225 30% 6%;
+    --secondary: 215 20% 62%;
+    --secondary-foreground: 225 30% 6%;
+    --muted: 220 25% 16%;
+    --muted-foreground: 215 20% 62%;
+    --accent: 160 75% 32%;
+    --accent-foreground: 225 30% 6%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 220 25% 14%;
+    --input: 220 25% 14%;
+    --ring: 38 60% 58%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-cyber-black text-foreground font-sans antialiased;
+    background:
+      radial-gradient(ellipse at 15% 15%, rgba(212, 168, 83, 0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 85%, rgba(148, 163, 184, 0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 60%, rgba(5, 150, 105, 0.03) 0%, transparent 60%),
+      #0a0d14;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #d4a853 0%, #e8c878 45%, #b8843a 100%);
+  }
+
+  .glass {
+    @apply bg-cyber-slate/60 backdrop-blur-xl border border-white/10;
+  }
+
+  .glow {
+    box-shadow: 0 0 40px -10px rgba(212, 168, 83, 0.2);
+  }
+
+  .glow-secondary {
+    box-shadow: 0 0 40px -10px rgba(148, 163, 184, 0.15);
+  }
+
+  .glow-accent {
+    box-shadow: 0 0 40px -10px rgba(5, 150, 105, 0.15);
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:border-primary/20 hover:shadow-lg;
+    transition-property: border-color, box-shadow, transform;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0d14;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #d4a853, #94a3b8);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #e8c878, #d4a853);
+}
+
+/* Selection */
+::selection {
+  background: rgba(212, 168, 83, 0.25);
+  color: #f8fafc;
+}
+
+/* Geometric pattern for blog cards */
+.blog-pattern {
+  background-image:
+    linear-gradient(rgba(212, 168, 83, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212, 168, 83, 0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Timeline line refined */
+.timeline-line {
+  background: linear-gradient(to bottom, #d4a853, #94a3b8 60%, #059669);
+}
