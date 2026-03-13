@@ -15,8 +15,9 @@ RUN npm install -g pnpm && \
 # Copy source code
 COPY . .
 
-# Build the application
+# Build the application - set API URL at build time
 ENV CI=true
+ENV VITE_API_URL=/api
 RUN pnpm build
 
 # Production stage
