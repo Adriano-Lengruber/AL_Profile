@@ -475,8 +475,12 @@ function Services() {
       border: 'hover:border-primary/30',
       title: 'Análise de Dados',
       description: 'Transformo dados brutos em insights acionáveis que guiam decisões estratégicas com precisão.',
-      items: ['ETL & Data Pipelines', 'Análise Estatística', 'Relatórios Executivos', 'Python & SQL', 'Machine Learning', 'Visualização de Dados'],
-      badges: ['Python', 'SQL', 'Pandas'],
+      items: [
+        { text: 'Scripts automatizados para ETL', badges: ['Python', 'Pandas'] },
+        { text: 'Análises estatísticas e forecasts', badges: ['Python', 'NumPy'] },
+        { text: 'Relatórios executivos interativos', badges: ['Power BI', 'Excel'] },
+        { text: 'Dashboards em tempo real', badges: ['Tableau', 'Power BI'] },
+      ],
     },
     {
       icon: <Bot size={28} />,
@@ -485,8 +489,12 @@ function Services() {
       border: 'hover:border-cyber-emerald/30',
       title: 'AI Agents',
       description: 'Desenvolvimento de agentes de IA autônomos para automatizar tarefas complexas e repetitivas.',
-      items: ['LLM Integration', 'Workflow Automation', 'RAG & Knowledge Bases', 'LangChain', 'AutoGPT', 'NLP'],
-      badges: ['Python', 'LangChain', 'OpenAI'],
+      items: [
+        { text: 'Assistentes virtuais personalizados', badges: ['OpenAI', 'LangChain'] },
+        { text: 'Automação de workflows com IA', badges: ['n8n', 'Python'] },
+        { text: 'RAG para consultas em documentos', badges: ['Vector DB', 'GPT'] },
+        { text: 'Chatbots para atendimento', badges: ['Rasa', 'Dialogflow'] },
+      ],
     },
     {
       icon: <LayoutDashboard size={28} />,
@@ -495,18 +503,26 @@ function Services() {
       border: 'hover:border-cyber-steel/30',
       title: 'Business Intelligence',
       description: 'Dashboards interativos e painéis analíticos que revelam o desempenho do negócio em tempo real.',
-      items: ['Power BI & DAX', 'KPIs & Métricas', 'Integração SAP/ERP', 'Looker Studio', 'Tableau', 'Data Warehouse'],
-      badges: ['Power BI', 'DAX', 'SAP'],
+      items: [
+        { text: 'Dashboards executivos', badges: ['Power BI', 'Tableau'] },
+        { text: 'Modelagem DAX avançada', badges: ['DAX', 'Power BI'] },
+        { text: 'Integração com SAP/ERP', badges: ['SAP', 'SQL'] },
+        { text: 'Data Warehousing', badges: ['Snowflake', 'PostgreSQL'] },
+      ],
     },
     {
       icon: <Zap size={28} />,
-      color: 'text-cyber-gold',
-      bg: 'bg-cyber-gold/10',
-      border: 'hover:border-cyber-gold/30',
+      color: 'text-cyber-amber',
+      bg: 'bg-cyber-amber/10',
+      border: 'hover:border-cyber-amber/30',
       title: 'Automação & RPA',
       description: 'Elimino tarefas manuais com robôs de software, reduzindo erros e aumentando a produtividade.',
-      items: ['Power Automate', 'Web Scraping', 'Scripts Python', 'Integração de APIs', 'Automação de Planilhas', 'Bots'],
-      badges: ['Python', 'RPA', 'Selenium'],
+      items: [
+        { text: 'Robôs de web scraping', badges: ['Python', 'Selenium'] },
+        { text: 'Automação de planilhas', badges: ['Python', 'OpenPyXL'] },
+        { text: 'Integração de APIs', badges: ['REST', 'Python'] },
+        { text: 'Automação de processos', badges: ['Power Automate', 'n8n'] },
+      ],
     },
     {
       icon: <Code2 size={28} />,
@@ -515,18 +531,26 @@ function Services() {
       border: 'hover:border-cyber-blue/30',
       title: 'Desenvolvimento Full-Stack',
       description: 'Aplicações web modernas, APIs e sistemas personalizados do conceito à produção.',
-      items: ['React & TypeScript', 'APIs REST/FastAPI', 'Deploy & DevOps', 'Node.js', 'PostgreSQL', 'Cloud'],
-      badges: ['React', 'TypeScript', 'FastAPI'],
+      items: [
+        { text: 'SPAs e aplicações web', badges: ['React', 'TypeScript'] },
+        { text: 'APIs RESTful', badges: ['FastAPI', 'Node.js'] },
+        { text: 'Sistemas com banco de dados', badges: ['PostgreSQL', 'MongoDB'] },
+        { text: 'Deploy e DevOps', badges: ['Docker', 'AWS'] },
+      ],
     },
     {
       icon: <TrendingUp size={28} />,
-      color: 'text-cyber-amber',
-      bg: 'bg-cyber-amber/10',
-      border: 'hover:border-cyber-amber/30',
+      color: 'text-cyber-indigo',
+      bg: 'bg-cyber-indigo/10',
+      border: 'hover:border-cyber-indigo/30',
       title: 'DevOps',
       description: 'Configuração e disponibilização de VPS 100% funcional de acordo com cada necessidade do cliente.',
-      items: ['VPS & Servidores', 'Docker & Kubernetes', 'CI/CD Pipeline', 'Cloud AWS/GCP/Azure', 'Nginx & Reverse Proxy', 'Monitoramento'],
-      badges: ['Docker', 'AWS', 'Linux'],
+      items: [
+        { text: 'VPS e servidores configurados', badges: ['Linux', 'Nginx'] },
+        { text: 'Containers Docker', badges: ['Docker', 'Docker Compose'] },
+        { text: 'CI/CD pipelines', badges: ['GitHub Actions', 'GitLab'] },
+        { text: 'Cloud computing', badges: ['AWS', 'GCP', 'Azure'] },
+      ],
     },
   ];
 
@@ -550,23 +574,25 @@ function Services() {
               </div>
               <h3 className="font-heading text-lg font-semibold mb-2">{svc.title}</h3>
               <p className="text-muted-foreground text-sm leading-relaxed mb-4">{svc.description}</p>
-              <ul className="space-y-1.5 mb-4">
-                {svc.items.map((item) => (
-                  <li key={item} className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <CheckCheck size={14} className={svc.color} />
-                    {item}
+              <ul className="space-y-2 mb-4">
+                {svc.items.map((item, idx) => (
+                  <li key={idx} className="flex flex-col gap-1.5">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <CheckCheck size={14} className={svc.color} />
+                      {item.text}
+                    </div>
+                    {item.badges && (
+                      <div className="flex flex-wrap gap-1.5 ml-5">
+                        {item.badges.map((badge) => (
+                          <span key={badge} className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${svc.bg} ${svc.color}`}>
+                            {badge}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </li>
                 ))}
               </ul>
-              {svc.badges && (
-                <div className="flex flex-wrap gap-2 pt-3 border-t border-white/5">
-                  {svc.badges.map((badge) => (
-                    <span key={badge} className={`px-2.5 py-1 rounded-full text-xs font-medium ${svc.bg} ${svc.color}`}>
-                      {badge}
-                    </span>
-                  ))}
-                </div>
-              )}
             </motion.div>
           ))}
         </div>
