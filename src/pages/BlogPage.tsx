@@ -22,6 +22,7 @@ const blogPatterns = [
 
 interface Post {
   id: string;
+  _id?: string;
   title: string;
   excerpt: string;
   content: string;
@@ -128,6 +129,18 @@ export default function BlogPage() {
 
     fetchPosts();
   }, [pagination?.page, token, user?.id]);
+
+  // Check for post ID in URL query and open post modal
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const postId = params.get('id');
+    if (postId && posts.length > 0) {
+      const post = posts.find(p => p._id === postId || p.id === postId);
+      if (post) {
+        setSelectedPost(post);
+      }
+    }
+  }, [posts]);
 
   const allTags = Array.from(new Set(posts.flatMap(post => post.tags)));
 
