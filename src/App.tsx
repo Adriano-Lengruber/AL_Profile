@@ -360,35 +360,35 @@ function About() {
 }
 
 // ──────────────────────────────────────────────────────────────
-// Tech Stack - Carrossel com CSS Marquee
+// Tech Stack - Carrossel com CSS Marquee (Tema Dourado Premium)
 // ──────────────────────────────────────────────────────────────
 function TechStack() {
-  // Tech stack com ícones Lucide (confiável) + cores
+  // Tech stack com ícones Lucide (tema dourado)
   const techStack = [
-    { name: 'Python', icon: <FileCode size={24} />, color: '#3776AB', bg: 'from-yellow-400/20 to-yellow-600/20' },
-    { name: 'TensorFlow', icon: <BrainCircuit size={24} />, color: '#FF6F00', bg: 'from-orange-400/20 to-orange-600/20' },
-    { name: 'PyTorch', icon: <Sparkles size={24} />, color: '#EE4C2C', bg: 'from-red-400/20 to-red-600/20' },
-    { name: 'Pandas', icon: <BarChart3 size={24} />, color: '#150458', bg: 'from-purple-400/20 to-purple-600/20' },
-    { name: 'NumPy', icon: <TrendingUp size={24} />, color: '#013243', bg: 'from-blue-400/20 to-blue-600/20' },
-    { name: 'MySQL', icon: <Database size={24} />, color: '#4479A1', bg: 'from-blue-500/20 to-blue-700/20' },
-    { name: 'PostgreSQL', icon: <HardDrive size={24} />, color: '#336791', bg: 'from-blue-400/20 to-blue-600/20' },
-    { name: 'MongoDB', icon: <Hexagon size={24} />, color: '#47A248', bg: 'from-green-400/20 to-green-600/20' },
-    { name: 'Redis', icon: <Zap size={24} />, color: '#DC382D', bg: 'from-red-500/20 to-red-700/20' },
-    { name: 'Power BI', icon: <LayoutDashboard size={24} />, color: '#F2C811', bg: 'from-yellow-500/20 to-yellow-700/20' },
-    { name: 'Tableau', icon: <CircleDot size={24} />, color: '#E97627', bg: 'from-orange-400/20 to-orange-600/20' },
-    { name: 'AWS', icon: <Cloud size={24} />, color: '#FF9900', bg: 'from-orange-400/20 to-yellow-600/20' },
-    { name: 'GCP', icon: <CloudLightning size={24} />, color: '#4285F4', bg: 'from-blue-400/20 to-blue-600/20' },
-    { name: 'Azure', icon: <CloudFog size={24} />, color: '#0078D4', bg: 'from-blue-500/20 to-blue-700/20' },
-    { name: 'Docker', icon: <Box size={24} />, color: '#2496ED', bg: 'from-blue-400/20 to-cyan-600/20' },
-    { name: 'Kubernetes', icon: <Container size={24} />, color: '#326CE5', bg: 'from-indigo-400/20 to-indigo-600/20' },
-    { name: 'React', icon: <Hexagon size={24} />, color: '#61DAFB', bg: 'from-cyan-400/20 to-blue-500/20' },
-    { name: 'TypeScript', icon: <Code2 size={24} />, color: '#3178C6', bg: 'from-blue-400/20 to-blue-600/20' },
-    { name: 'Node.js', icon: <Server size={24} />, color: '#339933', bg: 'from-green-500/20 to-green-700/20' },
-    { name: 'FastAPI', icon: <Rocket size={24} />, color: '#017794', bg: 'from-teal-400/20 to-teal-600/20' },
-    { name: 'Git', icon: <GitBranch size={24} />, color: '#F05032', bg: 'from-orange-500/20 to-red-500/20' },
-    { name: 'GitHub', icon: <Github size={24} />, color: '#333333', bg: 'from-gray-400/20 to-gray-600/20' },
-    { name: 'SAP', icon: <Terminal size={24} />, color: '#0FAAFF', bg: 'from-blue-500/20 to-blue-700/20' },
-    { name: 'n8n', icon: <Workflow size={24} />, color: '#FA6400', bg: 'from-orange-400/20 to-purple-600/20' },
+    { name: 'Python', icon: <FileCode size={24} />, color: '#3776AB' },
+    { name: 'TensorFlow', icon: <BrainCircuit size={24} />, color: '#FF6F00' },
+    { name: 'PyTorch', icon: <Sparkles size={24} />, color: '#EE4C2C' },
+    { name: 'Pandas', icon: <BarChart3 size={24} />, color: '#150458' },
+    { name: 'NumPy', icon: <TrendingUp size={24} />, color: '#013243' },
+    { name: 'MySQL', icon: <Database size={24} />, color: '#4479A1' },
+    { name: 'PostgreSQL', icon: <HardDrive size={24} />, color: '#336791' },
+    { name: 'MongoDB', icon: <Hexagon size={24} />, color: '#47A248' },
+    { name: 'Redis', icon: <Zap size={24} />, color: '#DC382D' },
+    { name: 'Power BI', icon: <LayoutDashboard size={24} />, color: '#F2C811' },
+    { name: 'Tableau', icon: <CircleDot size={24} />, color: '#E97627' },
+    { name: 'AWS', icon: <Cloud size={24} />, color: '#FF9900' },
+    { name: 'GCP', icon: <CloudLightning size={24} />, color: '#4285F4' },
+    { name: 'Azure', icon: <CloudFog size={24} />, color: '#0078D4' },
+    { name: 'Docker', icon: <Box size={24} />, color: '#2496ED' },
+    { name: 'Kubernetes', icon: <Container size={24} />, color: '#326CE5' },
+    { name: 'React', icon: <Hexagon size={24} />, color: '#61DAFB' },
+    { name: 'TypeScript', icon: <Code2 size={24} />, color: '#3178C6' },
+    { name: 'Node.js', icon: <Server size={24} />, color: '#339933' },
+    { name: 'FastAPI', icon: <Rocket size={24} />, color: '#017794' },
+    { name: 'Git', icon: <GitBranch size={24} />, color: '#F05032' },
+    { name: 'GitHub', icon: <Github size={24} />, color: '#d4a853' },
+    { name: 'SAP', icon: <Terminal size={24} />, color: '#0FAAFF' },
+    { name: 'n8n', icon: <Workflow size={24} />, color: '#FA6400' },
   ];
 
   return (
@@ -427,12 +427,12 @@ function TechStack() {
             >
               <div className="flex flex-col items-center gap-2 group cursor-pointer">
                 <div 
-                  className={`w-14 h-14 rounded-xl bg-gradient-to-br ${tech.bg} flex items-center justify-center shadow-lg border border-white/5 group-hover:border-white/20 group-hover:scale-110 transition-all duration-300`}
-                  style={{ color: tech.color }}
+                  className="w-14 h-14 rounded-xl bg-gradient-to-br from-cyber-gold/20 to-cyber-gold/5 flex items-center justify-center shadow-lg border border-cyber-gold/20 group-hover:border-cyber-gold/50 group-hover:scale-110 transition-all duration-300"
+                  style={{ color: '#d4a853' }}
                 >
                   {tech.icon}
                 </div>
-                <span className="text-xs font-medium text-muted-foreground group-hover:text-white transition-colors whitespace-nowrap">
+                <span className="text-xs font-medium text-muted-foreground group-hover:text-cyber-gold transition-colors whitespace-nowrap">
                   {tech.name}
                 </span>
               </div>
@@ -446,12 +446,12 @@ function TechStack() {
             >
               <div className="flex flex-col items-center gap-2 group cursor-pointer">
                 <div 
-                  className={`w-14 h-14 rounded-xl bg-gradient-to-br ${tech.bg} flex items-center justify-center shadow-lg border border-white/5 group-hover:border-white/20 group-hover:scale-110 transition-all duration-300`}
-                  style={{ color: tech.color }}
+                  className="w-14 h-14 rounded-xl bg-gradient-to-br from-cyber-gold/20 to-cyber-gold/5 flex items-center justify-center shadow-lg border border-cyber-gold/20 group-hover:border-cyber-gold/50 group-hover:scale-110 transition-all duration-300"
+                  style={{ color: '#d4a853' }}
                 >
                   {tech.icon}
                 </div>
-                <span className="text-xs font-medium text-muted-foreground group-hover:text-white transition-colors whitespace-nowrap">
+                <span className="text-xs font-medium text-muted-foreground group-hover:text-cyber-gold transition-colors whitespace-nowrap">
                   {tech.name}
                 </span>
               </div>
