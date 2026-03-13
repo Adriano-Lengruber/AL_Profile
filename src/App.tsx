@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Routes, Route, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Github, Linkedin, Mail, Phone, MapPin, ExternalLink, Menu, X,
@@ -6,9 +7,11 @@ import {
   User, LogIn, Send, Code2, Database, BarChart3, LayoutDashboard,
   Calculator, Eye, Building2, Cloud, Bot, Zap, Palette, GitBranch,
   BrainCircuit, Wrench, Rocket, Users, Terminal, Cpu, CheckCircle2,
-  ChevronDown, Calendar, FileDown, Award, TrendingUp, Blocks,
-  CheckCheck, Sparkles, Activity,
+  ChevronDown, ChevronLeft, ChevronRight, Calendar, FileDown, Award, TrendingUp, Blocks,
+  CheckCheck, Sparkles, Activity, Instagram, Youtube,
 } from 'lucide-react';
+import useEmblaCarousel from 'embla-carousel-react';
+import BlogPage from './pages/BlogPage';
 
 interface Experience {
   id: number; title: string; company: string; period: string;
@@ -22,6 +25,8 @@ interface BlogPost {
   id: number; title: string; excerpt: string; author: string; date: string;
   readTime: string; likes: number; comments: number; tags: string[];
 }
+
+export { blogPosts };
 interface Skill {
   name: string; level: number; category: 'language' | 'tool' | 'cloud' | 'other';
   icon: React.ReactNode;
@@ -99,6 +104,22 @@ const blogPosts: BlogPost[] = [
   { id: 2, title: 'Automação Inteligente: O Futuro do Trabalho', excerpt: 'Descubra como AI Agents estão revolucionando a forma como trabalhamos e produzimos resultados.', author: 'Adriano Lengruber', date: '08 Jan 2025', readTime: '6 min', likes: 98, comments: 15, tags: ['AI', 'Automação', 'Futuro'] },
   { id: 3, title: 'Dashboards que Contam Histórias', excerpt: 'Técnicas avançadas de visualização de dados para comunicar insights de forma eficaz no Power BI.', author: 'Adriano Lengruber', date: '02 Jan 2025', readTime: '10 min', likes: 187, comments: 31, tags: ['Power BI', 'Visualização', 'DAX'] },
   { id: 4, title: 'Introdução ao Power Platform', excerpt: 'Um guia completo para começar a utilizar Power Apps, Power Automate e Power BI na prática.', author: 'Adriano Lengruber', date: '28 Dez 2024', readTime: '12 min', likes: 156, comments: 28, tags: ['Power Platform', 'Low-Code', 'Microsoft'] },
+];
+
+const education = [
+  { title: 'Pós-graduação Lato Sensu', school: 'Faculdade Líbano', degree: 'Business Intelligence, Big Data e Analytics — Ciência de Dados', period: '2024 - 2025' },
+  { title: 'Bootcamp', school: 'SoulCode', degree: 'Analista de Dados', period: '2023' },
+  { title: 'Bacharel', school: 'Universidade Iguaçu', degree: 'Sistemas de Informação', period: '2004 - 2007' },
+  { title: 'Técnico', school: 'Wall Escola Técnica', degree: 'Tecnologia da Informação', period: '2008 - 2010' },
+];
+
+const certifications = [
+  { name: 'Power BI para Análise de Dados', provider: 'Microsoft', year: '2024' },
+  { name: 'Fundamentos de Python', provider: 'Python Institute', year: '2023' },
+  { name: 'Implementando Banco de Dados', provider: 'Microsoft', year: '2023' },
+  { name: 'Classificação e Tratamento da Informação', provider: 'ESC', year: '2023' },
+  { name: 'Data Science Fundamentals', provider: 'IBM', year: '2023' },
+  { name: 'Machine Learning Specialist', provider: 'Coursera', year: '2024' },
 ];
 
 // ──────────────────────────────────────────────────────────────
@@ -342,7 +363,8 @@ function Services() {
       border: 'hover:border-primary/30',
       title: 'Análise de Dados',
       description: 'Transformo dados brutos em insights acionáveis que guiam decisões estratégicas com precisão.',
-      items: ['ETL & Data Pipelines', 'Análise Estatística', 'Relatórios Executivos'],
+      items: ['ETL & Data Pipelines', 'Análise Estatística', 'Relatórios Executivos', 'Python & SQL', 'Machine Learning', 'Visualização de Dados'],
+      badges: ['Python', 'SQL', 'Pandas'],
     },
     {
       icon: <Bot size={28} />,
@@ -351,7 +373,8 @@ function Services() {
       border: 'hover:border-cyber-emerald/30',
       title: 'AI Agents',
       description: 'Desenvolvimento de agentes de IA autônomos para automatizar tarefas complexas e repetitivas.',
-      items: ['LLM Integration', 'Workflow Automation', 'RAG & Knowledge Bases'],
+      items: ['LLM Integration', 'Workflow Automation', 'RAG & Knowledge Bases', 'LangChain', 'AutoGPT', 'NLP'],
+      badges: ['Python', 'LangChain', 'OpenAI'],
     },
     {
       icon: <LayoutDashboard size={28} />,
@@ -360,7 +383,8 @@ function Services() {
       border: 'hover:border-cyber-steel/30',
       title: 'Business Intelligence',
       description: 'Dashboards interativos e painéis analíticos que revelam o desempenho do negócio em tempo real.',
-      items: ['Power BI & DAX', 'KPIs & Métricas', 'Integração SAP/ERP'],
+      items: ['Power BI & DAX', 'KPIs & Métricas', 'Integração SAP/ERP', 'Looker Studio', 'Tableau', 'Data Warehouse'],
+      badges: ['Power BI', 'DAX', 'SAP'],
     },
     {
       icon: <Zap size={28} />,
@@ -369,7 +393,8 @@ function Services() {
       border: 'hover:border-cyber-gold/30',
       title: 'Automação & RPA',
       description: 'Elimino tarefas manuais com robôs de software, reduzindo erros e aumentando a produtividade.',
-      items: ['Power Automate', 'Web Scraping', 'Scripts Python'],
+      items: ['Power Automate', 'Web Scraping', 'Scripts Python', 'Integração de APIs', 'Automação de Planilhas', 'Bots'],
+      badges: ['Python', 'RPA', 'Selenium'],
     },
     {
       icon: <Code2 size={28} />,
@@ -378,16 +403,18 @@ function Services() {
       border: 'hover:border-cyber-blue/30',
       title: 'Desenvolvimento Full-Stack',
       description: 'Aplicações web modernas, APIs e sistemas personalizados do conceito à produção.',
-      items: ['React & TypeScript', 'APIs REST/FastAPI', 'Deploy & DevOps'],
+      items: ['React & TypeScript', 'APIs REST/FastAPI', 'Deploy & DevOps', 'Node.js', 'PostgreSQL', 'Cloud'],
+      badges: ['React', 'TypeScript', 'FastAPI'],
     },
     {
       icon: <TrendingUp size={28} />,
       color: 'text-cyber-amber',
       bg: 'bg-cyber-amber/10',
       border: 'hover:border-cyber-amber/30',
-      title: 'Marketing Digital',
-      description: 'Estratégias orientadas a dados para crescimento orgânico, anúncios e presença digital.',
-      items: ['SEO & Analytics', 'Gestão de Tráfego', 'Social Media'],
+      title: 'DevOps',
+      description: 'Configuração e disponibilização de VPS 100% funcional de acordo com cada necessidade do cliente.',
+      items: ['VPS & Servidores', 'Docker & Kubernetes', 'CI/CD Pipeline', 'Cloud AWS/GCP/Azure', 'Nginx & Reverse Proxy', 'Monitoramento'],
+      badges: ['Docker', 'AWS', 'Linux'],
     },
   ];
 
@@ -411,7 +438,7 @@ function Services() {
               </div>
               <h3 className="font-heading text-lg font-semibold mb-2">{svc.title}</h3>
               <p className="text-muted-foreground text-sm leading-relaxed mb-4">{svc.description}</p>
-              <ul className="space-y-1.5">
+              <ul className="space-y-1.5 mb-4">
                 {svc.items.map((item) => (
                   <li key={item} className="flex items-center gap-2 text-sm text-muted-foreground">
                     <CheckCheck size={14} className={svc.color} />
@@ -419,6 +446,15 @@ function Services() {
                   </li>
                 ))}
               </ul>
+              {svc.badges && (
+                <div className="flex flex-wrap gap-2 pt-3 border-t border-white/5">
+                  {svc.badges.map((badge) => (
+                    <span key={badge} className={`px-2.5 py-1 rounded-full text-xs font-medium ${svc.bg} ${svc.color}`}>
+                      {badge}
+                    </span>
+                  ))}
+                </div>
+              )}
             </motion.div>
           ))}
         </div>
@@ -452,15 +488,6 @@ function Resume() {
     }
   };
 
-  const education = [
-    { title: 'Pós-graduação Lato Sensu', school: 'Faculdade Líbano', degree: 'Business Intelligence, Big Data e Analytics — Ciência de Dados', period: '2024 - 2025' },
-    { title: 'Bootcamp', school: 'SoulCode', degree: 'Analista de Dados', period: '2023' },
-    { title: 'Bacharel', school: 'Universidade Iguaçu', degree: 'Sistemas de Informação', period: '2004 - 2007' },
-    { title: 'Técnico', school: 'Wall Escola Técnica', degree: 'Tecnologia da Informação', period: '2008 - 2010' },
-  ];
-
-  const certs = ['Power BI para Análise de Dados', 'Fundamentos de Python', 'Implementando Banco de Dados', 'Classificação e Tratamento da Informação'];
-
   return (
     <section id="resume" className="py-24 relative">
       <div className="max-w-7xl mx-auto px-6">
@@ -469,111 +496,206 @@ function Resume() {
           <p className="text-muted-foreground max-w-2xl mx-auto">Uma jornada de aprendizado contínuo e conquistas profissionais</p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid gap-8">
           {/* Experience */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2">
             <h3 className="font-heading text-xl font-semibold mb-6 flex items-center gap-2">
               <Terminal className="text-primary" size={20} /> Experiência Profissional
             </h3>
             <div className="relative">
-              <div className="absolute left-6 top-0 bottom-0 w-px timeline-line" />
-              {experiences.map((exp, index) => (
-                <motion.div key={exp.id} initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }} transition={{ delay: index * 0.08 }} className="relative pl-16 pb-8">
-                  <div className={`absolute left-[18px] top-1 w-4 h-4 rounded-full border-2 border-cyber-black ${exp.current ? 'bg-cyber-emerald shadow-sm shadow-cyber-emerald/50' : 'bg-cyber-gold'}`} />
-                  <div className="glass rounded-xl p-6 cursor-pointer hover:border-primary/25 transition-all duration-300"
-                    onClick={() => setExpandedId(expandedId === exp.id ? null : exp.id)}>
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <h4 className="font-semibold text-lg leading-tight">{exp.title}</h4>
-                        <p className="text-primary text-sm font-medium mt-0.5">{exp.company}</p>
+              {/* Central timeline line */}
+              <div className="absolute left-1/2 top-0 bottom-0 w-px timeline-line -translate-x-1/2 hidden lg:block" />
+              {/* Left side timeline for mobile */}
+              <div className="absolute left-6 top-0 bottom-0 w-px timeline-line lg:hidden" />
+              
+              {experiences.map((exp, index) => {
+                const isFirst = index === 0;
+                const isLeft = index % 2 === 1;
+                const isRight = index % 2 === 0 && !isFirst;
+                
+                return (
+                  <motion.div 
+                    key={exp.id} 
+                    initial={{ opacity: 0, y: 20 }} 
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }} 
+                    transition={{ delay: index * 0.1 }}
+                    className={`relative mb-8 ${isFirst ? 'lg:col-span-2' : ''}`}
+                  >
+                    {/* Central dot for desktop */}
+                    {isFirst && (
+                      <div className="hidden lg:flex absolute left-1/2 top-8 -translate-x-1/2 z-10">
+                        <div className={`w-5 h-5 rounded-full border-3 border-cyber-black ${exp.current ? 'bg-cyber-emerald shadow-lg shadow-cyber-emerald/60' : 'bg-cyber-gold'} ${exp.current ? 'animate-pulse' : ''}`} />
                       </div>
-                      {exp.current && (
-                        <span className="px-2.5 py-1 rounded-full bg-cyber-emerald/15 text-cyber-emerald text-xs font-medium flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-cyber-emerald animate-pulse" /> Atual
-                        </span>
-                      )}
+                    )}
+                    {isLeft && (
+                      <div className="hidden lg:flex absolute left-1/2 top-8 -translate-x-1/2 z-10">
+                        <div className={`w-4 h-4 rounded-full border-2 border-cyber-black ${exp.current ? 'bg-cyber-emerald shadow-sm shadow-cyber-emerald/50' : 'bg-cyber-gold'}`} />
+                      </div>
+                    )}
+                    {isRight && (
+                      <div className="hidden lg:flex absolute left-1/2 top-8 -translate-x-1/2 z-10">
+                        <div className={`w-4 h-4 rounded-full border-2 border-cyber-black ${exp.current ? 'bg-cyber-emerald shadow-sm shadow-cyber-emerald/50' : 'bg-cyber-gold'}`} />
+                      </div>
+                    )}
+                    {/* Mobile dot */}
+                    <div className="lg:hidden absolute left-[18px] top-6">
+                      <div className={`w-4 h-4 rounded-full border-2 border-cyber-black ${exp.current ? 'bg-cyber-emerald shadow-sm shadow-cyber-emerald/50' : 'bg-cyber-gold'}`} />
                     </div>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground mb-3">
-                      <span className="flex items-center gap-1"><Calendar size={12} /> {exp.period}</span>
-                      <span className="flex items-center gap-1"><MapPin size={12} /> {exp.location}</span>
-                    </div>
-                    <p className="text-muted-foreground text-sm leading-relaxed">{exp.description}</p>
-                    <AnimatePresence>
-                      {expandedId === exp.id && (
-                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                          <div className="flex flex-wrap gap-2 pt-4 border-t border-white/10 mt-4">
-                            {exp.skills.map((skill) => (
-                              <span key={skill} className="px-2.5 py-1 rounded-md bg-cyber-slate text-xs text-primary/80 border border-primary/15">{skill}</span>
-                            ))}
+                    
+                    {/* Card */}
+                    <div className={`
+                      ${isFirst 
+                        ? 'lg:w-2/3 lg:mx-auto lg:translate-x-[25%]' 
+                        : isLeft 
+                          ? 'lg:w-[45%] lg:mr-auto lg:pr-8 lg:text-right' 
+                          : 'lg:w-[45%] lg:ml-auto lg:pl-8'
+                      }
+                      lg:py-6 lg:px-8
+                    `}>
+                      <div 
+                        className={`glass rounded-xl p-6 cursor-pointer hover:border-primary/25 transition-all duration-300 ${isFirst ? 'border-primary/30 shadow-lg shadow-primary/10' : ''}`}
+                        onClick={() => setExpandedId(expandedId === exp.id ? null : exp.id)}
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <h4 className="font-semibold text-lg leading-tight">{exp.title}</h4>
+                            <p className="text-primary text-sm font-medium mt-0.5">{exp.company}</p>
                           </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                    <button className="text-primary/70 text-xs flex items-center gap-1 mt-3 hover:text-primary transition-colors">
-                      {expandedId === exp.id ? 'Ver menos' : 'Ver mais'}
-                      <ChevronDown size={13} className={`transition-transform ${expandedId === exp.id ? 'rotate-180' : ''}`} />
-                    </button>
+                          {exp.current && (
+                            <span className="px-2.5 py-1 rounded-full bg-cyber-emerald/15 text-cyber-emerald text-xs font-medium flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-cyber-emerald animate-pulse" /> Atual
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground mb-3">
+                          <span className="flex items-center gap-1"><Calendar size={12} /> {exp.period}</span>
+                          <span className="flex items-center gap-1"><MapPin size={12} /> {exp.location}</span>
+                        </div>
+                        <p className="text-muted-foreground text-sm leading-relaxed">{exp.description}</p>
+                        <AnimatePresence>
+                          {expandedId === exp.id && (
+                            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                              <div className="flex flex-wrap gap-2 pt-4 border-t border-white/10 mt-4">
+                                {exp.skills.map((skill) => (
+                                  <span key={skill} className="px-2.5 py-1 rounded-md bg-cyber-slate text-xs text-primary/80 border border-primary/15">{skill}</span>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                        <button className="text-primary/70 text-xs flex items-center gap-1 mt-3 hover:text-primary transition-colors">
+                          {expandedId === exp.id ? 'Ver menos' : 'Ver mais'}
+                          <ChevronDown size={13} className={`transition-transform ${expandedId === exp.id ? 'rotate-180' : ''}`} />
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// Education - Seção Independente
+// ──────────────────────────────────────────────────────────────
+function Education() {
+  return (
+    <section id="education" className="py-24 relative">
+      <div className="max-w-7xl mx-auto px-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
+          <h2 className="font-heading text-4xl font-bold mb-4">Formação <span className="text-gradient">Acadêmica</span></h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto">Minha jornada educacional construindo a base do conhecimento</p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          {education.map((edu, index) => (
+            <motion.div 
+              key={edu.school} 
+              initial={{ opacity: 0, y: 20 }} 
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }} 
+              transition={{ delay: index * 0.1 }}
+              className={`glass rounded-xl p-6 hover:border-primary/25 transition-all duration-300 ${index === 0 ? 'border-primary/30 md:col-span-2' : ''}`}
+            >
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <p className="text-xs text-primary font-medium mb-1">{edu.title}</p>
+                  <h4 className="font-semibold text-lg">{edu.school}</h4>
+                </div>
+                <span className="px-3 py-1 rounded-full bg-cyber-slate/50 text-xs text-muted-foreground">
+                  {edu.period}
+                </span>
+              </div>
+              <p className="text-muted-foreground">{edu.degree}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// Certifications - Carrossel
+// ──────────────────────────────────────────────────────────────
+function Certifications() {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' });
+
+  return (
+    <section id="certifications" className="py-24 relative">
+      <div className="max-w-7xl mx-auto px-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
+          <h2 className="font-heading text-4xl font-bold mb-4">Certificações <span className="text-gradient">Profissionais</span></h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto">Credenciais que validam meu conhecimento e competências</p>
+        </motion.div>
+
+        <div className="relative">
+          <button 
+            onClick={() => emblaApi?.scrollPrev()}
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-12 h-12 rounded-full glass flex items-center justify-center hover:bg-primary/15 hover:border-primary/25 transition-all hidden md:flex"
+          >
+            <ChevronLeft size={20} />
+          </button>
+          
+          <div className="overflow-hidden" ref={emblaRef}>
+            <div className="flex gap-4">
+              {certifications.map((cert, index) => (
+                <motion.div 
+                  key={cert.name}
+                  initial={{ opacity: 0, scale: 0.95 }} 
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }} 
+                  transition={{ delay: index * 0.05 }}
+                  className="flex-shrink-0 w-72"
+                >
+                  <div className="glass rounded-xl p-6 hover:border-primary/25 transition-all duration-300 h-full">
+                    <div className="w-12 h-12 rounded-xl bg-cyber-gold/10 flex items-center justify-center mb-4">
+                      <Award className="text-cyber-gold" size={24} />
+                    </div>
+                    <h4 className="font-semibold mb-2 line-clamp-2">{cert.name}</h4>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>{cert.provider}</span>
+                      <span className="px-2 py-0.5 rounded-full bg-cyber-slate/50">{cert.year}</span>
+                    </div>
                   </div>
                 </motion.div>
               ))}
             </div>
           </div>
 
-          {/* Skills + Education + Certs */}
-          <div className="space-y-6">
-            <h3 className="font-heading text-xl font-semibold mb-6 flex items-center gap-2">
-              <Cpu className="text-primary" size={20} /> Habilidades Técnicas
-            </h3>
-            <div className="space-y-3">
-              {skills.map((skill, index) => (
-                <motion.div key={skill.name} initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }} transition={{ delay: index * 0.04 }} className="glass rounded-xl p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="flex items-center gap-2 text-sm font-medium">
-                      <span className={`p-1 rounded ${getCategoryColor(skill.category)}`}>{skill.icon}</span>
-                      {skill.name}
-                    </span>
-                    <span className="text-xs text-muted-foreground">{skill.level}%</span>
-                  </div>
-                  <div className="h-1.5 bg-cyber-slate/80 rounded-full overflow-hidden">
-                    <motion.div initial={{ width: 0 }} whileInView={{ width: `${skill.level}%` }}
-                      viewport={{ once: true }} transition={{ duration: 1, delay: index * 0.04 }}
-                      className={`h-full rounded-full ${getBarColor(skill.category)}`} />
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            <h3 className="font-heading text-xl font-semibold mt-8 mb-4 flex items-center gap-2">
-              <BookOpen className="text-primary" size={20} /> Formação Acadêmica
-            </h3>
-            <div className="space-y-3">
-              {education.map((edu, index) => (
-                <motion.div key={edu.school} initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }} transition={{ delay: index * 0.1 }} className="glass rounded-xl p-4">
-                  <p className="text-xs text-muted-foreground mb-0.5">{edu.title}</p>
-                  <h4 className="font-semibold text-sm">{edu.school}</h4>
-                  <p className="text-xs text-primary/80 mt-0.5">{edu.degree}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{edu.period}</p>
-                </motion.div>
-              ))}
-            </div>
-
-            <h3 className="font-heading text-xl font-semibold mt-8 mb-4 flex items-center gap-2">
-              <CheckCircle2 className="text-primary" size={20} /> Certificações
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {certs.map((cert, index) => (
-                <motion.span key={cert} initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }} transition={{ delay: index * 0.05 }}
-                  className="px-3 py-2 rounded-lg glass text-xs text-muted-foreground hover:text-primary/80 transition-colors">
-                  {cert}
-                </motion.span>
-              ))}
-            </div>
-          </div>
+          <button 
+            onClick={() => emblaApi?.scrollNext()}
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-12 h-12 rounded-full glass flex items-center justify-center hover:bg-primary/15 hover:border-primary/25 transition-all hidden md:flex"
+          >
+            <ChevronRight size={20} />
+          </button>
         </div>
       </div>
     </section>
@@ -584,6 +706,61 @@ function Resume() {
 // Projects
 // ──────────────────────────────────────────────────────────────
 function Projects() {
+  const [repos, setRepos] = useState<Repository[]>([]);
+  const [loading, setLoading] = useState(true);
+  const GITHUB_USERNAME = 'Adriano-Lengruber';
+
+  useEffect(() => {
+    fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=updated&per_page=9`)
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const mapped = data.map((repo: any) => ({
+            id: repo.id,
+            name: repo.name,
+            description: repo.description || 'Sem descrição',
+            language: repo.language || 'Code',
+            languageColor: getLanguageColor(repo.language),
+            stars: repo.stargazers_count,
+            forks: repo.forks_count,
+            url: repo.html_url,
+            topics: repo.topics || [],
+          }));
+          setRepos(mapped);
+        } else {
+          setRepos(repositories);
+        }
+        setLoading(false);
+      })
+      .catch(() => {
+        setRepos(repositories);
+        setLoading(false);
+      });
+  }, []);
+
+  function getLanguageColor(lang: string | null): string {
+    const colors: Record<string, string> = {
+      JavaScript: '#f1e05a',
+      TypeScript: '#3178c6',
+      Python: '#3572A5',
+      HTML: '#e34c26',
+      CSS: '#563d7c',
+      Java: '#b07219',
+      Go: '#00ADD8',
+      Rust: '#dea584',
+      'C++': '#f34b7d',
+      C: '#555555',
+      Ruby: '#701516',
+      PHP: '#4F5D95',
+      Swift: '#F05138',
+      Kotlin: '#A97BFF',
+      Shell: '#89e051',
+    };
+    return colors[lang || ''] || '#8b949e';
+  }
+
+  const displayRepos = repos.length > 0 ? repos : repositories;
+
   return (
     <section id="projects" className="py-24 relative">
       <div className="max-w-7xl mx-auto px-6">
@@ -593,34 +770,45 @@ function Projects() {
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {repositories.map((repo, index) => (
-            <motion.a key={repo.id} href={repo.url} target="_blank" rel="noopener noreferrer"
-              initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-              transition={{ delay: index * 0.08 }}
-              className="glass rounded-xl p-6 hover:border-primary/25 transition-all duration-300 group flex flex-col">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <GitBranch size={16} className="text-primary/60" />
-                  <h3 className="font-semibold group-hover:text-primary transition-colors text-sm">{repo.name}</h3>
+          {loading ? (
+            <div className="col-span-full flex items-center justify-center py-12">
+              <div className="flex items-center gap-3 text-muted-foreground">
+                <Activity className="animate-spin" size={20} />
+                Carregando repositórios...
+              </div>
+            </div>
+          ) : (
+            <>
+            {displayRepos.slice(0, 6).map((repo, index) => (
+              <motion.a key={repo.id} href={repo.url} target="_blank" rel="noopener noreferrer"
+                initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+                transition={{ delay: index * 0.08 }}
+                className="glass rounded-xl p-6 hover:border-primary/25 transition-all duration-300 group flex flex-col">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <GitBranch size={16} className="text-primary/60" />
+                    <h3 className="font-semibold group-hover:text-primary transition-colors text-sm">{repo.name}</h3>
+                  </div>
+                  <ExternalLink size={15} className="text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
                 </div>
-                <ExternalLink size={15} className="text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
-              </div>
-              <p className="text-muted-foreground text-sm mb-4 flex-1 leading-relaxed">{repo.description}</p>
-              <div className="flex items-center gap-4 mb-3 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: repo.languageColor }} />
-                  {repo.language}
-                </span>
-                <span className="flex items-center gap-1"><Star size={12} /> {repo.stars}</span>
-                <span className="flex items-center gap-1"><GitFork size={12} /> {repo.forks}</span>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {repo.topics.map((topic) => (
-                  <span key={topic} className="px-2 py-0.5 rounded text-xs bg-primary/8 text-primary/70 border border-primary/12">{topic}</span>
-                ))}
-              </div>
-            </motion.a>
-          ))}
+                <p className="text-muted-foreground text-sm mb-4 flex-1 leading-relaxed">{repo.description}</p>
+                <div className="flex items-center gap-4 mb-3 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: repo.languageColor }} />
+                    {repo.language}
+                  </span>
+                  <span className="flex items-center gap-1"><Star size={12} /> {repo.stars}</span>
+                  <span className="flex items-center gap-1"><GitFork size={12} /> {repo.forks}</span>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {repo.topics.map((topic) => (
+                    <span key={topic} className="px-2 py-0.5 rounded text-xs bg-primary/8 text-primary/70 border border-primary/12">{topic}</span>
+                  ))}
+                </div>
+              </motion.a>
+            ))}
+            </>
+          )}
         </div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mt-12">
@@ -646,6 +834,7 @@ const blogPatterns = [
 
 function Blog() {
   const [likedPosts, setLikedPosts] = useState<number[]>([]);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const handleLike = (id: number) => setLikedPosts((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
 
   return (
@@ -714,21 +903,54 @@ function Blog() {
             Crie uma conta para comentar, curtir artigos e contribuir com a comunidade de dados e IA.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
-            <button className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-all">
+            <button onClick={() => setShowAuthModal(true)} className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-all">
               <LogIn size={17} /> Cadastrar-se
             </button>
-            <button className="inline-flex items-center gap-2 px-6 py-3 glass rounded-lg font-semibold hover:border-primary/30 transition-all">
-              Já tenho conta
-            </button>
+            <Link to="/blog" className="inline-flex items-center gap-2 px-6 py-3 glass rounded-lg font-semibold hover:border-primary/30 transition-all">
+              Ver todos os posts <ArrowRight size={17} />
+            </Link>
           </div>
         </motion.div>
+
+        {/* Auth Modal */}
+        {showAuthModal && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowAuthModal(false)}
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }} 
+              animate={{ scale: 1, opacity: 1 }}
+              className="glass rounded-2xl p-8 max-w-md w-full"
+              onClick={e => e.stopPropagation()}
+            >
+              <h2 className="font-heading text-2xl font-bold mb-6 text-center">
+                Junte-se à Comunidade
+              </h2>
+              <p className="text-muted-foreground text-center mb-6">
+                Entre com sua conta para curtir, comentar e compartilhar posts.
+              </p>
+              <div className="space-y-3">
+                <button className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors">
+                  <LogIn size={18} />
+                  Entrar com Email
+                </button>
+              </div>
+              <p className="text-center text-sm text-muted-foreground mt-6">
+                Não tem conta?{' '}
+                <button className="text-primary hover:underline">
+                  Criar conta
+                </button>
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
       </div>
     </section>
   );
 }
-
-// ──────────────────────────────────────────────────────────────
-// Contact
 // ──────────────────────────────────────────────────────────────
 function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
@@ -772,7 +994,8 @@ function Contact() {
                 {[
                   { href: 'https://github.com/Adriano-Lengruber', icon: <Github size={19} />, label: 'GitHub' },
                   { href: 'https://linkedin.com/in/adriano-lengruber', icon: <Linkedin size={19} />, label: 'LinkedIn' },
-                  { href: 'https://instagram.com/supertech_solucoes_tecnologia', icon: <span className="text-xs font-bold">IG</span>, label: 'Instagram' },
+                  { href: 'https://instagram.com/supertech_solucoes_tecnologia', icon: <Instagram size={19} />, label: 'Instagram' },
+                  { href: 'https://wa.me/5522999999999', icon: <MessageCircle size={19} />, label: 'WhatsApp' },
                 ].map(({ href, icon, label }) => (
                   <a key={label} href={href} target="_blank" rel="noopener noreferrer"
                     className="w-11 h-11 glass rounded-xl flex items-center justify-center hover:bg-primary/15 hover:border-primary/25 hover:text-primary transition-all duration-200 text-muted-foreground">
@@ -783,7 +1006,7 @@ function Contact() {
             </div>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="glass rounded-xl p-8">
+          <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="glass rounded-xl p-8 space-y-6">
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid md:grid-cols-2 gap-5">
                 {[{ id: 'name', label: 'Nome', type: 'text', placeholder: 'Seu nome' },
@@ -825,6 +1048,24 @@ function Contact() {
                 </button>
               )}
             </form>
+            
+            {/* Redes Sociais alinhadas à direita */}
+            <div className="pt-4 border-t border-white/6">
+              <h3 className="font-semibold text-sm mb-4">Redes Sociais</h3>
+              <div className="flex gap-3">
+                {[
+                  { href: 'https://github.com/Adriano-Lengruber', icon: <Github size={19} />, label: 'GitHub' },
+                  { href: 'https://linkedin.com/in/adriano-lengruber', icon: <Linkedin size={19} />, label: 'LinkedIn' },
+                  { href: 'https://instagram.com/supertech_solucoes_tecnologia', icon: <Instagram size={19} />, label: 'Instagram' },
+                  { href: 'https://wa.me/5522999999999', icon: <MessageCircle size={19} />, label: 'WhatsApp' },
+                ].map(({ href, icon, label }) => (
+                  <a key={label} href={href} target="_blank" rel="noopener noreferrer"
+                    className="w-11 h-11 glass rounded-xl flex items-center justify-center hover:bg-primary/15 hover:border-primary/25 hover:text-primary transition-all duration-200 text-muted-foreground">
+                    {icon}
+                  </a>
+                ))}
+              </div>
+            </div>
           </motion.div>
         </div>
       </div>
@@ -863,16 +1104,23 @@ function Footer() {
 // ──────────────────────────────────────────────────────────────
 export default function App() {
   return (
-    <div className="min-h-screen bg-cyber-black">
-      <Navigation />
-      <Hero />
-      <About />
-      <Services />
-      <Resume />
-      <Projects />
-      <Blog />
-      <Contact />
-      <Footer />
-    </div>
+    <Routes>
+      <Route path="/" element={
+        <div className="min-h-screen bg-cyber-black">
+          <Navigation />
+          <Hero />
+          <About />
+          <Services />
+          <Resume />
+          <Education />
+          <Certifications />
+          <Projects />
+          <Blog />
+          <Contact />
+          <Footer />
+        </div>
+      } />
+      <Route path="/blog" element={<BlogPage />} />
+    </Routes>
   );
 }
