@@ -99,10 +99,10 @@ const blogPosts: BlogPost[] = [
 ];
 
 const education = [
-  { title: 'Pós-graduação Lato Sensu', school: 'Faculdade Líbano', degree: 'Business Intelligence, Big Data e Analytics — Ciência de Dados', period: '2024 - 2025', description: 'Formação avançada em técnicas de Business Intelligence,big data e analytics com foco em ciência de dados. Aprendizado em machine learning, visualização de dados e ferramentas como Python, R e Power BI.' },
-  { title: 'Bootcamp', school: 'SoulCode', degree: 'Analista de Dados', period: '2023', description: 'Bootcamp intensivo focado em análise de dados, SQL, Python, visualização de dados e business intelligence. Projetos práticos com ferramentas reais do mercado.' },
-  { title: 'Bacharel', school: 'Universidade Iguaçu', degree: 'Sistemas de Informação', period: '2004 - 2007', description: 'Graduação em Sistemas de Informação com foco em desenvolvimento de software, banco de dados, análise de sistemas e gestão de tecnologia da informação.' },
-  { title: 'Técnico', school: 'Wall Escola Técnica', degree: 'Técnico em Mecatrônica', period: '2008 - 2010', description: 'Curso técnico focado em mecânica, eletrônica e informática industrial. Programação de controladores lógicos programmáveis (CLP), manutenção de sistemas automatizados e robótica.' },
+  { title: 'Pós-graduação Lato Sensu', school: 'Faculdade Líbano', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7e/Itaú_Unibanco_Logo.svg', degree: 'Business Intelligence, Big Data e Analytics — Ciência de Dados', period: '2024 - 2025', description: 'Formação avançada em técnicas de Business Intelligence,big data e analytics com foco em ciência de dados. Aprendizado em machine learning, visualização de dados e ferramentas como Python, R e Power BI.' },
+  { title: 'Bootcamp', school: 'SoulCode', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg', degree: 'Analista de Dados', period: '2023', description: 'Bootcamp intensivo focado em análise de dados, SQL, Python, visualização de dados e business intelligence. Projetos práticos com ferramentas reais do mercado.' },
+  { title: 'Bacharel', school: 'Universidade Iguaçu', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7e/Itaú_Unibanco_Logo.svg', degree: 'Sistemas de Informação', period: '2004 - 2007', description: 'Graduação em Sistemas de Informação com foco em desenvolvimento de software, banco de dados, análise de sistemas e gestão de tecnologia da informação.' },
+  { title: 'Técnico', school: 'Wall Escola Técnica', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7e/Itaú_Unibanco_Logo.svg', degree: 'Técnico em Mecatrônica', period: '2008 - 2010', description: 'Curso técnico focado em mecânica, eletrônica e informática industrial. Programação de controladores lógicos programmáveis (CLP), manutenção de sistemas automatizados e robótica.' },
 ];
 
 const certifications = [
@@ -653,14 +653,14 @@ function Resume() {
                 className={`relative mb-8 last:mb-0`}
               >
                 {/* Timeline dot - all gold, properly positioned */}
-                <div className={`absolute left-[-18px] md:left-1/2 top-6 md:-translate-x-1/2 z-10 ${isFirst ? 'w-5 h-5' : 'w-4 h-4'}`}>
+                <div className={`absolute left-[-18px] md:left-1/2 top-6 md:-translate-x-1/2 z-10 w-4 h-4`}>
                   <div className={`w-full h-full rounded-full border-2 border-cyber-black bg-cyber-gold ${exp.current ? 'shadow-lg shadow-cyber-gold/50 animate-pulse' : ''}`} />
                 </div>
                 
                 {/* Card */}
                 <div className={`
                   glass rounded-xl p-6 hover:border-primary/25 transition-all duration-300 cursor-pointer
-                  ${exp.current ? 'md:w-2/3 md:mx-auto md:col-span-2' : isLeft ? 'md:w-[45%] md:mr-auto md:pr-8 md:text-right' : 'md:w-[45%] md:ml-auto md:pl-8'}
+                  ${isLeft ? 'md:w-[45%] md:mr-auto md:pr-8 md:text-right' : 'md:w-[45%] md:ml-auto md:pl-8'}
                 `} onClick={() => setExpandedId(expandedId === exp.id ? null : exp.id)}>
                   <div className="flex items-start justify-between mb-3">
                     <div>
@@ -726,8 +726,12 @@ function Education() {
               className="glass rounded-xl p-6 hover:border-primary/25 transition-all duration-300"
             >
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-xl bg-cyber-gold/10 flex items-center justify-center flex-shrink-0">
-                  <BookOpen className="text-cyber-gold" size={24} />
+                <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                  {edu.logo ? (
+                    <img src={edu.logo} alt={edu.school} className="w-8 h-8 object-contain" />
+                  ) : (
+                    <BookOpen className="text-cyber-gold" size={24} />
+                  )}
                 </div>
                 <div className="flex-1">
                   <div className="flex items-start justify-between mb-2">
@@ -982,7 +986,7 @@ function Blog() {
                 <motion.article key={post._id || post.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }} transition={{ delay: index * 0.1 }}
                   className="glass rounded-xl overflow-hidden hover:border-primary/25 transition-all duration-300 group flex flex-col cursor-pointer"
-                  onClick={() => window.location.href = '/blog'}>
+                  onClick={() => window.location.href = `/blog?id=${post._id}`}>
                   <div className={`h-44 bg-gradient-to-br ${pat.from} ${pat.to} relative overflow-hidden blog-pattern`}>
                     {post.imageUrl ? (
                       <img 
