@@ -52,19 +52,7 @@ const experiences: Experience[] = [
     skills: ['SAP BW', 'Power BI', 'DAX', 'PowerApps', 'Power Automate', 'ETL'],
   },
   {
-    id: 4, title: 'Analista de Dados', company: 'HCB Consultoria Empresarial',
-    period: 'Abr 2021 - Ago 2021', location: 'Macaé, RJ',
-    description: 'Manutenção nos dashboards, reestilização, reestruturação das ETLs, Medidas, KPIs. Utilização do sistema SAP Petrobrás para obtenção de Querys. Análises de dados.',
-    skills: ['Power BI', 'Spotfire', 'SAP', 'VBA', 'SQL', 'JavaScript', 'C#'],
-  },
-  {
-    id: 5, title: 'Analista de Suporte', company: 'PLANSUL Planejamento e Consultoria',
-    period: 'Out 2020 - Dez 2020', location: 'Itaperuna, RJ',
-    description: 'Manutenção das urnas eletrônicas de votação. Limpeza, reinstalação de software, formatação, substituição de peças, testes, distribuição.',
-    skills: ['Suporte Técnico', 'Hardware', 'Manutenção'],
-  },
-  {
-    id: 6, title: 'Gerente Operacional', company: 'BIF BEEF - BCG IND. E COM.',
+    id: 4, title: 'Gerente Operacional', company: 'BIF BEEF - BCG IND. E COM.',
     period: 'Abr 2014 - Set 2016', location: 'Itaperuna, RJ',
     description: 'Retorno financeiro e baixa nas duplicatas. Importação de pedidos para sistema ERP. Logística de entrega e faturamento (NFe). Gestão de rede interna e equipamentos.',
     skills: ['Gestão', 'ERP', 'Logística', 'Financeiro', 'Gestão de Equipes'],
@@ -107,10 +95,10 @@ const blogPosts: BlogPost[] = [
 ];
 
 const education = [
-  { title: 'Pós-graduação Lato Sensu', school: 'Faculdade Líbano', degree: 'Business Intelligence, Big Data e Analytics — Ciência de Dados', period: '2024 - 2025' },
-  { title: 'Bootcamp', school: 'SoulCode', degree: 'Analista de Dados', period: '2023' },
-  { title: 'Bacharel', school: 'Universidade Iguaçu', degree: 'Sistemas de Informação', period: '2004 - 2007' },
-  { title: 'Técnico', school: 'Wall Escola Técnica', degree: 'Tecnologia da Informação', period: '2008 - 2010' },
+  { title: 'Pós-graduação Lato Sensu', school: 'Faculdade Líbano', degree: 'Business Intelligence, Big Data e Analytics — Ciência de Dados', period: '2024 - 2025', description: 'Formação avançada em técnicas de Business Intelligence,big data e analytics com foco em ciência de dados. Aprendizado em machine learning, visualização de dados e ferramentas como Python, R e Power BI.' },
+  { title: 'Bootcamp', school: 'SoulCode', degree: 'Analista de Dados', period: '2023', description: 'Bootcamp intensivo focado em análise de dados, SQL, Python, visualização de dados e business intelligence. Projetos práticos com ferramentas reais do mercado.' },
+  { title: 'Bacharel', school: 'Universidade Iguaçu', degree: 'Sistemas de Informação', period: '2004 - 2007', description: 'Graduação em Sistemas de Informação com foco em desenvolvimento de software, banco de dados, análise de sistemas e gestão de tecnologia da informação.' },
+  { title: 'Técnico', school: 'Wall Escola Técnica', degree: 'Técnico em Mecatrônica', period: '2008 - 2010', description: 'Curso técnico focado em mecânica, eletrônica e informática industrial. Programação de controladores lógicos programmáveis (CLP), manutenção de sistemas automatizados e robótica.' },
 ];
 
 const certifications = [
@@ -141,7 +129,7 @@ function Navigation() {
     { name: 'Serviços', href: '#services' },
     { name: 'Currículo', href: '#resume' },
     { name: 'Projetos', href: '#projects' },
-    { name: 'Blog', href: '#blog' },
+    { name: 'Blog', href: '/blog' },
     { name: 'Contato', href: '#contact' },
   ];
 
@@ -153,12 +141,17 @@ function Navigation() {
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         <a href="#home" className="font-heading text-xl font-bold text-gradient">AL</a>
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center justify-center gap-8 flex-1">
           {navItems.map((item) => (
             <a key={item.name} href={item.href} className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200 tracking-wide">
               {item.name}
             </a>
           ))}
+        </div>
+        <div className="hidden md:flex">
+          <Link to="/blog" className="inline-flex items-center gap-2 px-5 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors duration-200">
+            Blog
+          </Link>
         </div>
         <button onClick={() => setIsOpen(!isOpen)} className="md:hidden text-foreground">
           {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -299,12 +292,30 @@ function Hero() {
 function About() {
   const yearsExp = new Date().getFullYear() - 2014;
   const stats = [
-    { icon: <Calendar size={22} className="text-primary" />, label: 'Anos de Exp.', value: `${yearsExp}+` },
-    { icon: <Wrench size={22} className="text-cyber-steel" />, label: 'Ferramentas', value: '15+' },
+    { icon: <Calendar size={22} className="text-cyber-emerald" />, label: 'Anos de Exp.', value: `${yearsExp}+` },
+    { icon: <Wrench size={22} className="text-cyber-emerald" />, label: 'Ferramentas', value: '15+' },
     { icon: <Rocket size={22} className="text-cyber-emerald" />, label: 'Projetos', value: '50+' },
-    { icon: <Users size={22} className="text-primary" />, label: 'Clientes', value: '20+' },
+    { icon: <Users size={22} className="text-cyber-emerald" />, label: 'Clientes', value: '20+' },
   ];
 
+  // Tech stack logos for carousel
+  const techStack = [
+    { icon: <Code2 size={28} />, name: 'Python' },
+    { icon: <Database size={28} />, name: 'SQL' },
+    { icon: <BarChart3 size={28} />, name: 'Power BI' },
+    { icon: <LayoutDashboard size={28} />, name: 'DAX' },
+    { icon: <Bot size={28} />, name: 'AI Agents' },
+    { icon: <BrainCircuit size={28} />, name: 'ML' },
+    { icon: <Zap size={28} />, name: 'RPA' },
+    { icon: <Cloud size={28} />, name: 'Cloud' },
+    { icon: <GitBranch size={28} />, name: 'Git' },
+    { icon: <Building2 size={28} />, name: 'SAP' },
+    { icon: <Cpu size={28} />, name: 'ETL' },
+    { icon: <Terminal size={28} />, name: 'Docker' },
+  ];
+
+  // Duplicate for seamless infinite scroll
+  const techStackDoubled = [...techStack, ...techStack, ...techStack];
 
   return (
     <section id="about" className="py-24 relative">
@@ -316,7 +327,7 @@ function About() {
 
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="space-y-5">
-            <h3 className="font-heading text-2xl font-semibold">Transformando Complexidade em Simplicidade</h3>
+            <h3 className="font-heading text-2xl font-semibold"><span className="text-cyber-gold">Transformando</span> Complexidade em <span className="text-cyber-gold">Simplicidade</span></h3>
             <p className="text-muted-foreground leading-relaxed">
               Sou cientista de dados em especialização nas áreas de automação e inteligência artificial, com o propósito de transformar processos complexos em soluções inteligentes, eficientes e acessíveis.
             </p>
@@ -326,27 +337,93 @@ function About() {
             <p className="text-muted-foreground leading-relaxed">
               Atualmente, estou focado em automações inteligentes e aplicações de IA voltadas à otimização de processos, ganho de produtividade e suporte à tomada de decisão.
             </p>
-            <div className="flex flex-wrap gap-2 pt-2">
-              {['Python', 'Machine Learning', 'Power BI', 'AI Agents', 'Automação'].map((tag) => (
-                <span key={tag} className="px-3 py-1 rounded-full glass text-sm text-primary/80 border-primary/20">
-                  {tag}
-                </span>
-              ))}
-            </div>
           </motion.div>
 
-           <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="grid grid-cols-2 md:grid-cols-4 gap-4">
+           <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="grid grid-cols-2 gap-4">
              {stats.map((stat, index) => (
                <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-                 transition={{ delay: index * 0.1 }} className="glass rounded-xl p-5 text-center hover:border-primary/20 transition-all duration-300 min-h-[140px]">
-                 <div className="flex justify-center mb-2">{stat.icon}</div>
-                 <div className="text-2xl md:text-3xl font-bold text-gradient mb-1">{stat.value}</div>
-                 <div className="text-xs md:text-sm text-muted-foreground leading-tight">{stat.label}</div>
+                 transition={{ delay: index * 0.1 }} className="glass rounded-xl p-6 text-left hover:border-primary/20 transition-all duration-300 min-h-[160px] flex flex-col justify-center">
+                 <div className="flex justify-center mb-3">{stat.icon}</div>
+                 <div className="text-3xl md:text-4xl font-bold text-gradient mb-1">{stat.value}</div>
+                 <div className="text-sm text-muted-foreground">{stat.label}</div>
                </motion.div>
              ))}
            </motion.div>
         </div>
       </div>
+    </section>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// Tech Stack - Carrossel Automático
+// ──────────────────────────────────────────────────────────────
+function TechStack() {
+  const techStack = [
+    { icon: <Code2 size={32} />, name: 'Python' },
+    { icon: <Database size={32} />, name: 'SQL' },
+    { icon: <BarChart3 size={32} />, name: 'Power BI' },
+    { icon: <LayoutDashboard size={32} />, name: 'DAX' },
+    { icon: <Bot size={32} />, name: 'AI Agents' },
+    { icon: <BrainCircuit size={32} />, name: 'ML' },
+    { icon: <Zap size={32} />, name: 'RPA' },
+    { icon: <Cloud size={32} />, name: 'Cloud' },
+    { icon: <GitBranch size={32} />, name: 'Git' },
+    { icon: <Building2 size={32} />, name: 'SAP' },
+    { icon: <Cpu size={32} />, name: 'ETL' },
+    { icon: <Terminal size={32} />, name: 'Docker' },
+  ];
+
+  // Duplicate for seamless infinite scroll
+  const techStackDoubled = [...techStack, ...techStack, ...techStack];
+
+  return (
+    <section className="py-16 relative overflow-hidden bg-cyber-black">
+      <div className="max-w-7xl mx-auto px-6 mb-8">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center">
+          <h2 className="font-heading text-3xl font-bold mb-2">Tech <span className="text-gradient">Stack</span></h2>
+          <p className="text-muted-foreground text-sm">Tecnologias que domino</p>
+        </motion.div>
+      </div>
+
+      <div className="relative">
+        {/* Gradient masks for smooth edges */}
+        <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-cyber-black to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-cyber-black to-transparent z-10 pointer-events-none" />
+
+        {/* Infinite scrolling carousel */}
+        <div className="flex gap-8 animate-infinite-scroll">
+          {techStackDoubled.map((tech, index) => (
+            <motion.div
+              key={`${tech.name}-${index}`}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: (index % 12) * 0.05 }}
+              className="flex flex-col items-center gap-2 min-w-[80px] cursor-pointer group"
+            >
+              <div className="w-16 h-16 rounded-xl bg-cyber-gold/10 flex items-center justify-center text-cyber-gold group-hover:bg-cyber-gold/20 group-hover:scale-110 transition-all duration-300">
+                {tech.icon}
+              </div>
+              <span className="text-xs text-muted-foreground group-hover:text-cyber-gold transition-colors">{tech.name}</span>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* CSS animation */}
+      <style>{`
+        @keyframes infinite-scroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-33.33%); }
+        }
+        .animate-infinite-scroll {
+          animation: infinite-scroll 30s linear infinite;
+        }
+        .animate-infinite-scroll:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
     </section>
   );
 }
@@ -492,18 +569,18 @@ function Resume() {
     <section id="resume" className="py-24 relative">
       <div className="max-w-7xl mx-auto px-6">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
-          <h2 className="font-heading text-4xl font-bold mb-4">Currículo <span className="text-gradient">Profissional</span></h2>
+          <h2 className="font-heading text-4xl font-bold mb-4">Experiência <span className="text-gradient">Profissional</span></h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">Uma jornada de aprendizado contínuo e conquistas profissionais</p>
         </motion.div>
 
         {/* Experience - Timeline Simplificada para Mobile First */}
         <div className="relative pl-8 md:pl-0">
-          {/* Timeline line - left side on mobile, center on desktop */}
-          <div className="absolute left-[18px] md:left-1/2 top-0 bottom-0 w-px timeline-line md:-translate-x-1/2" />
+          {/* Timeline line - left side on mobile, center on desktop - all gold */}
+          <div className="absolute left-[18px] md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-cyber-gold via-cyber-gold to-cyber-gold md:-translate-x-1/2" />
           
           {experiences.map((exp, index) => {
             const isFirst = index === 0;
-            const isLeft = index % 2 === 1;
+            const isLeft = index % 2 === 0;
             
             return (
               <motion.div 
@@ -512,17 +589,17 @@ function Resume() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }} 
                 transition={{ delay: index * 0.1 }}
-                className={`relative mb-8 last:mb-0 ${isFirst ? 'md:col-span-2' : ''}`}
+                className={`relative mb-8 last:mb-0`}
               >
-                {/* Timeline dot */}
+                {/* Timeline dot - all gold, properly positioned */}
                 <div className={`absolute left-[-18px] md:left-1/2 top-6 md:-translate-x-1/2 z-10 ${isFirst ? 'w-5 h-5' : 'w-4 h-4'}`}>
-                  <div className={`w-full h-full rounded-full border-2 border-cyber-black ${exp.current ? 'bg-cyber-emerald shadow-lg shadow-cyber-emerald/50' : 'bg-cyber-gold'} ${exp.current ? 'animate-pulse' : ''}`} />
+                  <div className={`w-full h-full rounded-full border-2 border-cyber-black bg-cyber-gold ${exp.current ? 'shadow-lg shadow-cyber-gold/50 animate-pulse' : ''}`} />
                 </div>
                 
                 {/* Card */}
                 <div className={`
                   glass rounded-xl p-6 hover:border-primary/25 transition-all duration-300 cursor-pointer
-                  ${isFirst ? 'md:w-2/3 md:mx-auto md:translate-x-[25%]' : isLeft ? 'md:w-[45%] md:mr-auto md:pr-8 md:text-right' : 'md:w-[45%] md:ml-auto md:pl-8'}
+                  ${exp.current ? 'md:w-2/3 md:mx-auto md:col-span-2' : isLeft ? 'md:w-[45%] md:mr-auto md:pr-8 md:text-right' : 'md:w-[45%] md:ml-auto md:pl-8'}
                 `} onClick={() => setExpandedId(expandedId === exp.id ? null : exp.id)}>
                   <div className="flex items-start justify-between mb-3">
                     <div>
@@ -585,18 +662,28 @@ function Education() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }} 
               transition={{ delay: index * 0.1 }}
-              className={`glass rounded-xl p-6 hover:border-primary/25 transition-all duration-300 ${index === 0 ? 'border-primary/30 md:col-span-2' : ''}`}
+              className="glass rounded-xl p-6 hover:border-primary/25 transition-all duration-300"
             >
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <p className="text-xs text-primary font-medium mb-1">{edu.title}</p>
-                  <h4 className="font-semibold text-lg">{edu.school}</h4>
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-cyber-gold/10 flex items-center justify-center flex-shrink-0">
+                  <BookOpen className="text-cyber-gold" size={24} />
                 </div>
-                <span className="px-3 py-1 rounded-full bg-cyber-slate/50 text-xs text-muted-foreground">
-                  {edu.period}
-                </span>
+                <div className="flex-1">
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <p className="text-xs text-primary font-medium mb-0.5">{edu.title}</p>
+                      <h4 className="font-semibold text-lg">{edu.school}</h4>
+                    </div>
+                    <span className="px-3 py-1 rounded-full bg-cyber-slate/50 text-xs text-muted-foreground">
+                      {edu.period}
+                    </span>
+                  </div>
+                  <p className="text-primary font-medium mb-2">{edu.degree}</p>
+                  {'description' in edu && edu.description && (
+                    <p className="text-muted-foreground text-sm leading-relaxed">{edu.description}</p>
+                  )}
+                </div>
               </div>
-              <p className="text-muted-foreground">{edu.degree}</p>
             </motion.div>
           ))}
         </div>
@@ -942,8 +1029,9 @@ function Contact() {
           <p className="text-muted-foreground max-w-2xl mx-auto">Tem um projeto em mente? Entre em contato para discutirmos como posso ajudar.</p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-12">
-          <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="space-y-4">
+        <div className="grid lg:grid-cols-2 gap-12 items-stretch">
+          {/* Left side - Contact Info */}
+          <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="space-y-4 flex flex-col justify-between">
             {contactInfo.map(({ icon, bg, label, content }) => (
               <div key={label} className="glass rounded-xl p-5 flex items-center gap-4">
                 <div className={`w-11 h-11 rounded-xl ${bg} flex items-center justify-center flex-shrink-0`}>{icon}</div>
@@ -969,7 +1057,8 @@ function Contact() {
             </div>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="glass rounded-xl p-8 space-y-6">
+          {/* Right side - Form */}
+          <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="glass rounded-xl p-8 space-y-6 flex flex-col">
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid md:grid-cols-2 gap-5">
                 {[{ id: 'name', label: 'Nome', type: 'text', placeholder: 'Seu nome' },
@@ -1011,24 +1100,6 @@ function Contact() {
                 </button>
               )}
             </form>
-            
-            {/* Redes Sociais alinhadas à direita */}
-            <div className="pt-4 border-t border-white/6">
-              <h3 className="font-semibold text-sm mb-4">Redes Sociais</h3>
-              <div className="flex gap-3">
-                {[
-                  { href: 'https://github.com/Adriano-Lengruber', icon: <Github size={19} />, label: 'GitHub' },
-                  { href: 'https://linkedin.com/in/adriano-lengruber', icon: <Linkedin size={19} />, label: 'LinkedIn' },
-                  { href: 'https://instagram.com/supertech_solucoes_tecnologia', icon: <Instagram size={19} />, label: 'Instagram' },
-                  { href: 'https://wa.me/5522999999999', icon: <MessageCircle size={19} />, label: 'WhatsApp' },
-                ].map(({ href, icon, label }) => (
-                  <a key={label} href={href} target="_blank" rel="noopener noreferrer"
-                    className="w-11 h-11 glass rounded-xl flex items-center justify-center hover:bg-primary/15 hover:border-primary/25 hover:text-primary transition-all duration-200 text-muted-foreground">
-                    {icon}
-                  </a>
-                ))}
-              </div>
-            </div>
           </motion.div>
         </div>
       </div>
@@ -1073,6 +1144,7 @@ export default function App() {
           <Navigation />
           <Hero />
           <About />
+          <TechStack />
           <Services />
           <Resume />
           <Education />
