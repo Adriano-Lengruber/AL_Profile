@@ -14,6 +14,7 @@ RUN npm install -g pnpm && \
 COPY . .
 
 # Build the application
+ENV CI=true
 RUN pnpm build
 
 # Production stage
