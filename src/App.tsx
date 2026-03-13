@@ -213,14 +213,6 @@ function Hero() {
 
       <div className="max-w-7xl mx-auto px-6 py-32 relative z-10">
         <div className="text-center">
-          {/* Available badge */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="mb-8">
-            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm text-cyber-emerald font-medium tracking-wide">
-              <span className="w-2 h-2 rounded-full bg-cyber-emerald animate-pulse" />
-              Disponível para novos projetos
-            </span>
-          </motion.div>
-
           <motion.h1
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}
             className="font-heading text-5xl md:text-7xl font-bold mb-6 tracking-tight"
@@ -296,10 +288,10 @@ function Hero() {
 function About() {
   const yearsExp = new Date().getFullYear() - 2014;
   const stats = [
-    { icon: <Calendar size={22} className="text-cyber-emerald" />, label: 'Anos de Exp.', value: `${yearsExp}+` },
-    { icon: <Wrench size={22} className="text-cyber-emerald" />, label: 'Ferramentas', value: '15+' },
-    { icon: <Rocket size={22} className="text-cyber-emerald" />, label: 'Projetos', value: '50+' },
-    { icon: <Users size={22} className="text-cyber-emerald" />, label: 'Clientes', value: '20+' },
+    { icon: <Calendar size={22} className="text-primary" />, label: 'Anos de Exp.', value: `${yearsExp}+` },
+    { icon: <Wrench size={22} className="text-primary" />, label: 'Ferramentas', value: '15+' },
+    { icon: <Rocket size={22} className="text-primary" />, label: 'Projetos', value: '50+' },
+    { icon: <Users size={22} className="text-primary" />, label: 'Clientes', value: '20+' },
   ];
 
   // Tech stack logos for carousel
@@ -476,11 +468,12 @@ function Services() {
       title: 'Análise de Dados',
       description: 'Transformo dados brutos em insights acionáveis que guiam decisões estratégicas com precisão.',
       items: [
-        { text: 'Scripts automatizados para ETL', badges: ['Python', 'Pandas'] },
-        { text: 'Análises estatísticas e forecasts', badges: ['Python', 'NumPy'] },
-        { text: 'Relatórios executivos interativos', badges: ['Power BI', 'Excel'] },
-        { text: 'Dashboards em tempo real', badges: ['Tableau', 'Power BI'] },
+        { text: 'Pipeline de ETL automatizado para processamento de grandes volumes de dados' },
+        { text: 'Análise estatística avançada e modelagem preditiva' },
+        { text: 'Relatórios executivos interativos com métricas KPIs' },
+        { text: 'Dashboards em tempo real para monitoramento de negócios' },
       ],
+      badges: ['Python', 'SQL', 'Power BI'],
     },
     {
       icon: <Bot size={28} />,
@@ -490,67 +483,72 @@ function Services() {
       title: 'AI Agents',
       description: 'Desenvolvimento de agentes de IA autônomos para automatizar tarefas complexas e repetitivas.',
       items: [
-        { text: 'Assistentes virtuais personalizados', badges: ['OpenAI', 'LangChain'] },
-        { text: 'Automação de workflows com IA', badges: ['n8n', 'Python'] },
-        { text: 'RAG para consultas em documentos', badges: ['Vector DB', 'GPT'] },
-        { text: 'Chatbots para atendimento', badges: ['Rasa', 'Dialogflow'] },
+        { text: 'Agentes autônomos pessoais que aprendem com suas preferências' },
+        { text: 'Orquestração de múltiplos LLMs com memória persistente e contexto' },
+        { text: 'RAG implementation para consulta em bases de conhecimento vectorizadas' },
+        { text: 'Chatbots cognitivos com capacidade de raciocínio multi-etapas' },
       ],
+      badges: ['OpenAI', 'LangChain', 'Vector DB'],
     },
     {
       icon: <LayoutDashboard size={28} />,
-      color: 'text-cyber-steel',
-      bg: 'bg-cyber-steel/10',
-      border: 'hover:border-cyber-steel/30',
+      color: 'text-cyan-400',
+      bg: 'bg-cyan-400/10',
+      border: 'hover:border-cyan-400/30',
       title: 'Business Intelligence',
       description: 'Dashboards interativos e painéis analíticos que revelam o desempenho do negócio em tempo real.',
       items: [
-        { text: 'Dashboards executivos', badges: ['Power BI', 'Tableau'] },
-        { text: 'Modelagem DAX avançada', badges: ['DAX', 'Power BI'] },
-        { text: 'Integração com SAP/ERP', badges: ['SAP', 'SQL'] },
-        { text: 'Data Warehousing', badges: ['Snowflake', 'PostgreSQL'] },
+        { text: 'Arquitetura de Data Warehouse escalável' },
+        { text: 'Modelagem DAX avançada para cálculos complexos' },
+        { text: 'Integração nativa com SAP/ERP e sistemas legados' },
+        { text: 'Visualizações customizadas com storytelling de dados' },
       ],
+      badges: ['Power BI', 'Tableau', 'DAX'],
     },
     {
       icon: <Zap size={28} />,
-      color: 'text-cyber-amber',
-      bg: 'bg-cyber-amber/10',
-      border: 'hover:border-cyber-amber/30',
+      color: 'text-[#5C0017]',
+      bg: 'bg-[#5C0017]/10',
+      border: 'hover:border-[#5C0017]/30',
       title: 'Automação & RPA',
       description: 'Elimino tarefas manuais com robôs de software, reduzindo erros e aumentando a produtividade.',
       items: [
-        { text: 'Robôs de web scraping', badges: ['Python', 'Selenium'] },
-        { text: 'Automação de planilhas', badges: ['Python', 'OpenPyXL'] },
-        { text: 'Integração de APIs', badges: ['REST', 'Python'] },
-        { text: 'Automação de processos', badges: ['Power Automate', 'n8n'] },
+        { text: 'Robôs de web scraping para coleta de dados em larga escala' },
+        { text: 'Automação de planilhas Excel/Google Sheets com macros inteligentes' },
+        { text: 'Integração de APIs REST para conectar sistemas heterogêneos' },
+        { text: 'Workflows de automação com n8n e Power Automate' },
       ],
+      badges: ['Python', 'Selenium', 'RPA'],
     },
     {
       icon: <Code2 size={28} />,
-      color: 'text-cyber-blue',
-      bg: 'bg-cyber-blue/10',
-      border: 'hover:border-cyber-blue/30',
-      title: 'Desenvolvimento Full-Stack',
-      description: 'Aplicações web modernas, APIs e sistemas personalizados do conceito à produção.',
-      items: [
-        { text: 'SPAs e aplicações web', badges: ['React', 'TypeScript'] },
-        { text: 'APIs RESTful', badges: ['FastAPI', 'Node.js'] },
-        { text: 'Sistemas com banco de dados', badges: ['PostgreSQL', 'MongoDB'] },
-        { text: 'Deploy e DevOps', badges: ['Docker', 'AWS'] },
-      ],
-    },
-    {
-      icon: <TrendingUp size={28} />,
       color: 'text-cyber-indigo',
       bg: 'bg-cyber-indigo/10',
       border: 'hover:border-cyber-indigo/30',
+      title: 'Desenvolvimento Full-Stack',
+      description: 'Aplicações web modernas, APIs e sistemas personalizados do conceito à produção.',
+      items: [
+        { text: 'SPAs e PWAs com React e TypeScript de alta performance' },
+        { text: 'APIs RESTful e GraphQL com FastAPI/Node.js' },
+        { text: 'Arquitetura de microsserviços com containerização' },
+        { text: 'Deploy em cloud AWS/GCP/Azure com CI/CD' },
+      ],
+      badges: ['React', 'Node.js', 'TypeScript'],
+    },
+    {
+      icon: <TrendingUp size={28} />,
+      color: 'text-cyber-amber',
+      bg: 'bg-cyber-amber/10',
+      border: 'hover:border-cyber-amber/30',
       title: 'DevOps',
       description: 'Configuração e disponibilização de VPS 100% funcional de acordo com cada necessidade do cliente.',
       items: [
-        { text: 'VPS e servidores configurados', badges: ['Linux', 'Nginx'] },
-        { text: 'Containers Docker', badges: ['Docker', 'Docker Compose'] },
-        { text: 'CI/CD pipelines', badges: ['GitHub Actions', 'GitLab'] },
-        { text: 'Cloud computing', badges: ['AWS', 'GCP', 'Azure'] },
+        { text: 'Infraestrutura como código (Terraform/Ansible)' },
+        { text: 'Orquestração Kubernetes para alta disponibilidade' },
+        { text: 'Pipeline CI/CD automatizado com GitHub Actions' },
+        { text: 'Monitoramento e observabilidade com Prometheus/Grafana' },
       ],
+      badges: ['Docker', 'Kubernetes', 'AWS'],
     },
   ];
 
@@ -576,23 +574,21 @@ function Services() {
               <p className="text-muted-foreground text-sm leading-relaxed mb-4">{svc.description}</p>
               <ul className="space-y-2 mb-4">
                 {svc.items.map((item, idx) => (
-                  <li key={idx} className="flex flex-col gap-1.5">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <CheckCheck size={14} className={svc.color} />
-                      {item.text}
-                    </div>
-                    {item.badges && (
-                      <div className="flex flex-wrap gap-1.5 ml-5">
-                        {item.badges.map((badge) => (
-                          <span key={badge} className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${svc.bg} ${svc.color}`}>
-                            {badge}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                  <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <CheckCheck size={14} className={svc.color} />
+                    {item.text}
                   </li>
                 ))}
               </ul>
+              {svc.badges && svc.badges.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 pt-4 border-t border-cyber-gold/10">
+                  {svc.badges.map((badge) => (
+                    <span key={badge} className={`px-2 py-1 rounded-full text-xs font-medium ${svc.bg} ${svc.color}`}>
+                      {badge}
+                    </span>
+                  ))}
+                </div>
+              )}
             </motion.div>
           ))}
         </div>
