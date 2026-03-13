@@ -39,19 +39,20 @@ export default function BlogPage() {
     <div className="min-h-screen bg-cyber-black">
       {/* Header */}
       <header className="glass border-b border-white/10 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors">
-            <ArrowLeft size={20} />
-            Voltar ao portfólio
+        <nav className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded px-1 -ml-1">
+            <ArrowLeft size={18} className="md:w-5 md:h-5" />
+            <span className="hidden sm:inline">Voltar ao portfólio</span>
+            <span className="sm:hidden font-medium">Portfólio</span>
           </Link>
           <button 
             onClick={() => setShowAuthModal(true)}
-            className="flex items-center gap-2 px-4 py-2 glass rounded-lg hover:border-primary/30 transition-colors"
+            className="flex items-center gap-2 px-3 md:px-4 py-2 glass rounded-lg hover:border-primary/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
-            <LogIn size={18} />
-            Entrar
+            <LogIn size={16} className="md:w-[18px] md:h-[18px]" />
+            <span className="hidden sm:inline">Entrar</span>
           </button>
-        </div>
+        </nav>
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-12">

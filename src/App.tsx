@@ -193,7 +193,7 @@ function Hero() {
   const [roleIndex, setRoleIndex] = useState(0);
 
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
+    let timeout: ReturnType<typeof setTimeout>;
     const currentRole = roles[roleIndex];
     if (typedText.length < currentRole.length) {
       timeout = setTimeout(() => setTypedText(currentRole.slice(0, typedText.length + 1)), 100);
@@ -335,16 +335,16 @@ function About() {
             </div>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="grid grid-cols-2 gap-4">
-            {stats.map((stat, index) => (
-              <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }} className="glass rounded-xl p-6 text-center hover:border-primary/20 transition-all duration-300">
-                <div className="flex justify-center mb-3">{stat.icon}</div>
-                <div className="text-3xl font-bold text-gradient mb-1">{stat.value}</div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
-              </motion.div>
-            ))}
-          </motion.div>
+           <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="grid grid-cols-2 md:grid-cols-4 gap-4">
+             {stats.map((stat, index) => (
+               <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+                 transition={{ delay: index * 0.1 }} className="glass rounded-xl p-5 text-center hover:border-primary/20 transition-all duration-300 min-h-[140px]">
+                 <div className="flex justify-center mb-2">{stat.icon}</div>
+                 <div className="text-2xl md:text-3xl font-bold text-gradient mb-1">{stat.value}</div>
+                 <div className="text-xs md:text-sm text-muted-foreground leading-tight">{stat.label}</div>
+               </motion.div>
+             ))}
+           </motion.div>
         </div>
       </div>
     </section>
@@ -496,109 +496,72 @@ function Resume() {
           <p className="text-muted-foreground max-w-2xl mx-auto">Uma jornada de aprendizado contínuo e conquistas profissionais</p>
         </motion.div>
 
-        <div className="grid gap-8">
-          {/* Experience */}
-          <div className="lg:col-span-2">
-            <h3 className="font-heading text-xl font-semibold mb-6 flex items-center gap-2">
-              <Terminal className="text-primary" size={20} /> Experiência Profissional
-            </h3>
-            <div className="relative">
-              {/* Central timeline line */}
-              <div className="absolute left-1/2 top-0 bottom-0 w-px timeline-line -translate-x-1/2 hidden lg:block" />
-              {/* Left side timeline for mobile */}
-              <div className="absolute left-6 top-0 bottom-0 w-px timeline-line lg:hidden" />
-              
-              {experiences.map((exp, index) => {
-                const isFirst = index === 0;
-                const isLeft = index % 2 === 1;
-                const isRight = index % 2 === 0 && !isFirst;
+        {/* Experience - Timeline Simplificada para Mobile First */}
+        <div className="relative pl-8 md:pl-0">
+          {/* Timeline line - left side on mobile, center on desktop */}
+          <div className="absolute left-[18px] md:left-1/2 top-0 bottom-0 w-px timeline-line md:-translate-x-1/2" />
+          
+          {experiences.map((exp, index) => {
+            const isFirst = index === 0;
+            const isLeft = index % 2 === 1;
+            
+            return (
+              <motion.div 
+                key={exp.id} 
+                initial={{ opacity: 0, y: 20 }} 
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }} 
+                transition={{ delay: index * 0.1 }}
+                className={`relative mb-8 last:mb-0 ${isFirst ? 'md:col-span-2' : ''}`}
+              >
+                {/* Timeline dot */}
+                <div className={`absolute left-[-18px] md:left-1/2 top-6 md:-translate-x-1/2 z-10 ${isFirst ? 'w-5 h-5' : 'w-4 h-4'}`}>
+                  <div className={`w-full h-full rounded-full border-2 border-cyber-black ${exp.current ? 'bg-cyber-emerald shadow-lg shadow-cyber-emerald/50' : 'bg-cyber-gold'} ${exp.current ? 'animate-pulse' : ''}`} />
+                </div>
                 
-                return (
-                  <motion.div 
-                    key={exp.id} 
-                    initial={{ opacity: 0, y: 20 }} 
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }} 
-                    transition={{ delay: index * 0.1 }}
-                    className={`relative mb-8 ${isFirst ? 'lg:col-span-2' : ''}`}
-                  >
-                    {/* Central dot for desktop */}
-                    {isFirst && (
-                      <div className="hidden lg:flex absolute left-1/2 top-8 -translate-x-1/2 z-10">
-                        <div className={`w-5 h-5 rounded-full border-3 border-cyber-black ${exp.current ? 'bg-cyber-emerald shadow-lg shadow-cyber-emerald/60' : 'bg-cyber-gold'} ${exp.current ? 'animate-pulse' : ''}`} />
-                      </div>
-                    )}
-                    {isLeft && (
-                      <div className="hidden lg:flex absolute left-1/2 top-8 -translate-x-1/2 z-10">
-                        <div className={`w-4 h-4 rounded-full border-2 border-cyber-black ${exp.current ? 'bg-cyber-emerald shadow-sm shadow-cyber-emerald/50' : 'bg-cyber-gold'}`} />
-                      </div>
-                    )}
-                    {isRight && (
-                      <div className="hidden lg:flex absolute left-1/2 top-8 -translate-x-1/2 z-10">
-                        <div className={`w-4 h-4 rounded-full border-2 border-cyber-black ${exp.current ? 'bg-cyber-emerald shadow-sm shadow-cyber-emerald/50' : 'bg-cyber-gold'}`} />
-                      </div>
-                    )}
-                    {/* Mobile dot */}
-                    <div className="lg:hidden absolute left-[18px] top-6">
-                      <div className={`w-4 h-4 rounded-full border-2 border-cyber-black ${exp.current ? 'bg-cyber-emerald shadow-sm shadow-cyber-emerald/50' : 'bg-cyber-gold'}`} />
+                {/* Card */}
+                <div className={`
+                  glass rounded-xl p-6 hover:border-primary/25 transition-all duration-300 cursor-pointer
+                  ${isFirst ? 'md:w-2/3 md:mx-auto md:translate-x-[25%]' : isLeft ? 'md:w-[45%] md:mr-auto md:pr-8 md:text-right' : 'md:w-[45%] md:ml-auto md:pl-8'}
+                `} onClick={() => setExpandedId(expandedId === exp.id ? null : exp.id)}>
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <h4 className="font-semibold text-lg leading-tight">{exp.title}</h4>
+                      <p className="text-primary text-sm font-medium mt-0.5">{exp.company}</p>
                     </div>
-                    
-                    {/* Card */}
-                    <div className={`
-                      ${isFirst 
-                        ? 'lg:w-2/3 lg:mx-auto lg:translate-x-[25%]' 
-                        : isLeft 
-                          ? 'lg:w-[45%] lg:mr-auto lg:pr-8 lg:text-right' 
-                          : 'lg:w-[45%] lg:ml-auto lg:pl-8'
-                      }
-                      lg:py-6 lg:px-8
-                    `}>
-                      <div 
-                        className={`glass rounded-xl p-6 cursor-pointer hover:border-primary/25 transition-all duration-300 ${isFirst ? 'border-primary/30 shadow-lg shadow-primary/10' : ''}`}
-                        onClick={() => setExpandedId(expandedId === exp.id ? null : exp.id)}
-                      >
-                        <div className="flex items-start justify-between mb-3">
-                          <div>
-                            <h4 className="font-semibold text-lg leading-tight">{exp.title}</h4>
-                            <p className="text-primary text-sm font-medium mt-0.5">{exp.company}</p>
-                          </div>
-                          {exp.current && (
-                            <span className="px-2.5 py-1 rounded-full bg-cyber-emerald/15 text-cyber-emerald text-xs font-medium flex items-center gap-1">
-                              <span className="w-1.5 h-1.5 rounded-full bg-cyber-emerald animate-pulse" /> Atual
-                            </span>
-                          )}
+                    {exp.current && (
+                      <span className="px-2.5 py-1 rounded-full bg-cyber-emerald/15 text-cyber-emerald text-xs font-medium flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-cyber-emerald animate-pulse" /> Atual
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground mb-3">
+                    <span className="flex items-center gap-1"><Calendar size={12} /> {exp.period}</span>
+                    <span className="flex items-center gap-1"><MapPin size={12} /> {exp.location}</span>
+                  </div>
+                  <p className="text-muted-foreground text-sm leading-relaxed mb-4">{exp.description}</p>
+                  <AnimatePresence>
+                    {expandedId === exp.id && (
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                        <div className="flex flex-wrap gap-2 pt-4 border-t border-white/10">
+                          {exp.skills.map((skill) => (
+                            <span key={skill} className="px-2.5 py-1 rounded-md bg-cyber-slate text-xs text-primary/80 border border-primary/15">{skill}</span>
+                          ))}
                         </div>
-                        <div className="flex items-center gap-4 text-xs text-muted-foreground mb-3">
-                          <span className="flex items-center gap-1"><Calendar size={12} /> {exp.period}</span>
-                          <span className="flex items-center gap-1"><MapPin size={12} /> {exp.location}</span>
-                        </div>
-                        <p className="text-muted-foreground text-sm leading-relaxed">{exp.description}</p>
-                        <AnimatePresence>
-                          {expandedId === exp.id && (
-                            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                              <div className="flex flex-wrap gap-2 pt-4 border-t border-white/10 mt-4">
-                                {exp.skills.map((skill) => (
-                                  <span key={skill} className="px-2.5 py-1 rounded-md bg-cyber-slate text-xs text-primary/80 border border-primary/15">{skill}</span>
-                                ))}
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                        <button className="text-primary/70 text-xs flex items-center gap-1 mt-3 hover:text-primary transition-colors">
-                          {expandedId === exp.id ? 'Ver menos' : 'Ver mais'}
-                          <ChevronDown size={13} className={`transition-transform ${expandedId === exp.id ? 'rotate-180' : ''}`} />
-                        </button>
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                  <button className="text-primary/70 text-xs flex items-center gap-1 mt-3 hover:text-primary transition-colors">
+                    {expandedId === exp.id ? 'Ver menos' : 'Ver mais'}
+                    <ChevronDown size={13} className={`transition-transform ${expandedId === exp.id ? 'rotate-180' : ''}`} />
+                  </button>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
-      </div>
-    </section>
+        </div>
+      </section>
   );
 }
 
@@ -1078,18 +1041,18 @@ function Contact() {
 // ──────────────────────────────────────────────────────────────
 function Footer() {
   return (
-    <footer className="py-10 border-t border-white/6">
+    <footer className="py-8 md:py-10 border-t border-white/6">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-6">
+          <div className="flex items-center gap-3 self-center md:self-auto">
             <span className="font-heading text-xl font-bold text-gradient">AL</span>
             <span className="text-muted-foreground text-sm">© {new Date().getFullYear()} Adriano Lengruber</span>
           </div>
-          <div className="flex items-center gap-6 text-sm text-muted-foreground">
-            <a href="#" className="hover:text-primary transition-colors">Privacidade</a>
-            <a href="#" className="hover:text-primary transition-colors">Termos</a>
+          <div className="flex items-center gap-4 md:gap-6 text-sm text-muted-foreground self-center md:self-auto">
+            <a href="#" className="hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded px-1">Privacidade</a>
+            <a href="#" className="hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded px-1">Termos</a>
           </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground self-center md:self-auto">
             <Code2 size={13} className="text-primary/60" />
             <span>Feito com precisão e tecnologia</span>
           </div>
