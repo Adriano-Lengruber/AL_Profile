@@ -47,6 +47,8 @@ services:
     environment:
       # Usar URL relativa para funcionar com proxy do nginx
       - VITE_API_URL=/api
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       - backend
     networks:
