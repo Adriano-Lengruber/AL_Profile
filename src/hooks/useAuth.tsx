@@ -14,13 +14,14 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (username: string, email: string, password: string) => Promise<void>;
   logout: () => void;
+  updateUser: (user: Partial<User>) => void;
   isAuthenticated: boolean;
   loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3003/api';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -104,6 +105,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
+  const updateUser = (userData: Partial<User>) => {
+    setUser(prev => prev ? { ...prev, ...userData } : null);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -112,6 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         register,
         logout,
+        updateUser,
         isAuthenticated: !!user,
         loading
       }}

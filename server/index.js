@@ -34,6 +34,7 @@ const postSchema = new mongoose.Schema({
   title: { type: String, required: true },
   excerpt: { type: String, required: true },
   content: { type: String, required: true },
+  imageUrl: { type: String, default: '' },
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   authorName: { type: String, required: true },
   authorAvatar: { type: String, default: '' },
@@ -171,6 +172,33 @@ app.get('/api/auth/me', authenticateToken, async (req, res) => {
   }
 });
 
+// Update profile
+app.put('/api/auth/profile', authenticateToken, async (req, res) => {
+  try {
+    const { avatar, bio } = req.body;
+    
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+
+    if (avatar !== undefined) user.avatar = avatar;
+    if (bio !== undefined) user.bio = bio;
+
+    await user.save();
+
+    res.json({
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      avatar: user.avatar,
+      bio: user.bio
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao atualizar perfil' });
+  }
+});
+
 // Rotas de Posts
 app.get('/api/posts', async (req, res) => {
   try {
@@ -214,7 +242,7 @@ app.get('/api/posts/:id', async (req, res) => {
 
 app.post('/api/posts', authenticateToken, async (req, res) => {
   try {
-    const { title, excerpt, content, tags, readTime } = req.body;
+    const { title, excerpt, content, tags, readTime, imageUrl } = req.body;
 
     const user = await User.findById(req.user.id);
 
@@ -222,6 +250,7 @@ app.post('/api/posts', authenticateToken, async (req, res) => {
       title,
       excerpt,
       content,
+      imageUrl: imageUrl || '',
       author: user._id,
       authorName: user.username,
       authorAvatar: user.avatar,
@@ -249,13 +278,14 @@ app.put('/api/posts/:id', authenticateToken, async (req, res) => {
       return res.status(403).json({ error: 'Não autorizado' });
     }
 
-    const { title, excerpt, content, tags, readTime } = req.body;
+    const { title, excerpt, content, tags, readTime, imageUrl } = req.body;
     
     if (title) post.title = title;
     if (excerpt) post.excerpt = excerpt;
     if (content) post.content = content;
     if (tags) post.tags = tags;
     if (readTime) post.readTime = readTime;
+    if (imageUrl !== undefined) post.imageUrl = imageUrl;
 
     await post.save();
 
@@ -356,6 +386,220 @@ app.post('/api/posts/:id/comments', authenticateToken, async (req, res) => {
     res.status(201).json(comment);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao criar comentário' });
+  }
+});
+
+// Seed - Criar posts de exemplo (apenas para desenvolvimento)
+app.post('/api/seed', async (req, res) => {
+  try {
+    // Verificar se já existem posts
+    const existingPosts = await Post.countDocuments();
+    if (existingPosts > 0) {
+      return res.json({ message: 'Posts já existem', count: existingPosts });
+    }
+
+    // Criar usuário de exemplo ou usar existente
+    let user = await User.findOne({ email: 'admin@example.com' });
+    if (!user) {
+      const hashedPassword = await bcrypt.hash('admin123', 10);
+      user = new User({
+        username: 'Admin',
+        email: 'admin@example.com',
+        password: hashedPassword,
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin',
+        bio: 'Desenvolvedor e Analista de Dados'
+      });
+      await user.save();
+    }
+
+    const samplePosts = [
+      {
+        title: 'Introdução ao Machine Learning com Python',
+        excerpt: 'Aprenda os conceitos fundamentais de machine learning e como implementar seus primeiros modelos utilizando Python e bibliotecas populares como Scikit-learn.',
+        content: `Machine Learning (Aprendizado de Máquina) é uma área da inteligência artificial que permite que sistemas aprendam e melhorem automaticamente a partir da experiência.
+
+## Por que Python?
+
+Python se tornou a linguagem padrão para Machine Learning devido à sua simplicidade e ao ecossistema robusto de bibliotecas:
+
+- **NumPy**: Computação numérica
+- **Pandas**: Manipulação de dados
+- **Scikit-learn**: Algoritmos de ML
+- **TensorFlow/PyTorch**: Deep Learning
+
+## Primeiros Passos
+
+Vamos criar um modelo simples de classificação:
+
+\`\`\`python
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+model = RandomForestClassifier()
+model.fit(X_train, y_train)
+\`\`\`
+
+## Conclusão
+
+Machine Learning abre um mundo de possibilidades. Continue aprendendo e experimentando!`,
+        imageUrl: 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&h=400&fit=crop',
+        author: user._id,
+        authorName: user.username,
+        authorAvatar: user.avatar,
+        tags: ['Machine Learning', 'Python', 'Data Science'],
+        readTime: '10 min'
+      },
+      {
+        title: 'ETL com Python: Do Básico ao Avançado',
+        excerpt: 'Descubra como construir pipelines de ETL robustos utilizando Python, pandas e ferramentas modernas de orquestração.',
+        content: `ETL (Extract, Transform, Load) é o processo fundamental para integração de dados em qualquer organização.
+
+## O que é ETL?
+
+- **Extract (Extrair)**: Coletar dados de múltiplas fontes
+- **Transform (Transformar)**: Limpar, validar e converter dados
+- **Load (Carregar)**: Armazenar no destino final
+
+## Ferramentas Populares
+
+### Pandas
+Ideal para datasets de tamanho médio:
+
+\`\`\`python
+import pandas as pd
+
+df = pd.read_csv('dados.csv')
+df_clean = df.dropna()
+df_clean.to_sql('tabela_clean', conn)
+\`\`\`
+
+### Apache Airflow
+Para orquestração de pipelines complexos:
+
+- Programação baseada em DAGs
+- Monitoramento visual
+- Retry automático
+
+## Boas Práticas
+
+1. Use logging adequado
+2. Trate erros gracefully
+3. Documente seu pipeline
+4. Versione seus dados`,
+        imageUrl: 'https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=800&h=400&fit=crop',
+        author: user._id,
+        authorName: user.username,
+        authorAvatar: user.avatar,
+        tags: ['ETL', 'Python', 'Data Engineering'],
+        readTime: '15 min'
+      },
+      {
+        title: 'Power BI: Criando Dashboards Impactantes',
+        excerpt: 'Aprenda a criar dashboards profissionais no Power BI utilizando DAX avançado e visualizações personalizadas.',
+        content: `Power BI é uma ferramenta de business intelligence da Microsoft que permite transformar dados em insights visuais.
+
+## Fundamentos DAX
+
+DAX (Data Analysis Expressions) é a linguagem de fórmulas do Power BI:
+
+### Medidas vs Colunas Calculadas
+
+- **Colunas Calculadas**: Valores por linha
+- **Medidas**: Agregações dinâmicas
+
+### Exemplos de DAX
+
+\`\`\`dax
+Total Vendas = SUM(Vendas[Valor])
+Vendas YTD = TOTALYTD([Total Vendas], Calendario[Data])
+Margem = DIVIDE([Lucro], [Total Vendas])
+\`\`\`
+
+## Visualização Eficaz
+
+### Princípios de Design
+
+1. **Clareza**: Dados devem ser facilmente compreensíveis
+2. **Contexto**: Use tooltips e filtros
+3. **Consistência**: Cores e formatos uniformes
+4. **Interatividade**: Permita drill-through
+
+## Conclusão
+
+Um bom dashboard conta uma história com os dados. Pratique sempre!`,
+        imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=400&fit=crop',
+        author: user._id,
+        authorName: user.username,
+        authorAvatar: user.avatar,
+        tags: ['Power BI', 'DAX', 'Business Intelligence'],
+        readTime: '10 min'
+      },
+      {
+        title: 'Automação com n8n: Transforme Seu Fluxo de Trabalho',
+        excerpt: 'Descubra como o n8n pode automatizar tarefas repetitivas e integrar seus sistemas de forma eficiente.',
+        content: `n8n é uma ferramenta de automação de código aberto que permite conectar aplicativos e automatizar fluxos de trabalho.
+
+## Por que n8n?
+
+- Código aberto
+- Interface visual intuitiva
+- Hospedagem local (privacidade)
+- Integrações ilimitadas
+
+## Casos de Uso
+
+### Automação de Leads
+
+1. Novo lead no formulário → Cria registro no CRM
+2. Envia email de boas-vindas
+3. Notifica equipe no Slack
+
+### Sincronização de Dados
+
+1. Monitora planilha Google
+2. Atualiza banco de dados
+3. Gera relatório diário
+
+## Primeiro Workflow
+
+\`\`\`json
+{
+  "nodes": [
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook"
+    },
+    {
+      "name": "Slack",
+      "type": "n8n-nodes-base.slack"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{"node": "Slack", "type": "main", "index": 0}]]
+    }
+  }
+}
+\`\`\`
+
+## Conclusão
+
+Automação economiza tempo e reduz erros. Comece simples e expanda gradualmente!`,
+        imageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=400&fit=crop',
+        author: user._id,
+        authorName: user.username,
+        authorAvatar: user.avatar,
+        tags: ['Automação', 'n8n', 'Productivity'],
+        readTime: '8 min'
+      }
+    ];
+
+    await Post.insertMany(samplePosts);
+    
+    res.json({ message: 'Posts de exemplo criados com sucesso', count: samplePosts.length });
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao criar posts', details: error.message });
   }
 });
 

@@ -8,7 +8,10 @@ import {
   Calculator, Eye, Building2, Cloud, Bot, Zap, Palette, GitBranch,
   BrainCircuit, Wrench, Rocket, Users, Terminal, Cpu, CheckCircle2,
   ChevronDown, ChevronLeft, ChevronRight, Calendar, FileDown, Award, TrendingUp, Blocks,
-  CheckCheck, Sparkles, Activity, Instagram, Youtube,
+  CheckCheck, Sparkles, Activity, Instagram, Youtube, Server, Container, Workflow,
+  Network, GitGraph, Box, HardDrive, CloudLightning, CloudFog, Table2, FileSpreadsheet,
+  Variable, Warehouse, Kanban, Gauge, Hexagon, FileCode, Brackets, Globe,
+  CircleDot,
 } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
 import BlogPage from './pages/BlogPage';
@@ -357,104 +360,105 @@ function About() {
 }
 
 // ──────────────────────────────────────────────────────────────
-// Tech Stack - Carrossel Automático
+// Tech Stack - Carrossel com CSS Marquee
 // ──────────────────────────────────────────────────────────────
 function TechStack() {
+  // Tech stack com ícones Lucide (confiável) + cores
   const techStack = [
-    { icon: <Code2 size={32} />, name: 'Python', url: 'https://www.python.org/' },
-    { icon: <Database size={32} />, name: 'SQL', url: 'https://www.w3.org/SQL/' },
-    { icon: <BarChart3 size={32} />, name: 'Power BI', url: 'https://powerbi.microsoft.com/' },
-    { icon: <LayoutDashboard size={32} />, name: 'DAX', url: 'https://learn.microsoft.com/pt-br/dax/' },
-    { icon: <Bot size={32} />, name: 'AI Agents', url: 'https://aws.amazon.com/bedrock/' },
-    { icon: <BrainCircuit size={32} />, name: 'Machine Learning', url: 'https://www.tensorflow.org/' },
-    { icon: <Zap size={32} />, name: 'RPA', url: 'https://powerautomate.microsoft.com/' },
-    { icon: <Cloud size={32} />, name: 'Cloud', url: 'https://cloud.google.com/' },
-    { icon: <GitBranch size={32} />, name: 'Git', url: 'https://git-scm.com/' },
-    { icon: <Building2 size={32} />, name: 'SAP', url: 'https://www.sap.com/' },
-    { icon: <Cpu size={32} />, name: 'ETL', url: 'https://aws.amazon.com/what-is/etl/' },
-    { icon: <Terminal size={32} />, name: 'Docker', url: 'https://www.docker.com/' },
-    { icon: <Github size={32} />, name: 'GitHub', url: 'https://github.com/' },
-    { icon: <Code2 size={32} />, name: 'Salesforce', url: 'https://www.salesforce.com/' },
-    { icon: <Bot size={32} />, name: 'n8n', url: 'https://n8n.io/' },
-    { icon: <BrainCircuit size={32} />, name: 'LangChain', url: 'https://www.langchain.com/' },
-    { icon: <GitBranch size={32} />, name: 'LangGraph', url: 'https://langchain-ai.github.io/langgraph/' },
-    { icon: <BrainCircuit size={32} />, name: 'TensorFlow', url: 'https://www.tensorflow.org/' },
-    { icon: <Code2 size={32} />, name: 'FastAPI', url: 'https://fastapi.tiangolo.com/' },
-    { icon: <Code2 size={32} />, name: 'React', url: 'https://react.dev/' },
-    { icon: <Database size={32} />, name: 'PostgreSQL', url: 'https://www.postgresql.org/' },
-    { icon: <Cloud size={32} />, name: 'AWS', url: 'https://aws.amazon.com/' },
-    { icon: <Cloud size={32} />, name: 'Azure', url: 'https://azure.microsoft.com/' },
-    { icon: <Eye size={32} />, name: 'Looker', url: 'https://looker.com/' },
+    { name: 'Python', icon: <FileCode size={24} />, color: '#3776AB', bg: 'from-yellow-400/20 to-yellow-600/20' },
+    { name: 'TensorFlow', icon: <BrainCircuit size={24} />, color: '#FF6F00', bg: 'from-orange-400/20 to-orange-600/20' },
+    { name: 'PyTorch', icon: <Sparkles size={24} />, color: '#EE4C2C', bg: 'from-red-400/20 to-red-600/20' },
+    { name: 'Pandas', icon: <BarChart3 size={24} />, color: '#150458', bg: 'from-purple-400/20 to-purple-600/20' },
+    { name: 'NumPy', icon: <TrendingUp size={24} />, color: '#013243', bg: 'from-blue-400/20 to-blue-600/20' },
+    { name: 'MySQL', icon: <Database size={24} />, color: '#4479A1', bg: 'from-blue-500/20 to-blue-700/20' },
+    { name: 'PostgreSQL', icon: <HardDrive size={24} />, color: '#336791', bg: 'from-blue-400/20 to-blue-600/20' },
+    { name: 'MongoDB', icon: <Hexagon size={24} />, color: '#47A248', bg: 'from-green-400/20 to-green-600/20' },
+    { name: 'Redis', icon: <Zap size={24} />, color: '#DC382D', bg: 'from-red-500/20 to-red-700/20' },
+    { name: 'Power BI', icon: <LayoutDashboard size={24} />, color: '#F2C811', bg: 'from-yellow-500/20 to-yellow-700/20' },
+    { name: 'Tableau', icon: <CircleDot size={24} />, color: '#E97627', bg: 'from-orange-400/20 to-orange-600/20' },
+    { name: 'AWS', icon: <Cloud size={24} />, color: '#FF9900', bg: 'from-orange-400/20 to-yellow-600/20' },
+    { name: 'GCP', icon: <CloudLightning size={24} />, color: '#4285F4', bg: 'from-blue-400/20 to-blue-600/20' },
+    { name: 'Azure', icon: <CloudFog size={24} />, color: '#0078D4', bg: 'from-blue-500/20 to-blue-700/20' },
+    { name: 'Docker', icon: <Box size={24} />, color: '#2496ED', bg: 'from-blue-400/20 to-cyan-600/20' },
+    { name: 'Kubernetes', icon: <Container size={24} />, color: '#326CE5', bg: 'from-indigo-400/20 to-indigo-600/20' },
+    { name: 'React', icon: <Hexagon size={24} />, color: '#61DAFB', bg: 'from-cyan-400/20 to-blue-500/20' },
+    { name: 'TypeScript', icon: <Code2 size={24} />, color: '#3178C6', bg: 'from-blue-400/20 to-blue-600/20' },
+    { name: 'Node.js', icon: <Server size={24} />, color: '#339933', bg: 'from-green-500/20 to-green-700/20' },
+    { name: 'FastAPI', icon: <Rocket size={24} />, color: '#017794', bg: 'from-teal-400/20 to-teal-600/20' },
+    { name: 'Git', icon: <GitBranch size={24} />, color: '#F05032', bg: 'from-orange-500/20 to-red-500/20' },
+    { name: 'GitHub', icon: <Github size={24} />, color: '#333333', bg: 'from-gray-400/20 to-gray-600/20' },
+    { name: 'SAP', icon: <Terminal size={24} />, color: '#0FAAFF', bg: 'from-blue-500/20 to-blue-700/20' },
+    { name: 'n8n', icon: <Workflow size={24} />, color: '#FA6400', bg: 'from-orange-400/20 to-purple-600/20' },
   ];
 
-  // Duplicate for seamless infinite scroll
-  const techStackDoubled = [...techStack, ...techStack, ...techStack];
-
   return (
-    <section className="py-12 relative overflow-hidden bg-cyber-black">
-      <div className="max-w-7xl mx-auto px-6 mb-6">
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center">
+    <section className="py-12 relative bg-cyber-black overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 mb-8">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} 
+          whileInView={{ opacity: 1, y: 0 }} 
+          viewport={{ once: true }} 
+          className="text-center"
+        >
           <h2 className="font-heading text-3xl font-bold mb-2">Tech <span className="text-gradient">Stack</span></h2>
           <p className="text-muted-foreground text-sm">Tecnologias que domino</p>
         </motion.div>
       </div>
 
-      <div className="relative">
-        {/* Gradient masks for smooth edges */}
-        <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-cyber-black to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-cyber-black to-transparent z-10 pointer-events-none" />
-
-        {/* Infinite scrolling carousel - faster and scrollable */}
-        <div 
-          className="flex gap-8 overflow-x-auto scrollbar-hide cursor-grab active:cursor-grabbing"
-          style={{ 
-            animation: 'infinite-scroll 20s linear infinite',
-            scrollBehavior: 'smooth'
-          }}
-          onMouseEnter={(e) => {
-            const target = e.currentTarget as HTMLElement;
-            target.style.animationPlayState = 'paused';
-          }}
-          onMouseLeave={(e) => {
-            const target = e.currentTarget as HTMLElement;
-            target.style.animationPlayState = 'running';
-          }}
-        >
-          {techStackDoubled.map((tech, index) => (
-            <motion.a
-              href={tech.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              key={`${tech.name}-${index}`}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+      {/* Marquee Container */}
+      <div className="relative w-full overflow-hidden">
+        {/* Gradiente máscara esquerda */}
+        <div className="absolute left-0 top-0 bottom-0 w-24 z-10 bg-gradient-to-r from-cyber-black to-transparent" />
+        
+        {/* Gradiente máscara direita */}
+        <div className="absolute right-0 top-0 bottom-0 w-24 z-10 bg-gradient-to-l from-cyber-black to-transparent" />
+        
+        {/* Marquee Track */}
+        <div className="flex gap-6 marquee-track">
+          {/* Primeiro conjunto */}
+          {techStack.map((tech, index) => (
+            <motion.div
+              key={`first-${tech.name}-${index}`}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
-              transition={{ delay: (index % 24) * 0.03 }}
-              className="flex flex-col items-center gap-2 min-w-[80px] cursor-pointer group"
+              transition={{ delay: index * 0.05 }}
+              className="flex-shrink-0"
             >
-              <div className="w-16 h-16 rounded-xl flex items-center justify-center text-cyber-gold group-hover:scale-110 transition-all duration-300">
-                {tech.icon}
+              <div className="flex flex-col items-center gap-2 group cursor-pointer">
+                <div 
+                  className={`w-14 h-14 rounded-xl bg-gradient-to-br ${tech.bg} flex items-center justify-center shadow-lg border border-white/5 group-hover:border-white/20 group-hover:scale-110 transition-all duration-300`}
+                  style={{ color: tech.color }}
+                >
+                  {tech.icon}
+                </div>
+                <span className="text-xs font-medium text-muted-foreground group-hover:text-white transition-colors whitespace-nowrap">
+                  {tech.name}
+                </span>
               </div>
-              <span className="text-xs text-muted-foreground group-hover:text-cyber-gold transition-colors whitespace-nowrap">{tech.name}</span>
-            </motion.a>
+            </motion.div>
+          ))}
+          {/* Segundo conjunto para loop */}
+          {techStack.map((tech, index) => (
+            <motion.div
+              key={`second-${tech.name}-${index}`}
+              className="flex-shrink-0"
+            >
+              <div className="flex flex-col items-center gap-2 group cursor-pointer">
+                <div 
+                  className={`w-14 h-14 rounded-xl bg-gradient-to-br ${tech.bg} flex items-center justify-center shadow-lg border border-white/5 group-hover:border-white/20 group-hover:scale-110 transition-all duration-300`}
+                  style={{ color: tech.color }}
+                >
+                  {tech.icon}
+                </div>
+                <span className="text-xs font-medium text-muted-foreground group-hover:text-white transition-colors whitespace-nowrap">
+                  {tech.name}
+                </span>
+              </div>
+            </motion.div>
           ))}
         </div>
       </div>
-
-      {/* CSS animation */}
-      <style>{`
-        @keyframes infinite-scroll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-33.33%); }
-        }
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
     </section>
   );
 }
@@ -915,7 +919,7 @@ function Blog() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3003/api';
         const res = await fetch(`${API_URL}/posts?limit=2`);
         const data = await res.json();
         if (res.ok && data.posts) {
@@ -954,11 +958,19 @@ function Blog() {
                   className="glass rounded-xl overflow-hidden hover:border-primary/25 transition-all duration-300 group flex flex-col cursor-pointer"
                   onClick={() => window.location.href = '/blog'}>
                   <div className={`h-44 bg-gradient-to-br ${pat.from} ${pat.to} relative overflow-hidden blog-pattern`}>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className={`flex flex-col items-center gap-2 opacity-30 ${pat.accent}`}>
-                        <BarChart3 size={48} strokeWidth={1} />
+                    {post.imageUrl ? (
+                      <img 
+                        src={post.imageUrl} 
+                        alt={post.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className={`flex flex-col items-center gap-2 opacity-30 ${pat.accent}`}>
+                          <BarChart3 size={48} strokeWidth={1} />
+                        </div>
                       </div>
-                    </div>
+                    )}
                     <div className="absolute bottom-4 left-4 flex gap-2">
                       {post.tags?.slice(0, 2).map((tag: string) => (
                         <span key={tag} className="px-2.5 py-1 rounded glass text-xs font-medium backdrop-blur-md">{tag}</span>
@@ -987,10 +999,20 @@ function Blog() {
 
         {/* CTA to Blog Page */}
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-          className="mt-12 text-center">
-          <Link to="/blog" className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-all">
-            Ver todos os posts <ArrowRight size={17} />
-          </Link>
+          className="mt-16 text-center">
+          <div className="inline-flex flex-col items-center gap-4">
+            <p className="text-muted-foreground max-w-lg">
+              Junte-se à nossa comunidade de profissionais de dados. Compartilhe conhecimento, aprenda e cresça junto.
+            </p>
+            <Link to="/blog" className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground rounded-xl font-semibold hover:from-primary/90 hover:to-primary/70 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 transform hover:scale-105">
+              <BookOpen size={20} />
+              Explorar Blog Comunitário
+              <ArrowRight size={18} />
+            </Link>
+            <p className="text-xs text-muted-foreground/60">
+              ✓ Posts técnicos ✓ Tutoriais ✓ Discussões
+            </p>
+          </div>
         </motion.div>
       </div>
     </section>

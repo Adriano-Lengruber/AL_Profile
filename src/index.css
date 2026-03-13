@@ -140,3 +140,42 @@
 .card-tilt:hover {
   transform: translateY(-4px) scale(1.01);
 }
+
+/* Embla Carousel Styles */
+.embla {
+  overflow: hidden;
+  margin: 0 auto;
+  max-width: 100%;
+}
+
+.embla__container {
+  display: flex;
+  gap: 16px;
+  touch-action: pan-y pinch-zoom;
+}
+
+.embla__slide {
+  flex: 0 0 auto;
+  min-width: 140px;
+  max-width: 140px;
+  padding: 8px;
+}
+
+/* Marquee CSS Animation */
+.marquee-track {
+  animation: marquee 40s linear infinite;
+  width: fit-content;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
