@@ -1,52 +1,99 @@
-Bosta de readme!!!!
+# 🚀 AL_Profile - Portfólio Profissional
 
-# React + TypeScript + Vite
+Portfólio profissional moderno e interativo construído com React, TypeScript, Tailwind CSS e Node.js/Express com MongoDB.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![Status](https://img.shields.io/badge/status-em%20desenvolvimento-blue)
+![Tech Stack](https://img.shields.io/badge/tech-React%20%2B%20TypeScript%20%2B%20Node.js-green)
 
-Currently, two official plugins are available:
+## ✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Frontend
+- 🎨 Design moderno com tema cyber/gold
+- 📱 Totalmente responsivo (mobile-first)
+- ✨ Animações suaves com Framer Motion
+- 🔗 Tech Stack interativo com scroll automático e manual
+- 📝 Blog com posts recentes
+- 📧 Formulário de contato funcional
+- 🌐 Integração com API do GitHub
 
-## Expanding the ESLint configuration
+### Backend (Em Desenvolvimento)
+- 🔐 Sistema de autenticação JWT
+- 📝 API REST para Blog
+- 💬 Sistema de posts, likes e comentários
+- 👤 Sistema de usuários e perfis
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## 🛠️ Tecnologias
 
-- Configure the top-level `parserOptions` property like this:
+### Frontend
+- **React 18** - Biblioteca UI
+- **TypeScript** - Tipagem estática
+- **Vite** - Build tool
+- **Tailwind CSS** - Estilização
+- **Framer Motion** - Animações
+- **Lucide React** - Ícones
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### Backend
+- **Node.js** - Runtime JavaScript
+- **Express** - Framework web
+- **MongoDB** - Banco de dados
+- **Mongoose** - ODM MongoDB
+- **JWT** - Autenticação
+- **bcryptjs** - Criptografia de senhas
+
+## 🚀 Como Executar
+
+### Frontend
+```bash
+# Instalar dependências
+npm install
+
+# Rodar em desenvolvimento
+npm run dev
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+### Backend com Docker
+```bash
+# Subir containers (MongoDB + API)
+docker-compose -f docker-compose.blog.yml up -d
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+# A API estará disponível em: http://localhost:3003/api
 ```
+
+### Variáveis de Ambiente
+Crie um arquivo `.env` na raiz do projeto:
+```env
+VITE_API_URL=http://localhost:3003/api
+```
+
+## 📁 Estrutura do Projeto
+
+```
+AL_Profile/
+├── src/
+│   ├── components/     # Componentes React
+│   ├── hooks/         # Custom hooks (useAuth)
+│   ├── lib/           # Utilitários
+│   ├── pages/         # Páginas (BlogPage)
+│   ├── App.tsx        # Componente principal
+│   └── main.tsx      # Entry point
+├── server/            # Backend Node.js/Express
+│   ├── index.js       # Servidor API
+│   ├── package.json   # Dependências
+│   └── Dockerfile     # Container Docker
+├── docker-compose.blog.yml  # Docker Compose
+└── README.md
+```
+
+## 🔗 Links Úteis
+
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:3003/api
+- **GitHub**: https://github.com/Adriano-Lengruber
+
+## 📄 Licença
+
+MIT License - Feel free to use this project as a template!
+
+---
+
+Desenvolvido por [Adriano Lengruber](https://github.com/Adriano-Lengruber)
