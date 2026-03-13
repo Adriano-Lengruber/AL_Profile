@@ -9,6 +9,7 @@ COPY package.json pnpm-lock.yaml ./
 # Install pnpm and dependencies
 RUN npm install -g pnpm && \
     pnpm config set store-dir .pnpm-store && \
+    pnpm config set frozen-lockfile false && \
     pnpm install --no-frozen-lockfile
 
 # Copy source code
