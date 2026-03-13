@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
 import BlogPage from './pages/BlogPage';
+import { AuthProvider } from './hooks/useAuth';
 
 interface Experience {
   id: number; title: string; company: string; period: string;
@@ -26,7 +27,7 @@ interface BlogPost {
   readTime: string; likes: number; comments: number; tags: string[];
 }
 
-export { blogPosts };
+export { };
 interface Skill {
   name: string; level: number; category: 'language' | 'tool' | 'cloud' | 'other';
   icon: React.ReactNode;
@@ -327,7 +328,7 @@ function About() {
 
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="space-y-5">
-            <h3 className="font-heading text-2xl font-semibold"><span className="text-cyber-gold">Transformando</span> Complexidade em <span className="text-cyber-gold">Simplicidade</span></h3>
+            <h3 className="font-heading text-2xl font-semibold"><span className="text-white">Transformando</span> <span className="text-cyber-gold">Complexidade</span> <span className="text-white">em</span> <span className="text-cyber-gold">Simplicidade</span></h3>
             <p className="text-muted-foreground leading-relaxed">
               Sou cientista de dados em especialização nas áreas de automação e inteligência artificial, com o propósito de transformar processos complexos em soluções inteligentes, eficientes e acessíveis.
             </p>
@@ -342,7 +343,7 @@ function About() {
            <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="grid grid-cols-2 gap-4">
              {stats.map((stat, index) => (
                <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-                 transition={{ delay: index * 0.1 }} className="glass rounded-xl p-6 text-left hover:border-primary/20 transition-all duration-300 min-h-[160px] flex flex-col justify-center">
+                 transition={{ delay: index * 0.1 }} className="glass rounded-xl p-6 text-center hover:border-primary/20 transition-all duration-300 h-[160px] flex flex-col justify-center items-center">
                  <div className="flex justify-center mb-3">{stat.icon}</div>
                  <div className="text-3xl md:text-4xl font-bold text-gradient mb-1">{stat.value}</div>
                  <div className="text-sm text-muted-foreground">{stat.label}</div>
@@ -360,26 +361,38 @@ function About() {
 // ──────────────────────────────────────────────────────────────
 function TechStack() {
   const techStack = [
-    { icon: <Code2 size={32} />, name: 'Python' },
-    { icon: <Database size={32} />, name: 'SQL' },
-    { icon: <BarChart3 size={32} />, name: 'Power BI' },
-    { icon: <LayoutDashboard size={32} />, name: 'DAX' },
-    { icon: <Bot size={32} />, name: 'AI Agents' },
-    { icon: <BrainCircuit size={32} />, name: 'ML' },
-    { icon: <Zap size={32} />, name: 'RPA' },
-    { icon: <Cloud size={32} />, name: 'Cloud' },
-    { icon: <GitBranch size={32} />, name: 'Git' },
-    { icon: <Building2 size={32} />, name: 'SAP' },
-    { icon: <Cpu size={32} />, name: 'ETL' },
-    { icon: <Terminal size={32} />, name: 'Docker' },
+    { icon: <Code2 size={32} />, name: 'Python', url: 'https://www.python.org/' },
+    { icon: <Database size={32} />, name: 'SQL', url: 'https://www.w3.org/SQL/' },
+    { icon: <BarChart3 size={32} />, name: 'Power BI', url: 'https://powerbi.microsoft.com/' },
+    { icon: <LayoutDashboard size={32} />, name: 'DAX', url: 'https://learn.microsoft.com/pt-br/dax/' },
+    { icon: <Bot size={32} />, name: 'AI Agents', url: 'https://aws.amazon.com/bedrock/' },
+    { icon: <BrainCircuit size={32} />, name: 'Machine Learning', url: 'https://www.tensorflow.org/' },
+    { icon: <Zap size={32} />, name: 'RPA', url: 'https://powerautomate.microsoft.com/' },
+    { icon: <Cloud size={32} />, name: 'Cloud', url: 'https://cloud.google.com/' },
+    { icon: <GitBranch size={32} />, name: 'Git', url: 'https://git-scm.com/' },
+    { icon: <Building2 size={32} />, name: 'SAP', url: 'https://www.sap.com/' },
+    { icon: <Cpu size={32} />, name: 'ETL', url: 'https://aws.amazon.com/what-is/etl/' },
+    { icon: <Terminal size={32} />, name: 'Docker', url: 'https://www.docker.com/' },
+    { icon: <Github size={32} />, name: 'GitHub', url: 'https://github.com/' },
+    { icon: <Code2 size={32} />, name: 'Salesforce', url: 'https://www.salesforce.com/' },
+    { icon: <Bot size={32} />, name: 'n8n', url: 'https://n8n.io/' },
+    { icon: <BrainCircuit size={32} />, name: 'LangChain', url: 'https://www.langchain.com/' },
+    { icon: <GitBranch size={32} />, name: 'LangGraph', url: 'https://langchain-ai.github.io/langgraph/' },
+    { icon: <BrainCircuit size={32} />, name: 'TensorFlow', url: 'https://www.tensorflow.org/' },
+    { icon: <Code2 size={32} />, name: 'FastAPI', url: 'https://fastapi.tiangolo.com/' },
+    { icon: <Code2 size={32} />, name: 'React', url: 'https://react.dev/' },
+    { icon: <Database size={32} />, name: 'PostgreSQL', url: 'https://www.postgresql.org/' },
+    { icon: <Cloud size={32} />, name: 'AWS', url: 'https://aws.amazon.com/' },
+    { icon: <Cloud size={32} />, name: 'Azure', url: 'https://azure.microsoft.com/' },
+    { icon: <Eye size={32} />, name: 'Looker', url: 'https://looker.com/' },
   ];
 
   // Duplicate for seamless infinite scroll
   const techStackDoubled = [...techStack, ...techStack, ...techStack];
 
   return (
-    <section className="py-16 relative overflow-hidden bg-cyber-black">
-      <div className="max-w-7xl mx-auto px-6 mb-8">
+    <section className="py-12 relative overflow-hidden bg-cyber-black">
+      <div className="max-w-7xl mx-auto px-6 mb-6">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center">
           <h2 className="font-heading text-3xl font-bold mb-2">Tech <span className="text-gradient">Stack</span></h2>
           <p className="text-muted-foreground text-sm">Tecnologias que domino</p>
@@ -391,22 +404,39 @@ function TechStack() {
         <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-cyber-black to-transparent z-10 pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-cyber-black to-transparent z-10 pointer-events-none" />
 
-        {/* Infinite scrolling carousel */}
-        <div className="flex gap-8 animate-infinite-scroll">
+        {/* Infinite scrolling carousel - faster and scrollable */}
+        <div 
+          className="flex gap-8 overflow-x-auto scrollbar-hide cursor-grab active:cursor-grabbing"
+          style={{ 
+            animation: 'infinite-scroll 20s linear infinite',
+            scrollBehavior: 'smooth'
+          }}
+          onMouseEnter={(e) => {
+            const target = e.currentTarget as HTMLElement;
+            target.style.animationPlayState = 'paused';
+          }}
+          onMouseLeave={(e) => {
+            const target = e.currentTarget as HTMLElement;
+            target.style.animationPlayState = 'running';
+          }}
+        >
           {techStackDoubled.map((tech, index) => (
-            <motion.div
+            <motion.a
+              href={tech.url}
+              target="_blank"
+              rel="noopener noreferrer"
               key={`${tech.name}-${index}`}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: (index % 12) * 0.05 }}
+              transition={{ delay: (index % 24) * 0.03 }}
               className="flex flex-col items-center gap-2 min-w-[80px] cursor-pointer group"
             >
-              <div className="w-16 h-16 rounded-xl bg-cyber-gold/10 flex items-center justify-center text-cyber-gold group-hover:bg-cyber-gold/20 group-hover:scale-110 transition-all duration-300">
+              <div className="w-16 h-16 rounded-xl flex items-center justify-center text-cyber-gold group-hover:scale-110 transition-all duration-300">
                 {tech.icon}
               </div>
-              <span className="text-xs text-muted-foreground group-hover:text-cyber-gold transition-colors">{tech.name}</span>
-            </motion.div>
+              <span className="text-xs text-muted-foreground group-hover:text-cyber-gold transition-colors whitespace-nowrap">{tech.name}</span>
+            </motion.a>
           ))}
         </div>
       </div>
@@ -417,11 +447,12 @@ function TechStack() {
           0% { transform: translateX(0); }
           100% { transform: translateX(-33.33%); }
         }
-        .animate-infinite-scroll {
-          animation: infinite-scroll 30s linear infinite;
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
         }
-        .animate-infinite-scroll:hover {
-          animation-play-state: paused;
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
         }
       `}</style>
     </section>
@@ -828,8 +859,7 @@ function Projects() {
               </div>
             </div>
           ) : (
-            <>
-            {displayRepos.slice(0, 6).map((repo, index) => (
+            displayRepos.slice(0, 6).map((repo, index) => (
               <motion.a key={repo.id} href={repo.url} target="_blank" rel="noopener noreferrer"
                 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
                 transition={{ delay: index * 0.08 }}
@@ -856,147 +886,112 @@ function Projects() {
                   ))}
                 </div>
               </motion.a>
-            ))}
-            </>
+            ))
           )}
         </div>
-
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mt-12">
-          <a href="https://github.com/Adriano-Lengruber" target="_blank" rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 glass rounded-lg font-medium hover:border-primary/30 hover:text-primary transition-all duration-200">
-            Ver todos os repositórios <Github size={18} />
-          </a>
-        </motion.div>
       </div>
+
+      <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mt-12">
+        <a href="https://github.com/Adriano-Lengruber" target="_blank" rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-6 py-3 glass rounded-lg font-medium hover:border-primary/30 hover:text-primary transition-all duration-200">
+          Ver todos os repositórios <Github size={18} />
+        </a>
+      </motion.div>
     </section>
   );
 }
 
-// ──────────────────────────────────────────────────────────────
-// Blog
-// ──────────────────────────────────────────────────────────────
-const blogPatterns = [
-  { from: 'from-cyber-gold/10', to: 'to-cyber-amber/5', accent: 'text-cyber-gold' },
-  { from: 'from-cyber-steel/10', to: 'to-cyber-blue/5', accent: 'text-cyber-steel' },
-  { from: 'from-cyber-emerald/10', to: 'to-teal-900/20', accent: 'text-cyber-emerald' },
-  { from: 'from-primary/8', to: 'to-cyber-steel/5', accent: 'text-primary/70' },
-];
-
 function Blog() {
-  const [likedPosts, setLikedPosts] = useState<number[]>([]);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const handleLike = (id: number) => setLikedPosts((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
+  const blogPatterns = [
+    { from: 'from-cyber-gold/10', to: 'to-cyber-amber/5', accent: 'text-cyber-gold' },
+    { from: 'from-cyber-steel/10', to: 'to-cyber-blue/5', accent: 'text-cyber-steel' },
+    { from: 'from-cyber-emerald/10', to: 'to-teal-900/20', accent: 'text-cyber-emerald' },
+    { from: 'from-primary/8', to: 'to-cyber-steel/5', accent: 'text-primary/70' },
+  ];
+
+  const [posts, setPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+        const res = await fetch(`${API_URL}/posts?limit=2`);
+        const data = await res.json();
+        if (res.ok && data.posts) {
+          setPosts(data.posts);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar posts:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
 
   return (
-    <section id="blog" className="py-24 relative">
+    <section id="blog" className="py-16 relative">
       <div className="max-w-7xl mx-auto px-6">
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
-          <h2 className="font-heading text-4xl font-bold mb-4">Blog <span className="text-gradient">Comunitário</span></h2>
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-10">
+          <h2 className="font-heading text-3xl font-bold mb-4">Blog <span className="text-gradient">Comunitário</span></h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">Compartilhando conhecimento sobre dados, IA e tecnologia. Junte-se à comunidade!</p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          {blogPosts.map((post, index) => {
-            const pat = blogPatterns[index % blogPatterns.length];
-            return (
-              <motion.article key={post.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }} transition={{ delay: index * 0.1 }}
-                className="glass rounded-xl overflow-hidden hover:border-primary/25 transition-all duration-300 group flex flex-col">
-                {/* Elegant thumbnail — no emoji */}
-                <div className={`h-44 bg-gradient-to-br ${pat.from} ${pat.to} relative overflow-hidden blog-pattern`}>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className={`flex flex-col items-center gap-2 opacity-30 ${pat.accent}`}>
-                      <BarChart3 size={48} strokeWidth={1} />
+        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          {loading ? (
+            <div className="col-span-full text-center py-8 text-muted-foreground">
+              Carregando posts...
+            </div>
+          ) : posts.length > 0 ? (
+            <>
+            {posts.slice(0, 2).map((post, index) => {
+              const pat = blogPatterns[index % blogPatterns.length];
+              return (
+                <motion.article key={post._id || post.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }} transition={{ delay: index * 0.1 }}
+                  className="glass rounded-xl overflow-hidden hover:border-primary/25 transition-all duration-300 group flex flex-col cursor-pointer"
+                  onClick={() => window.location.href = '/blog'}>
+                  <div className={`h-44 bg-gradient-to-br ${pat.from} ${pat.to} relative overflow-hidden blog-pattern`}>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className={`flex flex-col items-center gap-2 opacity-30 ${pat.accent}`}>
+                        <BarChart3 size={48} strokeWidth={1} />
+                      </div>
+                    </div>
+                    <div className="absolute bottom-4 left-4 flex gap-2">
+                      {post.tags?.slice(0, 2).map((tag: string) => (
+                        <span key={tag} className="px-2.5 py-1 rounded glass text-xs font-medium backdrop-blur-md">{tag}</span>
+                      ))}
                     </div>
                   </div>
-                  <div className="absolute bottom-4 left-4 flex gap-2">
-                    {post.tags.slice(0, 2).map((tag) => (
-                      <span key={tag} className="px-2.5 py-1 rounded glass text-xs font-medium backdrop-blur-md">{tag}</span>
-                    ))}
-                  </div>
-                </div>
 
-                <div className="p-6 flex flex-col flex-1">
-                  <h3 className="font-heading text-lg font-semibold mb-2 group-hover:text-primary transition-colors leading-snug">{post.title}</h3>
-                  <p className="text-muted-foreground text-sm mb-4 flex-1 leading-relaxed">{post.excerpt}</p>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-4">
-                    <span className="font-medium">{post.author}</span>
-                    <span>{post.date} · {post.readTime} leitura</span>
+                  <div className="p-6 flex flex-col flex-1">
+                    <h3 className="font-heading text-lg font-semibold mb-2 group-hover:text-primary transition-colors leading-snug">{post.title}</h3>
+                    <p className="text-muted-foreground text-sm mb-4 flex-1 leading-relaxed">{post.excerpt}</p>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span className="font-medium">{post.authorName}</span>
+                      <span>{post.readTime} leitura</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-4 pt-4 border-t border-white/10">
-                    <button onClick={() => handleLike(post.id)}
-                      className={`flex items-center gap-1.5 text-sm transition-colors ${likedPosts.includes(post.id) ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}>
-                      <Heart size={15} fill={likedPosts.includes(post.id) ? 'currentColor' : 'none'} />
-                      {post.likes + (likedPosts.includes(post.id) ? 1 : 0)}
-                    </button>
-                    <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                      <MessageCircle size={15} /> {post.comments}
-                    </span>
-                    <button className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors ml-auto">
-                      <Share2 size={15} /> Compartilhar
-                    </button>
-                  </div>
-                </div>
-              </motion.article>
-            );
-          })}
+                </motion.article>
+              );
+            })}
+            </>
+          ) : (
+            <div className="col-span-full text-center py-8 text-muted-foreground">
+              Nenhum post encontrado. <Link to="/blog" className="text-primary hover:underline">Seja o primeiro a publicar!</Link>
+            </div>
+          )}
         </div>
 
-        {/* Auth CTA */}
+        {/* CTA to Blog Page */}
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-          className="mt-12 glass rounded-xl p-8 text-center">
-          <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-primary/10 flex items-center justify-center">
-            <User className="text-primary" size={24} />
-          </div>
-          <h3 className="font-heading text-xl font-semibold mb-2">Junte-se à Comunidade</h3>
-          <p className="text-muted-foreground mb-6 max-w-xl mx-auto text-sm">
-            Crie uma conta para comentar, curtir artigos e contribuir com a comunidade de dados e IA.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <button onClick={() => setShowAuthModal(true)} className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-all">
-              <LogIn size={17} /> Cadastrar-se
-            </button>
-            <Link to="/blog" className="inline-flex items-center gap-2 px-6 py-3 glass rounded-lg font-semibold hover:border-primary/30 transition-all">
-              Ver todos os posts <ArrowRight size={17} />
-            </Link>
-          </div>
+          className="mt-12 text-center">
+          <Link to="/blog" className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-all">
+            Ver todos os posts <ArrowRight size={17} />
+          </Link>
         </motion.div>
-
-        {/* Auth Modal */}
-        {showAuthModal && (
-          <motion.div 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }}
-            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
-            onClick={() => setShowAuthModal(false)}
-          >
-            <motion.div 
-              initial={{ scale: 0.9, opacity: 0 }} 
-              animate={{ scale: 1, opacity: 1 }}
-              className="glass rounded-2xl p-8 max-w-md w-full"
-              onClick={e => e.stopPropagation()}
-            >
-              <h2 className="font-heading text-2xl font-bold mb-6 text-center">
-                Junte-se à Comunidade
-              </h2>
-              <p className="text-muted-foreground text-center mb-6">
-                Entre com sua conta para curtir, comentar e compartilhar posts.
-              </p>
-              <div className="space-y-3">
-                <button className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors">
-                  <LogIn size={18} />
-                  Entrar com Email
-                </button>
-              </div>
-              <p className="text-center text-sm text-muted-foreground mt-6">
-                Não tem conta?{' '}
-                <button className="text-primary hover:underline">
-                  Criar conta
-                </button>
-              </p>
-            </motion.div>
-          </motion.div>
-        )}
       </div>
     </section>
   );
@@ -1138,24 +1133,26 @@ function Footer() {
 // ──────────────────────────────────────────────────────────────
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={
-        <div className="min-h-screen bg-cyber-black">
-          <Navigation />
-          <Hero />
-          <About />
-          <TechStack />
-          <Services />
-          <Resume />
-          <Education />
-          <Certifications />
-          <Projects />
-          <Blog />
-          <Contact />
-          <Footer />
-        </div>
-      } />
-      <Route path="/blog" element={<BlogPage />} />
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        <Route path="/" element={
+          <div className="min-h-screen bg-cyber-black">
+            <Navigation />
+            <Hero />
+            <About />
+            <TechStack />
+            <Services />
+            <Resume />
+            <Education />
+            <Certifications />
+            <Projects />
+            <Blog />
+            <Contact />
+            <Footer />
+          </div>
+        } />
+        <Route path="/blog" element={<BlogPage />} />
+      </Routes>
+    </AuthProvider>
   );
 }
