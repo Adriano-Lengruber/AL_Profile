@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  al-profile:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: al-profile:latest
+    container_name: al-profile
+    ports:
+      - "3003:80"
+    restart: unless-stopped
+    labels:
+      - "com.nginx-proxy-manager.preserve_source_ip=true"
+    networks:
+      - nginx-proxy
+
+networks:
+  nginx-proxy:
+    external: true
