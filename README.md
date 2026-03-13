@@ -90,6 +90,39 @@ AL_Profile/
 - **Backend API**: http://localhost:3003/api
 - **GitHub**: https://github.com/Adriano-Lengruber
 
+## 🚀 Deploy na VPS
+
+### Atualizar código na VPS:
+```bash
+# Já na pasta do projeto (/opt/AL_Profile)
+git pull origin master
+```
+
+### Subir containers:
+```bash
+# Build e iniciar (modo desenvolvimento local)
+docker-compose -f docker-compose.blog.yml up -d --build
+
+# Ou usar o Dockerfile direto:
+docker build -t al-profile .
+docker run -d -p 3003:80 --name al-profile al-profile
+```
+
+### Comandos úteis:
+```bash
+# Ver logs
+docker logs al-profile
+
+# Parar container
+docker stop al-profile
+
+# Remover container
+docker rm al-profile
+
+# Ver containers rodando
+docker ps
+```
+
 ## 📄 Licença
 
 MIT License - Feel free to use this project as a template!
