@@ -112,3 +112,31 @@
 .timeline-line {
   background: linear-gradient(to bottom, #d4a853, #94a3b8 60%, #059669);
 }
+
+/* Services card icon hover */
+.group:hover .service-icon {
+  transform: scale(1.12) rotate(-3deg);
+}
+
+/* Subtle section divider glow */
+.section-glow {
+  background: radial-gradient(ellipse at 50% 0%, rgba(212, 168, 83, 0.07) 0%, transparent 70%);
+}
+
+/* Animate spin slow (contact sending) */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-spin {
+  animation: spin-slow 1s linear infinite;
+}
+
+/* Card tilt on hover — hardware-accelerated */
+.card-tilt {
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease;
+}
+.card-tilt:hover {
+  transform: translateY(-4px) scale(1.01);
+}

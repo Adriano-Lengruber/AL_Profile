@@ -6,7 +6,8 @@ import {
   User, LogIn, Send, Code2, Database, BarChart3, LayoutDashboard,
   Calculator, Eye, Building2, Cloud, Bot, Zap, Palette, GitBranch,
   BrainCircuit, Wrench, Rocket, Users, Terminal, Cpu, CheckCircle2,
-  ChevronDown, Calendar,
+  ChevronDown, Calendar, FileDown, Award, TrendingUp, Blocks,
+  CheckCheck, Sparkles, Activity,
 } from 'lucide-react';
 
 interface Experience {
@@ -116,6 +117,7 @@ function Navigation() {
   const navItems = [
     { name: 'Início', href: '#home' },
     { name: 'Sobre', href: '#about' },
+    { name: 'Serviços', href: '#services' },
     { name: 'Currículo', href: '#resume' },
     { name: 'Projetos', href: '#projects' },
     { name: 'Blog', href: '#blog' },
@@ -233,6 +235,13 @@ function Hero() {
             <a href="#projects" className="inline-flex items-center gap-2 px-7 py-3 glass rounded-lg font-semibold hover:border-primary/30 transition-all duration-200">
               Ver projetos
             </a>
+            <a
+              href="/cv-adriano-lengruber.pdf"
+              download
+              className="inline-flex items-center gap-2 px-7 py-3 border border-primary/30 rounded-lg font-semibold text-primary hover:bg-primary/10 transition-all duration-200"
+            >
+              <FileDown size={18} /> Download CV
+            </a>
           </motion.div>
 
           <motion.div
@@ -267,12 +276,14 @@ function Hero() {
 // About
 // ──────────────────────────────────────────────────────────────
 function About() {
+  const yearsExp = new Date().getFullYear() - 2014;
   const stats = [
-    { icon: <Code2 size={22} className="text-primary" />, label: 'Linguagens', value: '5+' },
+    { icon: <Calendar size={22} className="text-primary" />, label: 'Anos de Exp.', value: `${yearsExp}+` },
     { icon: <Wrench size={22} className="text-cyber-steel" />, label: 'Ferramentas', value: '15+' },
     { icon: <Rocket size={22} className="text-cyber-emerald" />, label: 'Projetos', value: '50+' },
     { icon: <Users size={22} className="text-primary" />, label: 'Clientes', value: '20+' },
   ];
+
 
   return (
     <section id="about" className="py-24 relative">
@@ -320,8 +331,106 @@ function About() {
 }
 
 // ──────────────────────────────────────────────────────────────
+// Services
+// ──────────────────────────────────────────────────────────────
+function Services() {
+  const services = [
+    {
+      icon: <BarChart3 size={28} />,
+      color: 'text-primary',
+      bg: 'bg-primary/10',
+      border: 'hover:border-primary/30',
+      title: 'Análise de Dados',
+      description: 'Transformo dados brutos em insights acionáveis que guiam decisões estratégicas com precisão.',
+      items: ['ETL & Data Pipelines', 'Análise Estatística', 'Relatórios Executivos'],
+    },
+    {
+      icon: <Bot size={28} />,
+      color: 'text-cyber-emerald',
+      bg: 'bg-cyber-emerald/10',
+      border: 'hover:border-cyber-emerald/30',
+      title: 'AI Agents',
+      description: 'Desenvolvimento de agentes de IA autônomos para automatizar tarefas complexas e repetitivas.',
+      items: ['LLM Integration', 'Workflow Automation', 'RAG & Knowledge Bases'],
+    },
+    {
+      icon: <LayoutDashboard size={28} />,
+      color: 'text-cyber-steel',
+      bg: 'bg-cyber-steel/10',
+      border: 'hover:border-cyber-steel/30',
+      title: 'Business Intelligence',
+      description: 'Dashboards interativos e painéis analíticos que revelam o desempenho do negócio em tempo real.',
+      items: ['Power BI & DAX', 'KPIs & Métricas', 'Integração SAP/ERP'],
+    },
+    {
+      icon: <Zap size={28} />,
+      color: 'text-cyber-gold',
+      bg: 'bg-cyber-gold/10',
+      border: 'hover:border-cyber-gold/30',
+      title: 'Automação & RPA',
+      description: 'Elimino tarefas manuais com robôs de software, reduzindo erros e aumentando a produtividade.',
+      items: ['Power Automate', 'Web Scraping', 'Scripts Python'],
+    },
+    {
+      icon: <Code2 size={28} />,
+      color: 'text-cyber-blue',
+      bg: 'bg-cyber-blue/10',
+      border: 'hover:border-cyber-blue/30',
+      title: 'Desenvolvimento Full-Stack',
+      description: 'Aplicações web modernas, APIs e sistemas personalizados do conceito à produção.',
+      items: ['React & TypeScript', 'APIs REST/FastAPI', 'Deploy & DevOps'],
+    },
+    {
+      icon: <TrendingUp size={28} />,
+      color: 'text-cyber-amber',
+      bg: 'bg-cyber-amber/10',
+      border: 'hover:border-cyber-amber/30',
+      title: 'Marketing Digital',
+      description: 'Estratégias orientadas a dados para crescimento orgânico, anúncios e presença digital.',
+      items: ['SEO & Analytics', 'Gestão de Tráfego', 'Social Media'],
+    },
+  ];
+
+  return (
+    <section id="services" className="py-24 relative">
+      <div className="max-w-7xl mx-auto px-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
+          <h2 className="font-heading text-4xl font-bold mb-4">O que eu <span className="text-gradient">Ofereço</span></h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto">Soluções sob medida para transformar seus dados e processos em vantagem competitiva</p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {services.map((svc, i) => (
+            <motion.div key={svc.title}
+              initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+              transition={{ delay: i * 0.08 }}
+              className={`glass rounded-xl p-6 transition-all duration-300 group ${svc.border} hover:shadow-lg`}
+            >
+              <div className={`w-14 h-14 rounded-xl ${svc.bg} flex items-center justify-center mb-5 ${svc.color} group-hover:scale-110 transition-transform duration-300`}>
+                {svc.icon}
+              </div>
+              <h3 className="font-heading text-lg font-semibold mb-2">{svc.title}</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed mb-4">{svc.description}</p>
+              <ul className="space-y-1.5">
+                {svc.items.map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <CheckCheck size={14} className={svc.color} />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
 // Resume
 // ──────────────────────────────────────────────────────────────
+
 function Resume() {
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
@@ -623,7 +732,14 @@ function Blog() {
 // ──────────────────────────────────────────────────────────────
 function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
-  const handleSubmit = (e: React.FormEvent) => { e.preventDefault(); console.log('Form submitted:', formData); };
+  const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSending(true);
+    setTimeout(() => { setSending(false); setSent(true); setFormData({ name: '', email: '', subject: '', message: '' }); }, 1500);
+    setTimeout(() => setSent(false), 5500);
+  };
   const up = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setFormData((prev) => ({ ...prev, [field]: e.target.value }));
 
@@ -692,10 +808,22 @@ function Contact() {
                   className="w-full px-4 py-3 rounded-lg bg-cyber-black/50 border border-white/10 focus:border-primary/50 focus:outline-none transition-colors resize-none text-sm"
                   placeholder="Sua mensagem..." required />
               </div>
-              <button type="submit"
-                className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/20">
-                <Send size={17} /> Enviar Mensagem
-              </button>
+              {sent ? (
+                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+                  className="w-full flex flex-col items-center gap-3 py-6 text-center">
+                  <div className="w-16 h-16 rounded-full bg-cyber-emerald/15 flex items-center justify-center">
+                    <CheckCircle2 size={32} className="text-cyber-emerald" />
+                  </div>
+                  <p className="font-semibold text-lg">Mensagem enviada!</p>
+                  <p className="text-muted-foreground text-sm">Responderei em breve. Obrigado pelo contato 🙌</p>
+                </motion.div>
+              ) : (
+                <button type="submit" disabled={sending}
+                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/20 disabled:opacity-60">
+                  {sending ? <Activity size={17} className="animate-spin" /> : <Send size={17} />}
+                  {sending ? 'Enviando...' : 'Enviar Mensagem'}
+                </button>
+              )}
             </form>
           </motion.div>
         </div>
@@ -714,7 +842,7 @@ function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
             <span className="font-heading text-xl font-bold text-gradient">AL</span>
-            <span className="text-muted-foreground text-sm">© 2025 Adriano Lengruber</span>
+            <span className="text-muted-foreground text-sm">© {new Date().getFullYear()} Adriano Lengruber</span>
           </div>
           <div className="flex items-center gap-6 text-sm text-muted-foreground">
             <a href="#" className="hover:text-primary transition-colors">Privacidade</a>
@@ -739,6 +867,7 @@ export default function App() {
       <Navigation />
       <Hero />
       <About />
+      <Services />
       <Resume />
       <Projects />
       <Blog />
