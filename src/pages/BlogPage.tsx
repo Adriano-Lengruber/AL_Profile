@@ -5,7 +5,7 @@ import {
   ArrowLeft, Heart, MessageCircle, Share2, Search, 
   Calendar, User, LogIn, LogOut, Send, Loader2,
   Plus, Edit2, Trash2, X, ChevronLeft, ChevronRight,
-  Settings, Image, Tag, Clock
+  Settings, Image, Tag, Clock, BarChart3
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
@@ -838,15 +838,32 @@ export default function BlogPage() {
                   className="glass rounded-xl overflow-hidden hover:border-primary/25 transition-all duration-300 group cursor-pointer"
                   onClick={() => handleViewPost(post)}
                 >
-                  <div className={`h-40 ${pattern.gradient} flex items-center justify-center relative overflow-hidden`}>
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05)_0%,transparent_70%)]" />
-                    <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/40 to-transparent" />
-                    <span className={`${pattern.accent} font-heading text-5xl font-bold opacity-40 group-hover:opacity-60 transition-opacity duration-300 drop-shadow-lg`}>
-                      {post.title.charAt(0)}
-                    </span>
-                    {/* Tags only below - removed from image */}
+                  {/* Image area - standardized to landing page format */}
+                  <div className={`h-44 bg-gradient-to-br ${pattern.from} ${pattern.to} relative overflow-hidden blog-pattern`}>
+                    {post.imageUrl ? (
+                      <img 
+                        src={post.imageUrl} 
+                        alt={post.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className={`flex flex-col items-center gap-2 opacity-30 ${pattern.accent}`}>
+                          <BarChart3 size={48} strokeWidth={1} />
+                        </div>
+                      </div>
+                    )}
+                    {/* Gold badges on image */}
+                    <div className="absolute bottom-3 left-3 flex gap-2">
+                      {post.tags?.slice(0, 2).map((tag: string) => (
+                        <span key={tag} className="px-2.5 py-1 rounded glass text-xs font-medium backdrop-blur-md text-primary">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    {/* Edit button for owner */}
                     {isOwner && (
-                      <div className="absolute top-3 left-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button 
                           onClick={(e) => { e.stopPropagation(); openEditPost(post); }}
                           className="p-1.5 bg-black/50 backdrop-blur-sm rounded-lg hover:bg-black/70 transition-colors"
@@ -857,29 +874,16 @@ export default function BlogPage() {
                     )}
                   </div>
                   
-                  <div className="p-6">
-                    <div className="flex items-center gap-2 mb-3 flex-wrap">
-                      {post.tags.slice(0, 2).map(tag => {
-                        const color = getTagColor(tag);
-                        return (
-                          <span 
-                            key={tag} 
-                            className={`text-xs px-3 py-1 rounded-full bg-gradient-to-r ${color.bg} ${color.text} border ${color.border} font-medium`}
-                          >
-                            {tag}
-                          </span>
-                        );
-                      })}
-                    </div>
-                    
+                  <div className="p-5">
                     <h2 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors line-clamp-2">
                       {post.title}
                     </h2>
-                    <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
+                    <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
                       {post.excerpt}
                     </p>
                     
-                    <div className="flex items-center justify-between text-xs text-muted-foreground mb-4">
+                    {/* Date, read time and author */}
+                    <div className="flex items-center justify-between text-xs text-muted-foreground mb-3">
                       <span className="flex items-center gap-1">
                         <Calendar size={12} /> {new Date(post.createdAt).toLocaleDateString('pt-BR')}
                       </span>
@@ -887,8 +891,11 @@ export default function BlogPage() {
                         <Clock size={12} /> {post.readTime}
                       </span>
                     </div>
+                    <div className="text-xs text-primary/80 mb-3">
+                      {post.authorName || 'Autor'}
+                    </div>
                     
-                    <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                    <div className="flex items-center justify-between pt-3 border-t border-white/10">
                       <button 
                         onClick={(e) => {
                           e.stopPropagation();
