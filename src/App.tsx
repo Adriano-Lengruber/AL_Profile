@@ -99,10 +99,10 @@ const blogPosts: BlogPost[] = [
 ];
 
 const education = [
-  { title: 'Pós-graduação Lato Sensu', school: 'Faculdade Líbano', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7e/Itaú_Unibanco_Logo.svg', degree: 'Business Intelligence, Big Data e Analytics — Ciência de Dados', period: '2024 - 2025', description: 'Formação avançada em técnicas de Business Intelligence,big data e analytics com foco em ciência de dados. Aprendizado em machine learning, visualização de dados e ferramentas como Python, R e Power BI.' },
-  { title: 'Bootcamp', school: 'SoulCode', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg', degree: 'Analista de Dados', period: '2023', description: 'Bootcamp intensivo focado em análise de dados, SQL, Python, visualização de dados e business intelligence. Projetos práticos com ferramentas reais do mercado.' },
-  { title: 'Bacharel', school: 'Universidade Iguaçu', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7e/Itaú_Unibanco_Logo.svg', degree: 'Sistemas de Informação', period: '2004 - 2007', description: 'Graduação em Sistemas de Informação com foco em desenvolvimento de software, banco de dados, análise de sistemas e gestão de tecnologia da informação.' },
-  { title: 'Técnico', school: 'Wall Escola Técnica', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7e/Itaú_Unibanco_Logo.svg', degree: 'Técnico em Mecatrônica', period: '2008 - 2010', description: 'Curso técnico focado em mecânica, eletrônica e informática industrial. Programação de controladores lógicos programmáveis (CLP), manutenção de sistemas automatizados e robótica.' },
+  { title: 'Pós-graduação Lato Sensu', school: 'Faculdade Líbano', degree: 'Business Intelligence, Big Data e Analytics — Ciência de Dados', period: '2024 - 2025', description: 'Formação avançada em técnicas de Business Intelligence,big data e analytics com foco em ciência de dados. Aprendizado em machine learning, visualização de dados e ferramentas como Python, R e Power BI.' },
+  { title: 'Bootcamp', school: 'SoulCode Academy', degree: 'Analista de Dados', period: '2023', description: 'Bootcamp intensivo focado em análise de dados, SQL, Python, visualização de dados e business intelligence. Projetos práticos com ferramentas reais do mercado.' },
+  { title: 'Bacharel', school: 'Universidade Iguaçu - UNIG', degree: 'Sistemas de Informação', period: '2004 - 2007', description: 'Graduação em Sistemas de Informação com foco em desenvolvimento de software, banco de dados, análise de sistemas e gestão de tecnologia da informação.' },
+  { title: 'Técnico', school: 'Wall Escola Técnica', degree: 'Técnico em Mecatrônica', period: '2008 - 2010', description: 'Curso técnico focado em mecânica, eletrônica e informática industrial. Programação de controladores lógicos programmáveis (CLP), manutenção de sistemas automatizados e robótica.' },
 ];
 
 const certifications = [
@@ -537,9 +537,9 @@ function Services() {
     },
     {
       icon: <TrendingUp size={28} />,
-      color: 'text-cyber-amber',
-      bg: 'bg-cyber-amber/10',
-      border: 'hover:border-cyber-amber/30',
+      color: 'text-[#E07390]',
+      bg: 'bg-[#E07390]/10',
+      border: 'hover:border-[#E07390]/30',
       title: 'DevOps',
       description: 'Configuração e disponibilização de VPS 100% funcional de acordo com cada necessidade do cliente.',
       items: [
@@ -656,7 +656,7 @@ function Resume() {
                 {/* Card */}
                 <div className={`
                   glass rounded-xl p-6 hover:border-primary/25 transition-all duration-300 cursor-pointer
-                  ${isLeft ? 'md:w-[45%] md:mr-auto md:pr-8 md:text-right' : 'md:w-[45%] md:ml-auto md:pl-8'}
+                  ${isLeft ? 'md:w-[45%] md:mr-auto md:pr-8' : 'md:w-[45%] md:ml-auto md:pl-8'}
                 `} onClick={() => setExpandedId(expandedId === exp.id ? null : exp.id)}>
                   <div className="flex items-start justify-between mb-3">
                     <div>
@@ -721,29 +721,24 @@ function Education() {
               transition={{ delay: index * 0.1 }}
               className="glass rounded-xl p-6 hover:border-primary/25 transition-all duration-300"
             >
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                  {edu.logo ? (
-                    <img src={edu.logo} alt={edu.school} className="w-8 h-8 object-contain" />
-                  ) : (
-                    <BookOpen className="text-cyber-gold" size={24} />
-                  )}
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs text-primary font-medium">{edu.title}</p>
+                  <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Calendar size={12} className="text-primary" />
+                    {edu.period}
+                  </span>
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <p className="text-xs text-primary font-medium mb-0.5">{edu.title}</p>
-                      <h4 className="font-semibold text-lg">{edu.school}</h4>
-                    </div>
-                    <span className="px-3 py-1 rounded-full bg-cyber-slate/50 text-xs text-muted-foreground">
-                      {edu.period}
-                    </span>
-                  </div>
-                  <p className="text-primary font-medium mb-2">{edu.degree}</p>
-                  {'description' in edu && edu.description && (
-                    <p className="text-muted-foreground text-sm leading-relaxed">{edu.description}</p>
-                  )}
-                </div>
+                <h4 className="font-semibold text-lg">{edu.school}</h4>
+              </div>
+              <p className="text-primary font-medium mb-2">{edu.degree}</p>
+              {'description' in edu && edu.description && (
+                <p className="text-muted-foreground text-sm leading-relaxed">{edu.description}</p>
+              )}
+              <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-white/10">
+                <span className="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                  {edu.degree.split(' ')[0]}
+                </span>
               </div>
             </motion.div>
           ))}
@@ -889,7 +884,7 @@ function Projects() {
               </div>
             </div>
           ) : (
-            displayRepos.slice(0, 6).map((repo, index) => (
+            displayRepos.slice(0, 3).map((repo, index) => (
               <motion.a key={repo.id} href={repo.url} target="_blank" rel="noopener noreferrer"
                 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
                 transition={{ delay: index * 0.08 }}
