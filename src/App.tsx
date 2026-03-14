@@ -978,7 +978,7 @@ function Blog() {
                   viewport={{ once: true }} transition={{ delay: index * 0.1 }}
                   className="glass rounded-xl overflow-hidden hover:border-primary/25 transition-all duration-300 group flex flex-col cursor-pointer"
                   onClick={() => window.location.href = `/blog?id=${post._id}`}>
-                  <div className={`h-44 bg-gradient-to-br ${pat.from} ${pat.to} relative overflow-hidden blog-pattern`}>
+                  <div className={`h-44 bg-gradient-to-br ${pat.from} ${pat.to} relative overflow-hidden blog-pattern group-hover:brightness-75 transition-all duration-300`}>
                     {post.imageUrl ? (
                       <img 
                         src={post.imageUrl} 
@@ -994,7 +994,7 @@ function Blog() {
                     )}
                     <div className="absolute bottom-4 left-4 flex gap-2">
                       {post.tags?.slice(0, 2).map((tag: string) => (
-                        <span key={tag} className="px-2.5 py-1 rounded glass text-xs font-medium backdrop-blur-md">{tag}</span>
+                        <span key={tag} className="px-2.5 py-1 rounded glass text-xs font-medium backdrop-blur-md text-primary">{tag}</span>
                       ))}
                     </div>
                   </div>
@@ -1003,7 +1003,9 @@ function Blog() {
                     <h3 className="font-heading text-lg font-semibold mb-2 group-hover:text-primary transition-colors leading-snug">{post.title}</h3>
                     <p className="text-muted-foreground text-sm mb-4 flex-1 leading-relaxed">{post.excerpt}</p>
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span className="font-medium">{post.authorName}</span>
+                      <span className="flex items-center gap-1">
+                        <Calendar size={12} /> {new Date(post.createdAt).toLocaleDateString('pt-BR')}
+                      </span>
                       <span>{post.readTime} leitura</span>
                     </div>
                   </div>
