@@ -1,132 +1,119 @@
-# 🚀 AL_Profile - Portfólio Profissional
+# 🌐 AL_Profile Ecosystem - Adriano Lengruber
 
-Portfólio profissional moderno e interativo construído com React, TypeScript, Tailwind CSS e Node.js/Express com MongoDB.
+[![Status](https://img.shields.io/badge/status-ativo-success)](#)
+[![Tech Stack](https://img.shields.io/badge/tech-React%20%2B%20TypeScript%20%2B%20Node.js%20%2B%20MongoDB-blue)](#)
+[![Domain](https://img.shields.io/badge/domain-adriano--lengruber.com-gold)](https://adriano-lengruber.com)
 
-![Status](https://img.shields.io/badge/status-em%20desenvolvimento-blue)
-![Tech Stack](https://img.shields.io/badge/tech-React%20%2B%20TypeScript%20%2B%20Node.js-green)
-
-## ✨ Features
-
-### Frontend
-- 🎨 Design moderno com tema cyber/gold
-- 📱 Totalmente responsivo (mobile-first)
-- ✨ Animações suaves com Framer Motion
-- 🔗 Tech Stack interativo com scroll automático e manual
-- 📝 Blog com posts recentes
-- 📧 Formulário de contato funcional
-- 🌐 Integração com API do GitHub
-
-### Backend (Em Desenvolvimento)
-- 🔐 Sistema de autenticação JWT
-- 📝 API REST para Blog
-- 💬 Sistema de posts, likes e comentários
-- 👤 Sistema de usuários e perfis
-
-## 🛠️ Tecnologias
-
-### Frontend
-- **React 18** - Biblioteca UI
-- **TypeScript** - Tipagem estática
-- **Vite** - Build tool
-- **Tailwind CSS** - Estilização
-- **Framer Motion** - Animações
-- **Lucide React** - Ícones
-
-### Backend
-- **Node.js** - Runtime JavaScript
-- **Express** - Framework web
-- **MongoDB** - Banco de dados
-- **Mongoose** - ODM MongoDB
-- **JWT** - Autenticação
-- **bcryptjs** - Criptografia de senhas
-
-## 🚀 Como Executar
-
-### Frontend
-```bash
-# Instalar dependências
-npm install
-
-# Rodar em desenvolvimento
-npm run dev
-```
-
-### Backend com Docker
-```bash
-# Subir containers (MongoDB + API)
-docker-compose -f docker-compose.blog.yml up -d
-
-# A API estará disponível em: http://localhost:3003/api
-```
-
-### Variáveis de Ambiente
-Crie um arquivo `.env` na raiz do projeto:
-```env
-VITE_API_URL=http://localhost:3003/api
-```
-
-## 📁 Estrutura do Projeto
-
-```
-AL_Profile/
-├── src/
-│   ├── components/     # Componentes React
-│   ├── hooks/         # Custom hooks (useAuth)
-│   ├── lib/           # Utilitários
-│   ├── pages/         # Páginas (BlogPage)
-│   ├── App.tsx        # Componente principal
-│   └── main.tsx      # Entry point
-├── server/            # Backend Node.js/Express
-│   ├── index.js       # Servidor API
-│   ├── package.json   # Dependências
-│   └── Dockerfile     # Container Docker
-├── docker-compose.blog.yml  # Docker Compose
-└── README.md
-```
-
-## 🔗 Links Úteis
-
-- **Frontend**: http://localhost:5173
-- **Backend API**: http://localhost:3003/api
-- **GitHub**: https://github.com/Adriano-Lengruber
-
-## 🚀 Deploy na VPS
-
-### Atualizar código na VPS:
-```bash
-# Já na pasta do projeto (/opt/AL_Profile)
-git pull origin master
-```
-
-### Subir containers:
-```bash
-# Build e iniciar (modo desenvolvimento local)
-docker-compose -f docker-compose.blog.yml up -d --build
-
-# Ou usar o Dockerfile direto:
-docker build -t al-profile .
-docker run -d -p 3003:80 --name al-profile al-profile
-```
-
-### Comandos úteis:
-```bash
-# Ver logs
-docker logs al-profile
-
-# Parar container
-docker stop al-profile
-
-# Remover container
-docker rm al-profile
-
-# Ver containers rodando
-docker ps
-```
-
-## 📄 Licença
-
-MIT License - Feel free to use this project as a template!
+Este repositório contém o ecossistema digital completo de **Adriano Lengruber**, integrando um portal pessoal de alta performance, um blog técnico interativo e o **Work OS**, um sistema operacional administrativo robusto para gestão de consultoria.
 
 ---
 
-Desenvolvido por [Adriano Lengruber](https://github.com/Adriano-Lengruber)
+## 🏗️ Estrutura do Ecossistema
+
+### 1. 💎 Portal Pessoal ([adriano-lengruber.com](https://adriano-lengruber.com))
+Uma vitrine tecnológica de alta performance focada em conversão e branding pessoal.
+- **Visual Cyber/Gold**: Estética moderna com animações fluidas via Framer Motion.
+- **Currículo Interativo**: Timeline de experiências, habilidades categorizadas e certificações.
+- **Portfólio de Projetos**: Integração com a API do GitHub para exibição de repositórios em tempo real.
+- **Experiência 3D**: Elementos interativos utilizando **Three.js** e **React Three Fiber**.
+
+### 2. ✍️ Blog Técnico
+Plataforma de compartilhamento de conhecimento integrada.
+- **Conteúdo Dinâmico**: Posts sobre Data Science, IA, Automação e BI.
+- **Engajamento**: Sistema de likes e comentários persistentes via MongoDB.
+- **SEO Optimized**: Estrutura focada em indexação e legibilidade.
+
+### 3. 🚀 Work OS (Admin Dashboard)
+O cérebro operacional para gestão de clientes e projetos.
+- **Workspaces Estilo Monday.com**: Gestão granular de tarefas com quadros interativos.
+- **CRM Avançado**: Pipeline de vendas, gestão de stakeholders e análise de briefing por IA.
+- **Sincronização em Tempo Real**: Edição de células com persistência automática no MongoDB.
+- **Gerador de Propostas**: Automação de documentos comerciais e conversão direta para projetos.
+
+---
+
+## 🛠️ Stack Tecnológica
+
+### Frontend
+- **React 18** & **TypeScript**: Base sólida e tipada para a interface.
+- **Vite**: Tooling de próxima geração para desenvolvimento rápido.
+- **Tailwind CSS**: Estilização utilitária e responsiva.
+- **Framer Motion**: Orquestração de animações complexas.
+- **Three.js / React Three Fiber**: Renderização de elementos 3D interativos.
+- **Lucide React**: Conjunto de ícones vetoriais modernos.
+
+### Backend & Persistência
+- **Node.js** & **Express**: API RESTful robusta.
+- **MongoDB** & **Mongoose**: Armazenamento NoSQL escalável.
+- **JWT (JSON Web Tokens)**: Autenticação segura de usuários.
+- **Bcrypt.js**: Criptografia de ponta para segurança de dados.
+
+### Qualidade & Testes
+- **Vitest**: Framework de testes nativo para Vite.
+- **React Testing Library**: Garantia de comportamento da interface.
+
+---
+
+## 🚀 Como Iniciar o Projeto
+
+### Pré-requisitos
+- Node.js (v18+)
+- MongoDB (Instalação local ou cluster Atlas)
+- pnpm ou npm
+
+### Configuração
+1. Clone este repositório.
+2. Configure o arquivo `.env` na raiz:
+```env
+# Backend
+MONGODB_URI=sua_uri_do_mongodb
+JWT_SECRET=sua_chave_secreta
+
+# Frontend
+VITE_API_URL=http://localhost:3001/api
+```
+
+### Comandos Principais
+```bash
+# Instalar todas as dependências
+npm install
+
+# Rodar o Backend (API)
+node server/index.js
+
+# Rodar o Frontend (Portal + Work OS)
+npm run dev
+
+# Executar Testes Automatizados
+npm test
+```
+
+---
+
+## 🧪 Garantia de Qualidade
+O projeto utiliza testes automatizados para validar fluxos críticos:
+- **CRUD de Workspaces**: Criação, edição e exclusão de itens.
+- **Sincronização de Dados**: Verificação do debounce e persistência no banco.
+- **Fluxos de CRM**: Conversão de propostas e gestão de projetos.
+
+---
+
+## 📁 Organização do Código
+- `/src/App.tsx`: Ponto de entrada e portal principal.
+- `/src/pages/AdminDashboard.tsx`: Dashboard administrativa (Work OS).
+- `/src/pages/BlogPage.tsx`: Interface do blog.
+- `/src/test/`: Suíte de testes automatizados.
+- `/server/index.js`: Lógica de API e modelos de dados.
+
+---
+
+## 👤 Autor
+**Adriano Lengruber**
+*Consultoria de Soluções Inteligentes | AI Agents & Automation Specialist*
+
+- [Website](https://adriano-lengruber.com)
+- [LinkedIn](https://linkedin.com/in/adriano-lengruber)
+- [GitHub](https://github.com/Adriano-Lengruber)
+
+---
+*Transformando dados em decisões e processos em automação.*

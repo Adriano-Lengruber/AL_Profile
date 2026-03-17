@@ -46,8 +46,21 @@ import {
   FileCheck,
   FileCode,
   ShieldAlert,
-  HelpCircle
+  HelpCircle,
+  Activity,
+  ArrowUpRight,
+  MousePointer2
 } from 'lucide-react';
+
+import { 
+  AreaChart, 
+  Area, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip as RechartsTooltip, 
+  ResponsiveContainer 
+} from 'recharts';
 
 // --- Mapeamento de Ícones ---
 const ICON_MAP: Record<string, any> = {
@@ -686,10 +699,192 @@ const BoardView = ({ board, onUpdateCell, onAddItem, onAddGroup, onDeleteItem, o
   );
 };
 
+const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead }: { 
+  projects: Project[], 
+  workspaces: Workspace[],
+  onNewWorkspace: () => void,
+  onNewLead: () => void
+}) => {
+  const activeWorkspacesCount = workspaces.length;
+  const totalLeads = projects.filter(p => p.status === 'prospect').length;
+  const activeProjects = projects.filter(p => p.status === 'active').length;
+  const totalPipelineValue = projects.reduce((acc, p) => acc + (p.value || 0), 0);
+  const winRate = projects.length > 0 ? Math.round((projects.filter(p => p.status === 'finished' || p.status === 'active').length / projects.length) * 100) : 0;
+
+  // Gerar dados do gráfico a partir dos projetos finalizados e ativos
+  const getMonthlyRevenue = () => {
+    const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    const currentMonth = new Date().getMonth();
+    const last6Months = [];
+    
+    for (let i = 5; i >= 0; i--) {
+      const monthIdx = (currentMonth - i + 12) % 12;
+      last6Months.push({
+        name: months[monthIdx],
+        value: 0,
+        monthIdx
+      });
+    }
+
+    projects.forEach(p => {
+      if (p.status === 'active' || p.status === 'finished') {
+        // Simulação: se não tiver data, assume mês atual ou anterior
+        const date = p.deadline && p.deadline !== 'A definir' ? new Date(p.deadline) : new Date();
+        const monthIdx = date.getMonth();
+        const chartMonth = last6Months.find(m => m.monthIdx === monthIdx);
+        if (chartMonth) {
+          chartMonth.value += (p.value || 0);
+        }
+      }
+    });
+
+    return last6Months;
+  };
+
+  const chartData = getMonthlyRevenue();
+
+  return (
+    <div className="space-y-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+        <div>
+          <h2 className="text-4xl font-bold font-heading">Business <span className="text-gradient">Insights</span></h2>
+          <p className="text-muted-foreground mt-2">Visão consolidada da sua operação de consultoria.</p>
+        </div>
+        <div className="flex items-center gap-2 px-3 py-1.5 glass rounded-full border-cyber-emerald/20 text-cyber-emerald text-[10px] font-bold uppercase tracking-widest">
+          <div className="w-2 h-2 rounded-full bg-cyber-emerald animate-pulse" />
+          Sistema Online & Sincronizado
+        </div>
+      </div>
+
+      {/* KPI Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[
+          { label: 'Workspaces Ativos', value: activeWorkspacesCount, sub: '+2 esta semana', icon: Layout, color: 'text-primary' },
+          { label: 'Total de Leads', value: totalLeads, sub: 'Pipeline saudável', icon: Users, color: 'text-cyber-gold' },
+          { label: 'Valor em Pipeline', value: `R$ ${(totalPipelineValue / 1000).toFixed(1)}k`, sub: 'Estimado', icon: DollarSign, color: 'text-cyber-emerald' },
+          { label: 'Taxa de Conversão', value: `${winRate}%`, sub: 'Win rate histórico', icon: Activity, color: 'text-purple-500' },
+        ].map((kpi, i) => (
+          <div key={i} className="glass p-6 rounded-2xl border-white/5 relative overflow-hidden group hover:border-white/10 transition-all">
+            <div className="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity">
+              <kpi.icon size={80} />
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">{kpi.label}</p>
+              <h3 className={`text-3xl font-bold ${kpi.color}`}>{kpi.value}</h3>
+              <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1">
+                <ArrowUpRight size={10} /> {kpi.sub}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid lg:grid-cols-3 gap-8">
+        {/* Chart Area */}
+        <div className="lg:col-span-2 glass p-8 rounded-3xl border-white/5">
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h3 className="text-sm font-bold uppercase tracking-widest text-white">Velocidade de Receita</h3>
+              <p className="text-[10px] text-muted-foreground">Volume de projetos ativos e finalizados por mês</p>
+            </div>
+            <div className="px-2 py-1 bg-cyber-emerald/10 text-cyber-emerald text-[9px] font-bold rounded uppercase">Real-time</div>
+          </div>
+          
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartData}>
+                <defs>
+                  <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#0066FF" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#0066FF" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff05" />
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fontSize: 10, fill: '#888' }}
+                  dy={10}
+                />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fontSize: 10, fill: '#888' }}
+                  tickFormatter={(val) => `R$ ${val >= 1000 ? (val/1000).toFixed(1) + 'k' : val}`}
+                />
+                <RechartsTooltip 
+                  contentStyle={{ backgroundColor: '#050505', border: '1px solid #ffffff10', borderRadius: '12px', fontSize: '12px' }}
+                  itemStyle={{ color: '#0066FF' }}
+                  formatter={(value: any) => [`R$ ${Number(value).toLocaleString('pt-BR')}`, 'Receita']}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="value" 
+                  stroke="#0066FF" 
+                  strokeWidth={3}
+                  fillOpacity={1} 
+                  fill="url(#colorValue)" 
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Command Center */}
+        <div className="space-y-6">
+          <div className="glass p-8 rounded-3xl border-white/5 h-full">
+            <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-6">Command Center</h3>
+            <div className="space-y-3">
+              <button 
+                onClick={onNewWorkspace}
+                className="w-full p-4 rounded-xl bg-primary/10 border border-primary/20 flex items-center gap-3 group hover:bg-primary/20 transition-all text-left"
+              >
+                <div className="p-2 rounded-lg bg-primary/20 text-primary">
+                  <Plus size={18} />
+                </div>
+                <div>
+                  <p className="text-xs font-bold">Novo Workspace</p>
+                  <p className="text-[10px] text-muted-foreground">Organizar novo cliente</p>
+                </div>
+              </button>
+              
+              <button 
+                onClick={onNewLead}
+                className="w-full p-4 rounded-xl bg-cyber-gold/10 border border-cyber-gold/20 flex items-center gap-3 group hover:bg-cyber-gold/20 transition-all text-left"
+              >
+                <div className="p-2 rounded-lg bg-cyber-gold/20 text-cyber-gold">
+                  <MousePointer2 size={18} />
+                </div>
+                <div>
+                  <p className="text-xs font-bold">Injetar Lead</p>
+                  <p className="text-[10px] text-muted-foreground">Novo prospect detectado</p>
+                </div>
+              </button>
+
+              <div className="pt-6 border-t border-white/5">
+                <h4 className="text-[10px] font-bold uppercase text-muted-foreground mb-4">Módulos Ativos</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  {['Sales Engine', 'CRM', 'BI', 'Automation'].map((mod, i) => (
+                    <div key={i} className="px-3 py-2 rounded-lg bg-white/5 border border-white/5 text-[10px] font-bold flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-cyber-emerald" />
+                      {mod}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // --- Componentes ---
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<'proposals' | 'crm' | 'ops' | 'erp' | 'board'>('board');
+  const [activeTab, setActiveTab] = useState<'proposals' | 'crm' | 'ops' | 'erp' | 'board' | 'dashboard'>('dashboard');
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   
@@ -1204,6 +1399,12 @@ export default function AdminDashboard() {
           <div>
             <p className="px-3 text-[10px] font-bold text-muted-foreground uppercase mb-3 tracking-widest">Acesso Rápido</p>
             <button 
+              onClick={() => setActiveTab('dashboard')} 
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all text-sm ${activeTab === 'dashboard' ? 'bg-primary/10 text-primary border border-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
+            >
+              <Activity size={18} /> Dashboard Insights
+            </button>
+            <button 
               onClick={() => setActiveTab('proposals')} 
               className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all text-sm ${activeTab === 'proposals' ? 'bg-primary/10 text-primary border border-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
             >
@@ -1310,7 +1511,11 @@ export default function AdminDashboard() {
               </>
             ) : (
               <h2 className="text-sm font-bold uppercase tracking-widest">
-                {activeTab === 'proposals' ? 'Gerador de Propostas' : 'Configurações da Empresa'}
+                {activeTab === 'dashboard' ? 'Business Intelligence & Insights' : 
+                 activeTab === 'proposals' ? 'Gerador de Propostas' : 
+                 activeTab === 'crm' ? 'Gestão de Relacionamento (CRM)' :
+                 activeTab === 'erp' ? 'Dashboard Financeiro (ERP)' :
+                 'Configurações da Empresa'}
               </h2>
             )}
           </div>
@@ -1346,6 +1551,46 @@ export default function AdminDashboard() {
           )}
           <AnimatePresence mode="wait">
             
+            {/* NOVO MODELO: DASHBOARD INSIGHTS */}
+            {activeTab === 'dashboard' && (
+              <motion.div 
+                key="dashboard" 
+                initial={{ opacity: 0, y: 20 }} 
+                animate={{ opacity: 1, y: 0 }} 
+                exit={{ opacity: 0, y: -20 }}
+              >
+                <DashboardView 
+                  projects={projects} 
+                  workspaces={workspaces} 
+                  onNewWorkspace={() => {
+                    const name = prompt('Nome do novo cliente/workspace:');
+                    if (name) {
+                      const newWs: Workspace = {
+                        id: `ws-${Date.now()}`,
+                        name,
+                        icon: 'Layout',
+                        boards: [{
+                          id: `board-${Date.now()}`,
+                          name: 'Geral',
+                          columns: PROJECT_COLUMNS,
+                          groups: [{ id: 'g1', title: 'Início', color: '#579BFC', items: [] }]
+                        }]
+                      };
+                      setWorkspaces(prev => [...prev, newWs]);
+                      setActiveWorkspaceId(newWs.id);
+                      setActiveBoardId(newWs.boards[0].id);
+                      setActiveTab('board');
+                      toast.success('Workspace criado!');
+                    }
+                  }}
+                  onNewLead={() => {
+                    setActiveTab('proposals');
+                    toast.info('Preencha o briefing para gerar o lead.');
+                  }}
+                />
+              </motion.div>
+            )}
+
             {/* NOVO MODELO: BOARD VIEW DINÂMICO */}
             {activeTab === 'board' && (
               <motion.div 
