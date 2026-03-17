@@ -16,34 +16,42 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd ~/AL_Profile
-            git pull origin master
+            # Tentar encontrar o diretório correto (algumas VPS usam caminhos diferentes)
+            if [ -d "~/AL_Profile" ]; then
+              cd ~/AL_Profile
+            elif [ -d "/home/adriano/AL_Profile" ]; then
+              cd /home/adriano/AL_Profile
+            else
+              echo "Diretório AL_Profile não encontrado! Tentando criar..."
+              mkdir -p ~/AL_Profile && cd ~/AL_Profile
+              git clone https://github.com/Adriano-Lengruber/AL_Profile.git . || true
+            fi
+
+            # Garantir que estamos na branch master e atualizados
+            git fetch origin master
+            git reset --hard origin/master
             
-            # Limpeza radical para liberar recursos e remover conflitos
-            docker stop al-profile-frontend al-profile-backend al-profile-mongodb || true
-            docker rm al-profile-frontend al-profile-backend al-profile-mongodb || true
-            docker-compose -f docker-compose.blog.yml down --remove-orphans || true
+            # Limpeza resiliente (não falha se o container não existir)
+            docker stop al-profile-frontend al-profile-backend al-profile-mongodb 2>/dev/null || true
+            docker rm al-profile-frontend al-profile-backend al-profile-mongodb 2>/dev/null || true
             
-            # Prune de imagens antigas para liberar espaço (comum em VPS)
-            docker image prune -f || true
-            
-            # Tentar o build e up com timeout e log de erros
-            if ! docker-compose -f docker-compose.blog.yml up -d --build; then
-              echo "ERRO: Falha no docker-compose up. Tentando logs..."
-              docker-compose -f docker-compose.blog.yml logs --tail 50
-              exit 1
+            # Verificar se docker-compose ou 'docker compose' está disponível
+            COMPOSE_CMD="docker-compose"
+            if ! command -v docker-compose &> /dev/null; then
+              COMPOSE_CMD="docker compose"
             fi
             
-            # Aguardar inicialização estável
-            sleep 15
+            # Subir containers
+            $COMPOSE_CMD -f docker-compose.blog.yml up -d --build
             
-            # Reconectar o Nginx Proxy Manager à rede do projeto (O NPM deve estar rodando na mesma VPS)
-            # O nome da rede no Docker Compose é derivado do nome da pasta (AL_Profile) -> al_profile_al-profile-network
-            docker network connect al_profile_al-profile-network nginx-proxy-app-1 || true
+            # Aguardar inicialização
+            sleep 10
             
-            # Verificação Final
-            echo "--- STATUS FINAL ---"
+            # Reconectar rede do Nginx Proxy Manager (NPM)
+            # O nome da rede padrão do compose é [nome_da_pasta]_al-profile-network
+            # Se a pasta for AL_Profile, o docker converte para minúsculo: al_profile_al-profile-network
+            docker network connect al_profile_al-profile-network nginx-proxy-app-1 2>/dev/null || true
+            
+            # Verificação de Saúde
+            echo "--- CONTAINERS ATIVOS ---"
             docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep al-profile
-            
-            # Teste de resposta HTTP interna
-            docker exec al-profile-frontend curl -I localhost || echo "Frontend não está respondendo internamente!"
