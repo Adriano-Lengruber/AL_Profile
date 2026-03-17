@@ -15,6 +15,8 @@ import {
 } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
 import BlogPage from './pages/BlogPage';
+import AdminDashboard from './pages/AdminDashboard';
+import ClientPortal from './pages/ClientPortal';
 import { AuthProvider } from './hooks/useAuth';
 
 interface Experience {
@@ -131,6 +133,7 @@ function Navigation() {
     { name: 'Início', href: '#home' },
     { name: 'Sobre', href: '#about' },
     { name: 'Serviços', href: '#services' },
+    { name: 'Processo', href: '#process' },
     { name: 'Currículo', href: '#resume' },
     { name: 'Projetos', href: '#projects' },
     { name: 'Blog', href: '/blog' },
@@ -186,7 +189,7 @@ function Navigation() {
 // ──────────────────────────────────────────────────────────────
 function Hero() {
   const [typedText, setTypedText] = useState('');
-  const roles = ['Cientista de Dados', 'AI Agents Developer', 'Desenvolvedor Full Stack', 'Especialista Power BI'];
+  const roles = ['Consultoria de Soluções Inteligentes', 'AI Agents & Automation Specialist', 'Data Scientist & Full Stack Dev', 'Business Intelligence Expert'];
   const [roleIndex, setRoleIndex] = useState(0);
 
   useEffect(() => {
@@ -461,94 +464,64 @@ function TechStack() {
 function Services() {
   const services = [
     {
-      icon: <BarChart3 size={28} />,
-      color: 'text-primary',
-      bg: 'bg-primary/10',
-      border: 'hover:border-primary/30',
-      title: 'Análise de Dados',
-      description: 'Transformo dados brutos em insights acionáveis que guiam decisões estratégicas com precisão.',
+      icon: <BrainCircuit size={28} />,
+      color: 'text-cyber-gold',
+      bg: 'bg-cyber-gold/10',
+      border: 'hover:border-cyber-gold/30',
+      title: 'Consultoria Estratégica',
+      description: 'Diagnóstico profundo de processos para identificar gargalos e oportunidades de automação e inteligência.',
       items: [
-        { text: 'Pipeline de ETL automatizado para processamento de grandes volumes de dados' },
-        { text: 'Análise estatística avançada e modelagem preditiva' },
-        { text: 'Relatórios executivos interativos com métricas KPIs' },
-        { text: 'Dashboards em tempo real para monitoramento de negócios' },
+        { text: 'Mapeamento de processos e fluxos de dados' },
+        { text: 'Arquitetura de soluções escaláveis' },
+        { text: 'Relatório de impacto e ROI esperado' },
+        { text: 'Definição de stack tecnológica ideal' },
       ],
-      badges: ['Python', 'SQL', 'Power BI'],
-    },
-    {
-      icon: <Bot size={28} />,
-      color: 'text-cyber-emerald',
-      bg: 'bg-cyber-emerald/10',
-      border: 'hover:border-cyber-emerald/30',
-      title: 'AI Agents',
-      description: 'Desenvolvimento de agentes de IA autônomos para automatizar tarefas complexas e repetitivas.',
-      items: [
-        { text: 'Agentes autônomos pessoais que aprendem com suas preferências' },
-        { text: 'Orquestração de múltiplos LLMs com memória persistente e contexto' },
-        { text: 'RAG implementation para consulta em bases de conhecimento vectorizadas' },
-        { text: 'Chatbots cognitivos com capacidade de raciocínio multi-etapas' },
-      ],
-      badges: ['OpenAI', 'LangChain', 'Vector DB'],
+      badges: ['Estratégia', 'Arquitetura', 'ROI'],
     },
     {
       icon: <LayoutDashboard size={28} />,
       color: 'text-cyan-400',
       bg: 'bg-cyan-400/10',
       border: 'hover:border-cyan-400/30',
-      title: 'Business Intelligence',
-      description: 'Dashboards interativos e painéis analíticos que revelam o desempenho do negócio em tempo real.',
+      title: 'Soluções Inteligentes',
+      description: 'Desenvolvimento de sistemas personalizados que integram software, dados e IA em uma única plataforma.',
       items: [
-        { text: 'Arquitetura de Data Warehouse escalável' },
-        { text: 'Modelagem DAX avançada para cálculos complexos' },
-        { text: 'Integração nativa com SAP/ERP e sistemas legados' },
-        { text: 'Visualizações customizadas com storytelling de dados' },
+        { text: 'Plataformas web com inteligência nativa' },
+        { text: 'Dashboards analíticos de alta performance' },
+        { text: 'Modelos de Machine Learning integrados' },
+        { text: 'Sistemas de suporte à decisão' },
       ],
-      badges: ['Power BI', 'Tableau', 'DAX'],
+      badges: ['React', 'Python', 'ML'],
     },
     {
-      icon: <Zap size={28} />,
-      color: 'text-[#5C0017]',
-      bg: 'bg-[#5C0017]/10',
-      border: 'hover:border-[#5C0017]/30',
-      title: 'Automação & RPA',
-      description: 'Elimino tarefas manuais com robôs de software, reduzindo erros e aumentando a produtividade.',
+      icon: <Bot size={28} />,
+      color: 'text-cyber-emerald',
+      bg: 'bg-cyber-emerald/10',
+      border: 'hover:border-cyber-emerald/30',
+      title: 'Automação & IA',
+      description: 'Implementação de agentes de IA e RPA para eliminar tarefas repetitivas e aumentar a eficiência operacional.',
       items: [
-        { text: 'Robôs de web scraping para coleta de dados em larga escala' },
-        { text: 'Automação de planilhas Excel/Google Sheets com macros inteligentes' },
-        { text: 'Integração de APIs REST para conectar sistemas heterogêneos' },
-        { text: 'Workflows de automação com n8n e Power Automate' },
+        { text: 'Agentes de IA autônomos e cognitivos' },
+        { text: 'Automação de processos ponta a ponta (RPA)' },
+        { text: 'Integração de APIs e sistemas legados' },
+        { text: 'Workflows inteligentes com n8n e LLMs' },
       ],
-      badges: ['Python', 'Selenium', 'RPA'],
-    },
-    {
-      icon: <Code2 size={28} />,
-      color: 'text-cyber-indigo',
-      bg: 'bg-cyber-indigo/10',
-      border: 'hover:border-cyber-indigo/30',
-      title: 'Desenvolvimento Full-Stack',
-      description: 'Aplicações web modernas, APIs e sistemas personalizados do conceito à produção.',
-      items: [
-        { text: 'SPAs e PWAs com React e TypeScript de alta performance' },
-        { text: 'APIs RESTful e GraphQL com FastAPI/Node.js' },
-        { text: 'Arquitetura de microsserviços com containerização' },
-        { text: 'Deploy em cloud AWS/GCP/Azure com CI/CD' },
-      ],
-      badges: ['React', 'Node.js', 'TypeScript'],
+      badges: ['OpenAI', 'n8n', 'Python'],
     },
     {
       icon: <TrendingUp size={28} />,
       color: 'text-[#E07390]',
       bg: 'bg-[#E07390]/10',
       border: 'hover:border-[#E07390]/30',
-      title: 'DevOps',
-      description: 'Configuração e disponibilização de VPS 100% funcional de acordo com cada necessidade do cliente.',
+      title: 'Recorrência & Evolução',
+      description: 'Suporte contínuo, manutenção de infraestrutura e evolução constante da sua solução tecnológica.',
       items: [
-        { text: 'Infraestrutura como código (Terraform/Ansible)' },
-        { text: 'Orquestração Kubernetes para alta disponibilidade' },
-        { text: 'Pipeline CI/CD automatizado com GitHub Actions' },
-        { text: 'Monitoramento e observabilidade com Prometheus/Grafana' },
+        { text: 'Gestão de infraestrutura em nuvem (DevOps)' },
+        { text: 'Suporte técnico especializado' },
+        { text: 'Melhorias contínuas baseadas em dados' },
+        { text: 'Segurança e monitoramento 24/7' },
       ],
-      badges: ['Docker', 'Kubernetes', 'AWS'],
+      badges: ['DevOps', 'Cloud', 'Suporte'],
     },
   ];
 
@@ -587,6 +560,78 @@ function Services() {
                       {badge}
                     </span>
                   ))}
+                </div>
+              )}
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// Process - Como trabalhamos (Novo)
+// ──────────────────────────────────────────────────────────────
+function Process() {
+  const steps = [
+    {
+      number: '01',
+      title: 'Diagnóstico',
+      description: 'Análise profunda do seu negócio para identificar gargalos e oportunidades reais de ganho com tecnologia.',
+      icon: <Eye size={24} />,
+    },
+    {
+      number: '02',
+      title: 'Estratégia',
+      description: 'Desenho da arquitetura ideal, seleção da stack tecnológica e definição do roadmap de implementação.',
+      icon: <BrainCircuit size={24} />,
+    },
+    {
+      number: '03',
+      title: 'Desenvolvimento',
+      description: 'Construção da solução com metodologias ágeis, foco em UX/UI e integração total de dados e IA.',
+      icon: <Code2 size={24} />,
+    },
+    {
+      number: '04',
+      title: 'Evolução',
+      description: 'Acompanhamento contínuo, suporte especializado e melhorias constantes para garantir o ROI.',
+      icon: <TrendingUp size={24} />,
+    },
+  ];
+
+  return (
+    <section id="process" className="py-24 relative bg-cyber-black/30">
+      <div className="max-w-7xl mx-auto px-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
+          <h2 className="font-heading text-4xl font-bold mb-4">Como <span className="text-gradient">Atuamos</span></h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto">Um processo consultivo focado em resultados tangíveis e transparência total.</p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {steps.map((step, i) => (
+            <motion.div
+              key={step.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="relative group"
+            >
+              <div className="glass rounded-xl p-8 hover:border-primary/30 transition-all duration-300 h-full">
+                <div className="text-5xl font-bold text-cyber-gold/10 absolute top-4 right-6 group-hover:text-cyber-gold/20 transition-colors">
+                  {step.number}
+                </div>
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
+                  {step.icon}
+                </div>
+                <h3 className="font-heading text-xl font-semibold mb-3">{step.title}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{step.description}</p>
+              </div>
+              {i < steps.length - 1 && (
+                <div className="hidden lg:block absolute top-1/2 -right-4 translate-y-1/2 z-10 text-cyber-gold/20">
+                  <ArrowRight size={24} />
                 </div>
               )}
             </motion.div>
@@ -1187,6 +1232,7 @@ export default function App() {
             <About />
             <TechStack />
             <Services />
+            <Process />
             <Resume />
             <Education />
             <Certifications />
@@ -1197,6 +1243,8 @@ export default function App() {
           </div>
         } />
         <Route path="/blog" element={<BlogPage />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/portal/:id" element={<ClientPortal />} />
       </Routes>
     </AuthProvider>
   );

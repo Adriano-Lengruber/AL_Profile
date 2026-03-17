@@ -59,6 +59,76 @@ const User = mongoose.model('User', userSchema);
 const Post = mongoose.model('Post', postSchema);
 const Comment = mongoose.model('Comment', commentSchema);
 
+// --- Novos Modelos para o Admin Work OS ---
+
+const boardItemSchema = new mongoose.Schema({
+  id: String,
+  name: String,
+  values: mongoose.Schema.Types.Mixed,
+  subitems: [this]
+});
+
+const boardGroupSchema = new mongoose.Schema({
+  id: String,
+  title: String,
+  color: String,
+  items: [boardItemSchema]
+});
+
+const boardColumnSchema = new mongoose.Schema({
+  id: String,
+  title: String,
+  type: { type: String, enum: ['text', 'status', 'date', 'number', 'person', 'link', 'tags', 'priority', 'timeline'] },
+  width: Number
+});
+
+const boardSchema = new mongoose.Schema({
+  id: String,
+  name: String,
+  description: String,
+  columns: [boardColumnSchema],
+  groups: [boardGroupSchema]
+});
+
+const workspaceSchema = new mongoose.Schema({
+  id: String,
+  name: String,
+  icon: String,
+  boards: [boardSchema],
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+});
+
+const projectSchema = new mongoose.Schema({
+  id: String,
+  clientName: String,
+  projectName: String,
+  brief: String,
+  status: String,
+  value: Number,
+  deadline: String,
+  tasks: [{ id: String, title: String, status: String, startDate: String, endDate: String }],
+  costs: [{ label: String, value: Number }],
+  stakeholders: [{ name: String, role: String, influence: String, preference: String }],
+  meetingNotes: [{ date: String, content: String }],
+  documents: [{ id: String, name: String, type: { type: String }, date: String, size: String }],
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+});
+
+const companySchema = new mongoose.Schema({
+  name: String,
+  cnpj: String,
+  address: String,
+  email: String,
+  phone: String,
+  website: String,
+  bio: String,
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+});
+
+const Workspace = mongoose.model('Workspace', workspaceSchema);
+const Project = mongoose.model('Project', projectSchema);
+const Company = mongoose.model('Company', companySchema);
+
 // Middleware de autenticação
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -600,6 +670,115 @@ Automação economiza tempo e reduz erros. Comece simples e expanda gradualmente
     res.json({ message: 'Posts de exemplo criados com sucesso', count: samplePosts.length });
   } catch (error) {
     res.status(500).json({ error: 'Erro ao criar posts', details: error.message });
+  }
+});
+
+// --- Rotas Admin Work OS ---
+
+// Workspaces
+app.get('/api/workspaces', authenticateToken, async (req, res) => {
+  try {
+    const workspaces = await Workspace.find({ userId: req.user.id });
+    res.json(workspaces);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar workspaces' });
+  }
+});
+
+app.post('/api/workspaces', authenticateToken, async (req, res) => {
+  try {
+    const workspace = new Workspace({ ...req.body, userId: req.user.id });
+    await workspace.save();
+    res.status(201).json(workspace);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao criar workspace' });
+  }
+});
+
+app.put('/api/workspaces/:id', authenticateToken, async (req, res) => {
+  try {
+    const workspace = await Workspace.findOneAndUpdate(
+      { id: req.params.id, userId: req.user.id },
+      req.body,
+      { new: true, upsert: true }
+    );
+    res.json(workspace);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao atualizar workspace' });
+  }
+});
+
+// Projects
+app.get('/api/projects', authenticateToken, async (req, res) => {
+  try {
+    const projects = await Project.find({ userId: req.user.id });
+    res.json(projects);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar projetos' });
+  }
+});
+
+app.post('/api/projects', authenticateToken, async (req, res) => {
+  try {
+    const project = new Project({ ...req.body, userId: req.user.id });
+    await project.save();
+    res.status(201).json(project);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao criar projeto' });
+  }
+});
+
+app.put('/api/projects/:id', authenticateToken, async (req, res) => {
+  try {
+    const project = await Project.findOneAndUpdate(
+      { id: req.params.id, userId: req.user.id },
+      req.body,
+      { new: true, upsert: true }
+    );
+    res.json(project);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao atualizar projeto' });
+  }
+});
+
+app.delete('/api/workspaces/:id', authenticateToken, async (req, res) => {
+  try {
+    await Workspace.findOneAndDelete({ id: req.params.id, userId: req.user.id });
+    res.json({ message: 'Workspace removido com sucesso' });
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao remover workspace' });
+  }
+});
+
+app.delete('/api/projects/:id', authenticateToken, async (req, res) => {
+  try {
+    await Project.findOneAndDelete({ id: req.params.id, userId: req.user.id });
+    res.json({ message: 'Projeto removido com sucesso' });
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao remover projeto' });
+  }
+});
+
+// Company
+app.get('/api/company', authenticateToken, async (req, res) => {
+  try {
+    const company = await Company.findOne({ userId: req.user.id });
+    res.json(company);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar dados da empresa' });
+  }
+});
+
+app.post('/api/company', authenticateToken, async (req, res) => {
+  try {
+    const company = await Company.findOneAndUpdate(
+      { userId: req.user.id },
+      { ...req.body, userId: req.user.id },
+      { upsert: true, new: true }
+    );
+    res.json(company);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao salvar dados da empresa' });
   }
 });
 
