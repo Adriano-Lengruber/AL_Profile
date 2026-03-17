@@ -102,7 +102,10 @@ const ICON_MAP: Record<string, any> = {
   FileCheck,
   FileCode,
   ShieldAlert,
-  HelpCircle
+  HelpCircle,
+  Activity,
+  ArrowUpRight,
+  MousePointer2
 };
 
 // --- Tipagens ---
@@ -907,7 +910,7 @@ export default function AdminDashboard() {
   const [showPreview, setShowPreview] = useState(false);
 
   // --- API Integration ---
-  const API_BASE = 'http://localhost:3001/api';
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3003/api';
   const getHeaders = () => {
     const token = localStorage.getItem('token');
     return {
