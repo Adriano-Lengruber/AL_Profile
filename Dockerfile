@@ -18,7 +18,8 @@ COPY . .
 # Build the application - set API URL at build time
 ENV CI=true
 ENV VITE_API_URL=/api
-RUN pnpm build
+ENV BUILD_MODE=prod
+RUN pnpm build:prod
 
 # Production stage
 FROM nginx:alpine

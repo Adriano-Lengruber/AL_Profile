@@ -99,6 +99,24 @@ No seu repositório do GitHub, vá em **Settings > Secrets and variables > Actio
 4. Reinicia os containers com `docker-compose -f docker-compose.blog.yml up -d --build`.
 5. Reconecta a rede do Nginx Proxy Manager se necessário.
 
+### 🔍 Diagnóstico de Tela Branca (Se necessário)
+
+Se após o deploy a página continuar em branco:
+
+1.  **Inspecionar Console (F12)**: Verifique se há erros de carregamento de scripts (404 ou 500) ou erros de sintaxe JS.
+2.  **Verificar Logs na VPS**:
+    ```bash
+    # Ver logs do frontend
+    docker logs al-profile-frontend
+    
+    # Ver logs do Nginx Proxy Manager (se houver erro de Gateway)
+    docker logs nginx-proxy-app-1
+    ```
+3.  **Confirmar nomes de containers**:
+    ```bash
+    docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+    ```
+
 ---
 
 ## Verificação final
