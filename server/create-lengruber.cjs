@@ -41,10 +41,16 @@ async function createLengruber() {
     console.log('Senha:', password);
 
   } catch (error) {
-    console.error('Erro:', error);
+    console.error('Erro ao criar usuário Lengruber:', error);
   } finally {
     await client.close();
   }
 }
 
-createLengruber();
+// Exportar para uso no index.js
+module.exports = { createLengruber };
+
+// Executar se for chamado diretamente
+if (require.main === module) {
+  createLengruber();
+}

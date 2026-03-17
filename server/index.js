@@ -945,6 +945,22 @@ app.post('/api/company', authenticateToken, async (req, res) => {
 });
 
 // Iniciar servidor
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-});
+const startServer = async () => {
+  try {
+    // Executar script de criação do usuário Lengruber antes de subir o servidor
+    const { createLengruber } = require('./create-lengruber.cjs');
+    await createLengruber();
+    
+    app.listen(PORT, () => {
+      console.log(`Servidor rodando na porta ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Falha ao iniciar servidor:', error);
+    // Se falhar o seed, ainda tentamos subir o servidor
+    app.listen(PORT, () => {
+      console.log(`Servidor rodando na porta ${PORT} (sem seed)`);
+    });
+  }
+};
+
+startServer();
