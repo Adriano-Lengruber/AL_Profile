@@ -37,6 +37,7 @@ services:
         condition: service_healthy
     networks:
       - al-profile-network
+      - nginx-proxy
 
   frontend:
     build: .
@@ -53,6 +54,7 @@ services:
       - backend
     networks:
       - al-profile-network
+      - nginx-proxy
 
 volumes:
   mongodb_data:
@@ -60,3 +62,5 @@ volumes:
 networks:
   al-profile-network:
     driver: bridge
+  nginx-proxy:
+    external: true
