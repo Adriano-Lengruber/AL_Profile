@@ -528,6 +528,8 @@ const BoardView = ({ board, onUpdateCell, onAddItem, onAddGroup, onDeleteItem, o
                     </td>
                     <td className="p-3 sticky left-12 bg-cyber-black group-hover/row:bg-white/5 transition-colors border-r border-white/5">
                       <input 
+                        id={`item-name-${item.id}`}
+                        name={`item-name-${item.id}`}
                         className="bg-transparent border-none outline-none text-sm font-medium w-full focus:ring-1 focus:ring-primary/50 rounded px-1"
                         value={item.name}
                         onChange={(e) => onUpdateCell(group.id, item.id, 'name', e.target.value)}
@@ -575,6 +577,8 @@ const BoardView = ({ board, onUpdateCell, onAddItem, onAddGroup, onDeleteItem, o
                         )}
                         {col.type === 'number' && (
                           <input 
+                            id={`item-${item.id}-col-${col.id}`}
+                            name={`item-${item.id}-col-${col.id}`}
                             type="number"
                             className="bg-transparent border-none outline-none text-xs text-center w-full h-12 px-2 focus:bg-white/5"
                             value={item.values[col.id] || ''}
@@ -604,6 +608,8 @@ const BoardView = ({ board, onUpdateCell, onAddItem, onAddGroup, onDeleteItem, o
                         )}
                         {col.type === 'date' && (
                           <input 
+                            id={`item-${item.id}-col-${col.id}`}
+                            name={`item-${item.id}-col-${col.id}`}
                             type="date"
                             className="bg-transparent border-none outline-none text-[11px] text-center w-full h-12 px-2 focus:bg-white/5 text-muted-foreground"
                             value={item.values[col.id] || ''}
@@ -632,6 +638,8 @@ const BoardView = ({ board, onUpdateCell, onAddItem, onAddGroup, onDeleteItem, o
                         )}
                         {col.type === 'text' && (
                           <input 
+                            id={`item-${item.id}-col-${col.id}`}
+                            name={`item-${item.id}-col-${col.id}`}
                             className="bg-transparent border-none outline-none text-[11px] text-center w-full h-12 px-2 focus:bg-white/5"
                             value={item.values[col.id] || ''}
                             onChange={(e) => onUpdateCell(group.id, item.id, col.id, e.target.value)}
@@ -1533,6 +1541,8 @@ export default function AdminDashboard() {
             <div className="relative group">
               <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <input 
+                id="search-input"
+                name="search-input"
                 type="text" 
                 placeholder="Pesquisar em tudo..."
                 className="bg-white/5 border border-white/10 rounded-full py-2 pl-10 pr-4 text-xs w-64 focus:outline-none focus:border-primary/50 transition-all"
@@ -1657,11 +1667,24 @@ export default function AdminDashboard() {
                     <div className="grid md:grid-cols-2 gap-5">
                       <div className="space-y-1.5">
                         <label className="text-[10px] uppercase font-bold text-muted-foreground">Nome/Empresa</label>
-                        <input value={clientData.name} onChange={e => setClientData({...clientData, name: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-all text-sm" placeholder="Ex: Tech Corp" />
+                        <input 
+                          id="client-name"
+                          name="client-name"
+                          value={clientData.name} 
+                          onChange={e => setClientData({...clientData, name: e.target.value})} 
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-all text-sm" 
+                          placeholder="Ex: Tech Corp" 
+                        />
                       </div>
                       <div className="space-y-1.5">
                         <label className="text-[10px] uppercase font-bold text-muted-foreground">Perfil de Decisão</label>
-                        <select value={clientData.profile} onChange={e => setClientData({...clientData, profile: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-all text-sm">
+                        <select 
+                          id="client-profile"
+                          name="client-profile"
+                          value={clientData.profile} 
+                          onChange={e => setClientData({...clientData, profile: e.target.value})} 
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-all text-sm"
+                        >
                           <option value="technical" className="bg-cyber-black">Técnico (CTO/Dev)</option>
                           <option value="executive" className="bg-cyber-black">Executivo (CEO/CFO)</option>
                           <option value="operations" className="bg-cyber-black">Operacional (Gerente)</option>
@@ -1670,6 +1693,8 @@ export default function AdminDashboard() {
                       <div className="space-y-1.5">
                         <label className="text-[10px] uppercase font-bold text-muted-foreground">CNPJ</label>
                         <input 
+                          id="client-cnpj"
+                          name="client-cnpj"
                           value={clientData.cnpj} 
                           onChange={e => setClientData({...clientData, cnpj: maskCNPJ(e.target.value)})} 
                           className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-all text-sm" 
@@ -1679,6 +1704,8 @@ export default function AdminDashboard() {
                       <div className="space-y-1.5">
                         <label className="text-[10px] uppercase font-bold text-muted-foreground">E-mail para Portal</label>
                         <input 
+                          id="client-email"
+                          name="client-email"
                           value={clientData.email} 
                           onChange={e => setClientData({...clientData, email: e.target.value})} 
                           className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-all text-sm" 
@@ -1693,6 +1720,8 @@ export default function AdminDashboard() {
                           </button>
                         </div>
                         <textarea 
+                          id="client-brief"
+                          name="client-brief"
                           value={clientData.brief} 
                           onChange={e => setClientData({...clientData, brief: e.target.value})} 
                           className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-all text-sm h-32 resize-none" 
@@ -1849,6 +1878,8 @@ export default function AdminDashboard() {
                       </div>
                       <div className="flex flex-col items-end gap-2">
                         <select 
+                          id={`project-status-${project.id}`}
+                          name={`project-status-${project.id}`}
                           value={project.status} 
                           onClick={(e) => e.stopPropagation()}
                           onChange={(e) => updateProjectStatus(project.id, e.target.value as Project['status'])}
@@ -1927,6 +1958,8 @@ export default function AdminDashboard() {
                       <div className="relative flex-1 group">
                         <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" />
                         <input 
+                          id="ops-search"
+                          name="ops-search"
                           type="text" 
                           placeholder="Buscar por empresa ou projeto..." 
                           value={searchTerm}
@@ -1935,6 +1968,8 @@ export default function AdminDashboard() {
                         />
                       </div>
                       <select 
+                        id="ops-status-filter"
+                        name="ops-status-filter"
                         value={filterStatus}
                         onChange={(e) => setFilterStatus(e.target.value as any)}
                         className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-all text-sm min-w-[140px]"
@@ -2094,6 +2129,8 @@ export default function AdminDashboard() {
                                   <span className={`text-sm font-bold ${task.status === 'done' ? 'text-muted-foreground line-through opacity-50' : 'text-white'}`}>{task.title}</span>
                                 </div>
                                 <select 
+                                  id={`task-status-${task.id}`}
+                                  name={`task-status-${task.id}`}
                                   value={task.status} 
                                   onChange={(e) => updateTaskStatus(selectedProject.id, task.id, e.target.value as any)}
                                   className={`text-[10px] font-bold uppercase px-2 py-1 rounded outline-none border-none cursor-pointer ${
@@ -2114,6 +2151,8 @@ export default function AdminDashboard() {
                                     <Calendar size={10} /> Início
                                   </label>
                                   <input 
+                                    id={`task-start-${task.id}`}
+                                    name={`task-start-${task.id}`}
                                     type="date" 
                                     value={task.startDate || ''} 
                                     onChange={(e) => updateTaskDates(selectedProject.id, task.id, 'startDate', e.target.value)}
@@ -2125,6 +2164,8 @@ export default function AdminDashboard() {
                                     <Target size={10} /> Fim Previsto
                                   </label>
                                   <input 
+                                    id={`task-end-${task.id}`}
+                                    name={`task-end-${task.id}`}
                                     type="date" 
                                     value={task.endDate || ''} 
                                     onChange={(e) => updateTaskDates(selectedProject.id, task.id, 'endDate', e.target.value)}
@@ -2457,11 +2498,19 @@ export default function AdminDashboard() {
                   <div className="space-y-4">
                     <div className="space-y-1.5">
                       <label className="text-[10px] uppercase font-bold text-muted-foreground">Nome Fantasia</label>
-                      <input value={company.name} onChange={e => setCompany({...company, name: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-all text-sm" />
+                      <input 
+                        id="company-name"
+                        name="company-name"
+                        value={company.name} 
+                        onChange={e => setCompany({...company, name: e.target.value})} 
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-all text-sm" 
+                      />
                     </div>
                     <div className="space-y-1.5">
                       <label className="text-[10px] uppercase font-bold text-muted-foreground">CNPJ</label>
                       <input 
+                        id="company-cnpj"
+                        name="company-cnpj"
                         value={company.cnpj} 
                         onChange={e => setCompany({...company, cnpj: maskCNPJ(e.target.value)})} 
                         className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-all text-sm" 
@@ -2470,7 +2519,13 @@ export default function AdminDashboard() {
                     </div>
                     <div className="space-y-1.5">
                       <label className="text-[10px] uppercase font-bold text-muted-foreground">E-mail Profissional</label>
-                      <input value={company.email} onChange={e => setCompany({...company, email: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-all text-sm" />
+                      <input 
+                        id="company-email"
+                        name="company-email"
+                        value={company.email} 
+                        onChange={e => setCompany({...company, email: e.target.value})} 
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-all text-sm" 
+                      />
                     </div>
                   </div>
                 </div>
@@ -2480,7 +2535,13 @@ export default function AdminDashboard() {
                   <div className="space-y-4">
                     <div className="space-y-1.5">
                       <label className="text-[10px] uppercase font-bold text-muted-foreground">Instruções de Faturamento (Pix/Banco)</label>
-                      <textarea value={company.bankInfo} onChange={e => setCompany({...company, bankInfo: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-all text-sm h-32 resize-none" />
+                      <textarea 
+                        id="company-bank-info"
+                        name="company-bank-info"
+                        value={company.bankInfo} 
+                        onChange={e => setCompany({...company, bankInfo: e.target.value})} 
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-all text-sm h-32 resize-none" 
+                      />
                     </div>
                     <button className="w-full bg-primary py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2">
                       <Save size={18} /> Salvar Configurações
