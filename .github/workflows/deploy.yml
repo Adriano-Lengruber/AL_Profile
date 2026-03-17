@@ -1,0 +1,24 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploying via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ~/AL_Profile
+            git pull origin master
+            docker-compose -f docker-compose.blog.yml down
+            docker-compose -f docker-compose.blog.yml up -d --build
+            # Reconectar rede do Nginx Proxy Manager se necessário (conforme DOMAIN_SETUP.md)
+            docker network connect al_profile_al-profile-network nginx-proxy-app-1 || true
