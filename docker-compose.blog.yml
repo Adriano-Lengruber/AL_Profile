@@ -46,7 +46,7 @@ services:
     ports:
       - "3003:80"
     environment:
-      # Usar URL relativa para funcionar com proxy do nginx
+      # No Docker, o frontend fala com o backend via proxy do Nginx (/api)
       - VITE_API_URL=/api
     extra_hosts:
       - "host.docker.internal:host-gateway"

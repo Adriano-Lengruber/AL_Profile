@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3003/api';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 const blogPatterns = [
   { from: 'from-cyber-gold/10', to: 'to-cyber-amber/5', accent: 'text-cyber-gold', gradient: 'bg-gradient-to-br from-amber-900/30 via-yellow-900/20 to-orange-900/30' },

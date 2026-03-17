@@ -12,7 +12,8 @@ import {
   ArrowLeft,
   Layout,
   ExternalLink,
-  Target
+  Target,
+  FileText
 } from 'lucide-react';
 
 interface ProjectTask {

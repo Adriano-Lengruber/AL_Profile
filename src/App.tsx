@@ -17,7 +17,10 @@ import useEmblaCarousel from 'embla-carousel-react';
 import BlogPage from './pages/BlogPage';
 import AdminDashboard from './pages/AdminDashboard';
 import ClientPortal from './pages/ClientPortal';
+import Login from './pages/Login';
+import Register from './pages/Register';
 import { AuthProvider } from './hooks/useAuth';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 interface Experience {
   id: number; title: string; company: string; period: string;
@@ -985,7 +988,7 @@ function Blog() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3003/api';
+        const API_URL = import.meta.env.VITE_API_URL || '/api';
         const res = await fetch(`${API_URL}/posts?limit=2`);
         const data = await res.json();
         if (res.ok && data.posts) {
@@ -1243,7 +1246,13 @@ export default function App() {
           </div>
         } />
         <Route path="/blog" element={<BlogPage />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/admin" element={
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        } />
         <Route path="/portal/:id" element={<ClientPortal />} />
       </Routes>
     </AuthProvider>

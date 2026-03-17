@@ -3,15 +3,17 @@
 [![Status](https://img.shields.io/badge/status-ativo-success)](#)
 [![Tech Stack](https://img.shields.io/badge/tech-React%20%2B%20TypeScript%20%2B%20Node.js%20%2B%20MongoDB-blue)](#)
 [![Domain](https://img.shields.io/badge/domain-adriano--lengruber.com-gold)](https://adriano-lengruber.com)
+[![Docker](https://img.shields.io/badge/docker-containerized-blue)](https://www.docker.com/)
+[![Tests](https://img.shields.io/badge/tests-Playwright%20%2B%20Vitest-brightgreen)](#)
 
-Este repositório contém o ecossistema digital completo de **Adriano Lengruber**, integrando um portal pessoal de alta performance, um blog técnico interativo e o **Work OS**, um sistema operacional administrativo robusto para gestão de consultoria.
+Este repositório contém o ecossistema digital completo de **Adriano Lengruber**, integrando um portal pessoal de alta performance, um blog técnico interativo e o **Work OS**, um sistema operacional administrativo robusto para gestão de consultoria e projetos.
 
 ---
 
 ## 🏗️ Estrutura do Ecossistema
 
 ### 1. 💎 Portal Pessoal ([adriano-lengruber.com](https://adriano-lengruber.com))
-Uma vitrine tecnológica de alta performance focada em conversão e branding pessoal.
+Uma vitrine tecnológica de alta performance focada em branding pessoal e conversão.
 - **Visual Cyber/Gold**: Estética moderna com animações fluidas via Framer Motion.
 - **Currículo Interativo**: Timeline de experiências, habilidades categorizadas e certificações.
 - **Portfólio de Projetos**: Integração com a API do GitHub para exibição de repositórios em tempo real.
@@ -24,86 +26,123 @@ Plataforma de compartilhamento de conhecimento integrada.
 - **SEO Optimized**: Estrutura focada em indexação e legibilidade.
 
 ### 3. 🚀 Work OS (Admin Dashboard)
-O cérebro operacional para gestão de clientes e projetos.
-- **Workspaces Estilo Monday.com**: Gestão granular de tarefas com quadros interativos.
-- **CRM Avançado**: Pipeline de vendas, gestão de stakeholders e análise de briefing por IA.
+O cérebro operacional para gestão de clientes e projetos, inspirado em ferramentas como Monday.com.
+- **Business Intelligence**: Gráficos de performance e velocidade de receita via Recharts.
+- **CRM Avançado**: Pipeline de vendas, gestão de stakeholders e análise de briefing.
 - **Sincronização em Tempo Real**: Edição de células com persistência automática no MongoDB.
-- **Gerador de Propostas**: Automação de documentos comerciais e conversão direta para projetos.
+- **Gestão de Tarefas**: Quadros interativos para controle granular de atividades.
 
 ---
 
 ## 🛠️ Stack Tecnológica
 
 ### Frontend
-- **React 18** & **TypeScript**: Base sólida e tipada para a interface.
-- **Vite**: Tooling de próxima geração para desenvolvimento rápido.
+- **React 18** & **TypeScript**: Base sólida e tipada.
+- **Vite**: Build tool de alta performance.
 - **Tailwind CSS**: Estilização utilitária e responsiva.
-- **Framer Motion**: Orquestração de animações complexas.
-- **Three.js / React Three Fiber**: Renderização de elementos 3D interativos.
-- **Lucide React**: Conjunto de ícones vetoriais modernos.
+- **Framer Motion**: Animações de interface.
+- **Three.js / R3F**: Elementos 3D imersivos.
 
 ### Backend & Persistência
-- **Node.js** & **Express**: API RESTful robusta.
-- **MongoDB** & **Mongoose**: Armazenamento NoSQL escalável.
-- **JWT (JSON Web Tokens)**: Autenticação segura de usuários.
-- **Bcrypt.js**: Criptografia de ponta para segurança de dados.
+- **Node.js** & **Express**: API RESTful.
+- **MongoDB** & **Mongoose**: Banco de dados NoSQL.
+- **JWT**: Autenticação segura.
+- **Bcrypt.js**: Criptografia de senhas.
 
-### Qualidade & Testes
-- **Vitest**: Framework de testes nativo para Vite.
-- **React Testing Library**: Garantia de comportamento da interface.
+### Infraestrutura & DevOps
+- **Docker & Docker Compose**: Containerização completa do ecossistema.
+- **Nginx**: Proxy reverso para roteamento de tráfego e SSL.
+- **Nginx Proxy Manager**: Gestão simplificada de domínios e certificados.
 
 ---
 
-## 🚀 Como Iniciar o Projeto
+## 🐳 Docker & Deployment
+
+O projeto foi desenhado para rodar prioritariamente em containers Docker, garantindo paridade entre ambientes de desenvolvimento e produção.
+
+### Subir o ambiente completo
+```bash
+docker-compose -f docker-compose.blog.yml up -d --build
+```
+Isso iniciará:
+- **Frontend**: Acessível em [http://localhost:3003](http://localhost:3003)
+- **Backend**: Acessível via proxy em [http://localhost:3003/api](http://localhost:3003/api)
+- **MongoDB**: Banco de dados persistente.
+
+### Arquitetura de Proxy
+O Frontend utiliza um proxy reverso configurado no Nginx (`nginx.conf`) para encaminhar todas as requisições `/api` para o container do Backend, resolvendo problemas de CORS nativamente.
+
+---
+
+## 🚀 Desenvolvimento Local (Sem Docker)
+
+Caso precise rodar fora do Docker para depuração rápida:
 
 ### Pré-requisitos
 - Node.js (v18+)
-- MongoDB (Instalação local ou cluster Atlas)
-- pnpm ou npm
+- MongoDB local ou Atlas.
 
 ### Configuração
-1. Clone este repositório.
-2. Configure o arquivo `.env` na raiz:
+1. Configure o `.env` na raiz:
 ```env
-# Backend
-MONGODB_URI=sua_uri_do_mongodb
+MONGODB_URI=mongodb://localhost:27017/al_profile
 JWT_SECRET=sua_chave_secreta
-
-# Frontend
 VITE_API_URL=http://localhost:3001/api
 ```
 
-### Comandos Principais
+2. Comandos:
 ```bash
-# Instalar todas as dependências
-npm install
+# Instalar dependências
+npm install --legacy-peer-deps
 
-# Rodar o Backend (API)
+# Rodar Backend
 node server/index.js
 
-# Rodar o Frontend (Portal + Work OS)
+# Rodar Frontend
 npm run dev
+```
 
-# Executar Testes Automatizados
+---
+
+## 🧪 Garantia de Qualidade (Testes)
+
+O ecossistema conta com uma suíte de testes robusta para validar fluxos críticos.
+
+### 1. Testes End-to-End (Playwright)
+Validam o fluxo completo do usuário no ambiente Docker.
+```bash
+# Executar testes de Login e Dashboard
+npx playwright test tests/dashboard.spec.ts --reporter=line
+```
+
+### 2. Testes Unitários e Integração (Vitest)
+Validam componentes e lógica interna.
+```bash
 npm test
 ```
 
 ---
 
-## 🧪 Garantia de Qualidade
-O projeto utiliza testes automatizados para validar fluxos críticos:
-- **CRUD de Workspaces**: Criação, edição e exclusão de itens.
-- **Sincronização de Dados**: Verificação do debounce e persistência no banco.
-- **Fluxos de CRM**: Conversão de propostas e gestão de projetos.
+## 👤 Gestão de Usuários
+
+Para facilitar o desenvolvimento, existe um script para criar ou resetar o usuário principal (**Lengruber**):
+
+```bash
+# No diretório raiz
+node server/create-lengruber.cjs
+```
+**Credenciais Padrão (Ambiente de Teste):**
+- **Usuário:** `adrianolengruber@hotmail.com`
+- **Senha:** `AL_Password_2026`
 
 ---
 
 ## 📁 Organização do Código
-- `/src/App.tsx`: Ponto de entrada e portal principal.
-- `/src/pages/AdminDashboard.tsx`: Dashboard administrativa (Work OS).
-- `/src/pages/BlogPage.tsx`: Interface do blog.
-- `/src/test/`: Suíte de testes automatizados.
-- `/server/index.js`: Lógica de API e modelos de dados.
+- `/src/pages/AdminDashboard.tsx`: Core do Work OS.
+- `/server/index.js`: API e modelos Mongoose.
+- `/tests/`: Testes automatizados Playwright.
+- `docker-compose.blog.yml`: Orquestração de containers.
+- `nginx.conf`: Configuração do servidor e proxy.
 
 ---
 

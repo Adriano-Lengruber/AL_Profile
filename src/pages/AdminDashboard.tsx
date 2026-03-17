@@ -49,7 +49,8 @@ import {
   HelpCircle,
   Activity,
   ArrowUpRight,
-  MousePointer2
+  MousePointer2,
+  LogOut
 } from 'lucide-react';
 
 import { 
@@ -61,6 +62,8 @@ import {
   Tooltip as RechartsTooltip, 
   ResponsiveContainer 
 } from 'recharts';
+
+import { useAuth } from '../hooks/useAuth';
 
 // --- Mapeamento de Ícones ---
 const ICON_MAP: Record<string, any> = {
@@ -739,7 +742,7 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead }: {
 
     projects.forEach(p => {
       if (p.status === 'active' || p.status === 'finished') {
-        // Simulação: se não tiver data, assume mês atual ou anterior
+        // Usa a data de criação ou fallback para hoje se não houver deadline
         const date = p.deadline && p.deadline !== 'A definir' ? new Date(p.deadline) : new Date();
         const monthIdx = date.getMonth();
         const chartMonth = last6Months.find(m => m.monthIdx === monthIdx);
@@ -748,6 +751,13 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead }: {
         }
       }
     });
+
+    // Se todos os valores forem zero, adiciona um fallback visual para não quebrar o gráfico
+    const hasData = last6Months.some(m => m.value > 0);
+    if (!hasData) {
+      // Opcional: injetar dados fake apenas se realmente não houver nada para o gráfico não ficar vazio
+      // Ou apenas retornar os zeros e deixar o gráfico plano (que é o comportamento correto para "sem dados")
+    }
 
     return last6Months;
   };
@@ -811,6 +821,7 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead }: {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff05" />
+                {/* @ts-expect-error - Recharts types incompatibility with React 18 */}
                 <XAxis 
                   dataKey="name" 
                   axisLine={false} 
@@ -818,17 +829,20 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead }: {
                   tick={{ fontSize: 10, fill: '#888' }}
                   dy={10}
                 />
+                {/* @ts-expect-error - Recharts types incompatibility with React 18 */}
                 <YAxis 
                   axisLine={false} 
                   tickLine={false} 
                   tick={{ fontSize: 10, fill: '#888' }}
                   tickFormatter={(val) => `R$ ${val >= 1000 ? (val/1000).toFixed(1) + 'k' : val}`}
                 />
+                {/* @ts-expect-error - Recharts types incompatibility with React 18 */}
                 <RechartsTooltip 
                   contentStyle={{ backgroundColor: '#050505', border: '1px solid #ffffff10', borderRadius: '12px', fontSize: '12px' }}
                   itemStyle={{ color: '#0066FF' }}
                   formatter={(value: any) => [`R$ ${Number(value).toLocaleString('pt-BR')}`, 'Receita']}
                 />
+                {/* @ts-expect-error - Recharts types incompatibility with React 18 */}
                 <Area 
                   type="monotone" 
                   dataKey="value" 
@@ -848,7 +862,7 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead }: {
             <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-6">Command Center</h3>
             <div className="space-y-3">
               <button 
-                onClick={onNewWorkspace}
+                onClick={() => onNewWorkspace()}
                 className="w-full p-4 rounded-xl bg-primary/10 border border-primary/20 flex items-center gap-3 group hover:bg-primary/20 transition-all text-left"
               >
                 <div className="p-2 rounded-lg bg-primary/20 text-primary">
@@ -861,7 +875,7 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead }: {
               </button>
               
               <button 
-                onClick={onNewLead}
+                onClick={() => onNewLead()}
                 className="w-full p-4 rounded-xl bg-cyber-gold/10 border border-cyber-gold/20 flex items-center gap-3 group hover:bg-cyber-gold/20 transition-all text-left"
               >
                 <div className="p-2 rounded-lg bg-cyber-gold/20 text-cyber-gold">
@@ -895,7 +909,8 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead }: {
 // --- Componentes ---
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<'proposals' | 'crm' | 'ops' | 'erp' | 'board' | 'dashboard'>('dashboard');
+  const { user, logout } = useAuth();
+  const [activeTab, setActiveTab] = useState<'proposals' | 'crm' | 'ops' | 'erp' | 'board' | 'dashboard' | 'finance'>('dashboard');
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   
@@ -918,7 +933,7 @@ export default function AdminDashboard() {
   const [showPreview, setShowPreview] = useState(false);
 
   // --- API Integration ---
-  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3003/api';
+  const API_BASE = import.meta.env.VITE_API_URL || '/api';
   const getHeaders = () => {
     const token = localStorage.getItem('token');
     return {
@@ -1488,14 +1503,23 @@ export default function AdminDashboard() {
         </div>
 
         <div className="p-4 border-t border-white/5 bg-white/[0.02]">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-cyber-gold/20 flex items-center justify-center border border-cyber-gold/30">
-              <Fingerprint size={16} className="text-cyber-gold" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-cyber-gold/20 flex items-center justify-center border border-cyber-gold/30">
+                <Fingerprint size={16} className="text-cyber-gold" />
+              </div>
+              <div className="overflow-hidden">
+                <p className="text-xs font-bold truncate">{user?.username || company.name}</p>
+                <p className="text-[10px] text-muted-foreground truncate">Administrador</p>
+              </div>
             </div>
-            <div className="overflow-hidden">
-              <p className="text-xs font-bold truncate">{company.name}</p>
-              <p className="text-[10px] text-muted-foreground truncate">Administrador</p>
-            </div>
+            <button 
+              onClick={logout}
+              className="p-2 rounded-lg hover:bg-red-500/10 hover:text-red-500 transition-all text-muted-foreground"
+              title="Sair"
+            >
+              <LogOut size={16} />
+            </button>
           </div>
         </div>
       </aside>
@@ -1526,6 +1550,7 @@ export default function AdminDashboard() {
                  activeTab === 'proposals' ? 'Gerador de Propostas' : 
                  activeTab === 'crm' ? 'Gestão de Relacionamento (CRM)' :
                  activeTab === 'erp' ? 'Dashboard Financeiro (ERP)' :
+                 activeTab === 'finance' ? 'Perfil da Empresa' :
                  'Configurações da Empresa'}
               </h2>
             )}
@@ -2645,7 +2670,7 @@ export default function AdminDashboard() {
                 <button onClick={() => window.print()} className="px-6 py-2 rounded-xl bg-white/5 border border-white/10 text-sm font-bold flex items-center gap-2 hover:bg-white/10 transition-all">
                   <Download size={16} /> Imprimir / PDF
                 </button>
-                <button onClick={saveAsProject} className="px-6 py-2 rounded-xl bg-primary text-white text-sm font-bold flex items-center gap-2 hover:brightness-110 transition-all">
+                <button onClick={() => saveAsProject()} className="px-6 py-2 rounded-xl bg-primary text-white text-sm font-bold flex items-center gap-2 hover:brightness-110 transition-all">
                   <Save size={16} /> Salvar e Finalizar
                 </button>
               </div>
