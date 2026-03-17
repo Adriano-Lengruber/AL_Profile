@@ -18,13 +18,25 @@ jobs:
           script: |
             cd ~/AL_Profile
             git pull origin master
-            # Limpeza preventiva para evitar conflitos de nomes ou portas
+            # Limpeza preventiva total para garantir que não existam containers antigos
+            docker stop al-profile-frontend al-profile-backend al-profile-mongodb || true
+            docker rm al-profile-frontend al-profile-backend al-profile-mongodb || true
             docker-compose -f docker-compose.blog.yml down --remove-orphans
-            docker system prune -f --filter "label=com.docker.compose.project=al_profile" || true
-            # Build e deploy
+            
+            # Garantir que a rede externa existe
+            docker network create nginx-proxy || true
+            
+            # Build e deploy com log detalhado
             docker-compose -f docker-compose.blog.yml up -d --build
-            # Aguardar inicialização e reconectar rede do Nginx Proxy Manager
-            sleep 5
+            
+            # Aguardar e reconectar rede do Nginx Proxy Manager
+            sleep 10
             docker network connect al_profile_al-profile-network nginx-proxy-app-1 || true
-            # Log de status para debug no Actions
-            docker ps | grep al-profile
+            
+            # Diagnóstico pós-deploy para o log do GitHub Actions
+            echo "--- STATUS DOS CONTAINERS ---"
+            docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep al-profile
+            echo "--- LOGS DO FRONTEND (Últimas 20 linhas) ---"
+            docker logs --tail 20 al-profile-frontend
+            echo "--- VERIFICAÇÃO DE PORTA 3003 ---"
+            netstat -tuln | grep 3003 || echo "Porta 3003 não encontrada no host!"
