@@ -329,15 +329,15 @@ function About() {
 
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="space-y-5">
-            <h3 className="font-heading text-2xl font-semibold"><span className="text-white">Transformando</span> <span className="text-cyber-gold">Complexidade</span> <span className="text-white">em</span> <span className="text-cyber-gold">Simplicidade</span></h3>
-            <p className="text-muted-foreground leading-relaxed">
-              Sou cientista de dados em especialização nas áreas de automação e inteligência artificial, com o propósito de transformar processos complexos em soluções inteligentes, eficientes e acessíveis.
+            <h3 className="font-heading text-2xl font-semibold"><span className="text-white">Arquiteto de</span> <span className="text-cyber-gold">Soluções Inteligentes</span></h3>
+            <p className="text-muted-foreground leading-relaxed text-lg">
+              Especialista em <span className="text-white font-medium">Ciência de Dados, Automação e Inteligência Artificial</span>, dedico minha carreira a converter desafios operacionais complexos em sistemas inteligentes de alta performance.
             </p>
             <p className="text-muted-foreground leading-relaxed">
-              Ao longo da minha trajetória, atuei em diversas frentes tecnológicas — desde o desenvolvimento de softwares personalizados e manutenção de equipamentos eletrônicos, até marketing digital, análise de dados e atendimento a clientes corporativos e governamentais.
+              Minha trajetória multidisciplinar percorre desde a engenharia de software e hardware até o marketing estratégico e análise de dados corporativos. Essa visão 360º me permite projetar ecossistemas que não apenas automatizam tarefas, mas potencializam a tomada de decisão em níveis executivos e governamentais.
             </p>
-            <p className="text-muted-foreground leading-relaxed">
-              Atualmente, estou focado em automações inteligentes e aplicações de IA voltadas à otimização de processos, ganho de produtividade e suporte à tomada de decisão.
+            <p className="text-muted-foreground leading-relaxed border-l-2 border-cyber-gold pl-4 italic">
+              "Foco na criação de workflows cognitivos e aplicações de IA que transcendem a produtividade comum, entregando inteligência real e escalável para negócios que buscam a fronteira tecnológica."
             </p>
           </motion.div>
 

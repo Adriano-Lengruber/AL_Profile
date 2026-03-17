@@ -61,10 +61,18 @@ Acesse o painel do Nginx Proxy Manager: http://148.230.75.59:81/
 
 ### 4. Rede do Docker ✅
 
-Para o Nginx Proxy Manager alcançar os containers Docker, a rede já foi conectada:
+Para o Nginx Proxy Manager alcançar os containers Docker, a rede já foi conectada.
+
+**Status Atual dos Containers na VPS:**
+- `nginx-proxy-app-1`: Gerenciador de Proxy e SSL.
+- `al-profile-frontend`: Frontend (Porta 3003).
+- `al-profile-backend`: Backend API (Porta 3005 -> 3001 interno).
+- `al-profile-mongodb`: Banco de dados MongoDB.
+- `portainer`: Gestão visual de containers.
+- Outros: `devmaker3d`, `clubedocafe-frontend/server`, `adminer`.
 
 ```bash
-# Comando executado:
+# Comando para reconectar se necessário:
 docker network connect al_profile_al-profile-network nginx-proxy-app-1
 ```
 
