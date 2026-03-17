@@ -951,6 +951,15 @@ const startServer = async () => {
     const { createLengruber } = require('./create-lengruber.cjs');
     await createLengruber();
     
+    // Verificar se o banco está vazio e popular se necessário
+    const Workspace = mongoose.model('Workspace');
+    const workspaceCount = await Workspace.countDocuments();
+    if (workspaceCount === 0) {
+      console.log('Banco de dados parece estar vazio. Iniciando seed automático...');
+      const { runSeed } = require('./seed-db-module.cjs'); // Vou criar este wrapper
+      await runSeed();
+    }
+    
     app.listen(PORT, () => {
       console.log(`Servidor rodando na porta ${PORT}`);
     });

@@ -1,91 +1,35 @@
-require('dotenv').config();
 const mongoose = require('mongoose');
 
-// Conectar ao MongoDB
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/al-profile-blog';
+async function runSeed() {
+  try {
+    // Modelos (usando os já registrados no Mongoose)
+    const User = mongoose.model('User');
+    const Company = mongoose.model('Company');
+    const Project = mongoose.model('Project');
+    const Workspace = mongoose.model('Workspace');
 
-mongoose.connect(MONGODB_URI)
-  .then(async () => {
-    console.log('Conectado ao MongoDB para seeding...');
-    
-    // Modelos (simplificados para o script)
-    const User = mongoose.model('User', new mongoose.Schema({ username: String }));
-    
-    const companySchema = new mongoose.Schema({
-      name: String,
-      cnpj: String,
-      address: String,
-      email: String,
-      phone: String,
-      website: String,
-      bio: String,
-      userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
-    });
-    const Company = mongoose.model('Company', companySchema);
-
-    const projectSchema = new mongoose.Schema({
-      id: String,
-      clientName: String,
-      projectName: String,
-      brief: String,
-      status: String,
-      value: Number,
-      deadline: String,
-      tasks: [mongoose.Schema.Types.Mixed],
-      costs: [mongoose.Schema.Types.Mixed],
-      stakeholders: [mongoose.Schema.Types.Mixed],
-      meetingNotes: [mongoose.Schema.Types.Mixed],
-      userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
-    });
-    const Project = mongoose.model('Project', projectSchema);
-
-    const boardItemSchema = new mongoose.Schema();
-    boardItemSchema.add({
-      id: String,
-      name: String,
-      values: mongoose.Schema.Types.Mixed,
-      subitems: [boardItemSchema]
-    });
-
-    const workspaceSchema = new mongoose.Schema({
-      id: String,
-      name: String,
-      icon: String,
-      boards: [mongoose.Schema.Types.Mixed],
-      userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
-    });
-    const Workspace = mongoose.model('Workspace', workspaceSchema);
-
-    // 1. Pegar o primeiro usuário
-    const user = await User.findOne();
+    // 1. Pegar o usuário Lengruber
+    const user = await User.findOne({ email: 'adrianolengruber@hotmail.com' });
     if (!user) {
-      console.error('Nenhum usuário encontrado no banco de dados. Por favor, crie um usuário primeiro.');
-      process.exit(1);
+      console.error('Usuário Lengruber não encontrado para seed.');
+      return;
     }
     const userId = user._id;
-    console.log(`Semeando dados para o usuário: ${user.username} (${userId})`);
 
-    // 2. Limpar dados existentes
-    await Workspace.deleteMany({ userId });
-    await Project.deleteMany({ userId });
-    await Company.deleteMany({ userId });
-    console.log('Dados antigos removidos.');
-
-    // 3. Criar Empresa de Exemplo
+    // 2. Limpar dados existentes (apenas se for seed forçado ou se estiver vazio)
+    // No index.js já verificamos se está vazio, então aqui apenas inserimos
+    
+    // 3. Criar Empresa
     const sampleCompany = new Company({
-      name: "Nexus Consulting Group",
-      cnpj: "12.345.678/0001-90",
-      address: "Av. Paulista, 1000, São Paulo - SP",
-      email: "contato@nexusconsulting.com",
-      phone: "(11) 98765-4321",
-      website: "https://nexusconsulting.com",
-      bio: "Líderes em transformação digital e inteligência de dados aplicada ao mercado financeiro e varejo.",
+      name: "Adriano Lengruber Consultoria",
+      cnpj: "00.000.000/0001-00",
+      address: "Rio de Janeiro, RJ",
+      email: "adrianolengruber@hotmail.com",
       userId
     });
     await sampleCompany.save();
-    console.log('Empresa de exemplo criada.');
 
-    // 4. Criar Projetos Realistas (2026)
+    // 4. Projetos
     const sampleProjects = [
       {
         id: "p-1",
@@ -133,22 +77,11 @@ mongoose.connect(MONGODB_URI)
         value: 9200,
         deadline: "2026-03-01",
         userId
-      },
-      {
-        id: "p-5",
-        clientName: "RetailStore",
-        projectName: "Análise de Dados Marketing",
-        brief: "Dashboard de performance para campanhas de Ads.",
-        status: "prospect",
-        value: 5000,
-        deadline: "A definir",
-        userId
       }
     ];
     await Project.insertMany(sampleProjects);
-    console.log(`${sampleProjects.length} projetos criados.`);
 
-    // 5. Criar Workspaces e Boards
+    // 5. Workspaces
     const sampleWorkspaces = [
       {
         id: "ws-growth",
@@ -207,12 +140,11 @@ mongoose.connect(MONGODB_URI)
       }
     ];
     await Workspace.insertMany(sampleWorkspaces);
-    console.log(`${sampleWorkspaces.length} workspaces criados.`);
 
-    console.log('Database Admin Work OS zerado e populado com sucesso!');
-    process.exit(0);
-  })
-  .catch(err => {
-    console.error('Erro ao semear banco de dados:', err);
-    process.exit(1);
-  });
+    console.log('Seed de dados iniciais concluído com sucesso!');
+  } catch (error) {
+    console.error('Erro ao executar seed:', error);
+  }
+}
+
+module.exports = { runSeed };
