@@ -1074,49 +1074,49 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead }: {
         <div className="space-y-4 sm:space-y-6">
           <div className="glass p-4 sm:p-8 rounded-2xl sm:rounded-3xl border-white/5 h-full relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-[50px] -z-10 group-hover:bg-primary/10 transition-colors duration-500" />
-            <h3 className="text-xs sm:text-sm font-bold uppercase tracking-widest text-white mb-4 sm:mb-6 flex items-center gap-2">
-              <Zap size={16} className="text-cyber-gold" /> Command Center
+            <h3 className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-white/50 mb-4 sm:mb-6 flex items-center gap-2">
+              <Zap size={14} className="text-cyber-gold" /> Command Center
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-2 sm:gap-4">
               <button 
                 onClick={() => onNewWorkspace()}
-                className="w-full p-3 sm:p-4 rounded-xl bg-primary/5 border border-primary/10 flex items-center gap-3 sm:gap-4 group/btn hover:bg-primary/10 hover:border-primary/30 transition-all text-left hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full p-2.5 sm:p-4 rounded-xl bg-primary/5 border border-primary/10 flex items-center gap-3 sm:gap-4 group/btn hover:bg-primary/10 hover:border-primary/30 transition-all text-left hover:scale-[1.02] active:scale-[0.98] shadow-sm"
               >
-                <div className="p-2 sm:p-2.5 rounded-lg bg-primary/10 text-primary group-hover/btn:scale-110 transition-transform">
-                  <Plus size={18} className="sm:size-[20px]" />
+                <div className="p-1.5 sm:p-2.5 rounded-lg bg-primary/10 text-primary group-hover/btn:scale-110 transition-transform shrink-0">
+                  <Plus size={16} className="sm:size-[20px]" />
                 </div>
-                <div>
-                  <p className="text-xs font-bold text-white group-hover/btn:text-primary transition-colors">Novo Workspace</p>
-                  <p className="text-[9px] sm:text-[10px] text-muted-foreground">Organizar cliente</p>
+                <div className="min-w-0">
+                  <p className="text-[11px] sm:text-xs font-bold text-white group-hover/btn:text-primary transition-colors truncate">Novo Workspace</p>
+                  <p className="text-[8px] sm:text-[10px] text-muted-foreground truncate">Organizar cliente</p>
                 </div>
               </button>
               
               <button 
                 onClick={() => onNewLead()}
-                className="w-full p-3 sm:p-4 rounded-xl bg-cyber-gold/5 border border-cyber-gold/10 flex items-center gap-3 sm:gap-4 group/btn hover:bg-cyber-gold/10 hover:border-cyber-gold/30 transition-all text-left hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full p-2.5 sm:p-4 rounded-xl bg-cyber-gold/5 border border-cyber-gold/10 flex items-center gap-3 sm:gap-4 group/btn hover:bg-cyber-gold/10 hover:border-cyber-gold/30 transition-all text-left hover:scale-[1.02] active:scale-[0.98] shadow-sm"
               >
-                <div className="p-2 sm:p-2.5 rounded-lg bg-cyber-gold/10 text-cyber-gold group-hover/btn:scale-110 transition-transform">
-                  <MousePointer2 size={18} className="sm:size-[20px]" />
+                <div className="p-1.5 sm:p-2.5 rounded-lg bg-cyber-gold/10 text-cyber-gold group-hover/btn:scale-110 transition-transform shrink-0">
+                  <MousePointer2 size={16} className="sm:size-[20px]" />
                 </div>
-                <div>
-                  <p className="text-xs font-bold text-white group-hover/btn:text-cyber-gold transition-colors">Injetar Lead</p>
-                  <p className="text-[9px] sm:text-[10px] text-muted-foreground">Novo prospect</p>
+                <div className="min-w-0">
+                  <p className="text-[11px] sm:text-xs font-bold text-white group-hover/btn:text-cyber-gold transition-colors truncate">Injetar Lead</p>
+                  <p className="text-[8px] sm:text-[10px] text-muted-foreground truncate">Novo prospect</p>
                 </div>
               </button>
 
-              <div className="pt-4 sm:pt-6 mt-2 border-t border-white/5">
-                <div className="flex justify-between items-center mb-3 sm:mb-4">
-                  <h4 className="text-[9px] sm:text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Módulos Ativos</h4>
-                  <div className="px-2 py-0.5 rounded-full bg-cyber-emerald/10 text-cyber-emerald text-[7px] sm:text-[8px] font-bold border border-cyber-emerald/20">OK</div>
+              <div className="pt-3 sm:pt-6 mt-1 sm:mt-2 border-t border-white/5">
+                <div className="flex justify-between items-center mb-2 sm:mb-4">
+                  <h4 className="text-[8px] sm:text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Módulos Ativos</h4>
+                  <div className="px-1.5 py-0.5 rounded-full bg-cyber-emerald/10 text-cyber-emerald text-[6px] sm:text-[8px] font-bold border border-cyber-emerald/20 animate-pulse">LIVE</div>
                 </div>
-                <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                <div className="grid grid-cols-2 gap-1.5 sm:gap-3">
                   {[
                     { name: 'Sales Engine', icon: Target },
                     { name: 'CRM', icon: Users },
                     { name: 'BI', icon: Activity },
                     { name: 'Automation', icon: Zap }
                   ].map((mod, i) => (
-                    <div key={i} className="px-2 sm:px-3 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl bg-white/[0.02] border border-white/5 text-[8px] sm:text-[10px] font-bold flex items-center gap-1.5 sm:gap-2 hover:bg-white/[0.05] transition-colors cursor-default group/mod">
+                    <div key={i} className="px-1.5 sm:px-3 py-1 sm:py-2.5 rounded-lg sm:rounded-xl bg-white/[0.02] border border-white/5 text-[7px] sm:text-[10px] font-bold flex items-center gap-1 sm:gap-2 hover:bg-white/[0.05] transition-colors cursor-default group/mod min-w-0">
                       <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-cyber-emerald shadow-[0_0_8px_rgba(16,185,129,0.5)] group-hover/mod:scale-125 transition-transform shrink-0" />
                       <span className="text-muted-foreground group-hover/mod:text-white transition-colors truncate">{mod.name}</span>
                     </div>
@@ -2566,34 +2566,34 @@ export default function AdminDashboard() {
                                 </select>
                               </div>
                               
-                              <div className="flex flex-wrap gap-3 sm:gap-4 pl-8 sm:pl-10">
-                                <div className="space-y-1">
-                                  <label className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground flex items-center gap-1">
-                                    <Calendar size={10} /> Início
-                                  </label>
-                                  <input 
-                                    id={`task-start-${task.id}`}
-                                    name={`task-start-${task.id}`}
-                                    type="date" 
-                                    value={task.startDate || ''} 
-                                    onChange={(e) => updateTaskDates(selectedProject.id, task.id, 'startDate', e.target.value)}
-                                    className="bg-transparent border-none text-[10px] sm:text-[11px] text-muted-foreground outline-none focus:text-white transition-colors"
-                                  />
+                                <div className="flex flex-wrap gap-2 sm:gap-4 pl-8 sm:pl-10">
+                                  <div className="space-y-1 min-w-[100px] flex-1">
+                                    <label className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground flex items-center gap-1">
+                                      <Calendar size={10} /> Início
+                                    </label>
+                                    <input 
+                                      id={`task-start-${task.id}`}
+                                      name={`task-start-${task.id}`}
+                                      type="date" 
+                                      value={task.startDate || ''} 
+                                      onChange={(e) => updateTaskDates(selectedProject.id, task.id, 'startDate', e.target.value)}
+                                      className="bg-transparent border-none text-[10px] sm:text-[11px] text-muted-foreground outline-none focus:text-white transition-colors w-full"
+                                    />
+                                  </div>
+                                  <div className="space-y-1 min-w-[100px] flex-1">
+                                    <label className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground flex items-center gap-1">
+                                      <Target size={10} /> Fim Previsto
+                                    </label>
+                                    <input 
+                                      id={`task-end-${task.id}`}
+                                      name={`task-end-${task.id}`}
+                                      type="date" 
+                                      value={task.endDate || ''} 
+                                      onChange={(e) => updateTaskDates(selectedProject.id, task.id, 'endDate', e.target.value)}
+                                      className="bg-transparent border-none text-[10px] sm:text-[11px] text-muted-foreground outline-none focus:text-white transition-colors w-full"
+                                    />
+                                  </div>
                                 </div>
-                                <div className="space-y-1">
-                                  <label className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground flex items-center gap-1">
-                                    <Target size={10} /> Fim Previsto
-                                  </label>
-                                  <input 
-                                    id={`task-end-${task.id}`}
-                                    name={`task-end-${task.id}`}
-                                    type="date" 
-                                    value={task.endDate || ''} 
-                                    onChange={(e) => updateTaskDates(selectedProject.id, task.id, 'endDate', e.target.value)}
-                                    className="bg-transparent border-none text-[10px] sm:text-[11px] text-muted-foreground outline-none focus:text-white transition-colors"
-                                  />
-                                </div>
-                              </div>
                             </div>
                           ))}
                         </div>
