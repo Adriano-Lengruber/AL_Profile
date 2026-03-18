@@ -1,4 +1,5 @@
 require('dotenv').config();
+const os = require('os');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -243,12 +244,39 @@ app.get('/api/auth/me', authenticateToken, async (req, res) => {
   }
 });
 
+// --- System Stats Endpoint ---
+app.get('/api/system/stats', authenticateToken, (req, res) => {
+  const uptime = os.uptime();
+  const totalMem = os.totalmem();
+  const freeMem = os.freemem();
+  const memUsage = ((totalMem - freeMem) / totalMem) * 100;
+  
+  const cpus = os.cpus();
+  const loadAvg = os.loadavg();
+  
+  res.json({
+    platform: os.platform(),
+    release: os.release(),
+    uptime: uptime,
+    memory: {
+      total: totalMem,
+      free: freeMem,
+      usage: memUsage.toFixed(2)
+    },
+    cpu: {
+      model: cpus[0].model,
+      cores: cpus.length,
+      load: loadAvg
+    },
+    hostname: os.hostname(),
+    arch: os.arch()
+  });
+});
+
 // Update profile
 app.put('/api/auth/profile', authenticateToken, async (req, res) => {
   try {
     const { avatar, bio } = req.body;
-    
-    const user = await User.findById(req.user.id);
     if (!user) {
       return res.status(404).json({ error: 'Usuário não encontrado' });
     }

@@ -50,7 +50,11 @@ import {
   Activity,
   ArrowUpRight,
   MousePointer2,
-  LogOut
+  LogOut,
+  Server,
+  Cpu,
+  HardDrive,
+  Thermometer
 } from 'lucide-react';
 
 import { 
@@ -495,45 +499,45 @@ const BoardView = ({ board, onUpdateCell, onAddItem, onAddGroup, onDeleteItem, o
       {board.groups.map(group => (
         <div key={group.id} className="space-y-0 relative group/g">
           {/* Header do Grupo */}
-          <div className="flex items-center gap-3 mb-2 group/title">
-            <div className="w-1 h-6 rounded-full" style={{ backgroundColor: group.color }} />
-            <h3 className="text-lg font-bold" style={{ color: group.color }}>{group.title}</h3>
-            <span className="text-[10px] text-muted-foreground font-bold uppercase">{group.items.length} itens</span>
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 group/title">
+            <div className="w-1 h-5 sm:h-6 rounded-full" style={{ backgroundColor: group.color }} />
+            <h3 className="text-sm sm:text-lg font-bold" style={{ color: group.color }}>{group.title}</h3>
+            <span className="text-[9px] sm:text-[10px] text-muted-foreground font-bold uppercase tracking-wider">{group.items.length} itens</span>
             <button 
               onClick={() => onDeleteGroup(group.id)}
-              className="opacity-0 group-hover/g:opacity-100 p-1 hover:text-red-500 transition-all ml-2"
+              className="opacity-0 group-hover/g:opacity-100 p-1 hover:text-red-500 transition-all ml-1 sm:ml-2"
               title="Remover Grupo"
             >
-              <Trash2 size={14} />
+              <Trash2 size={12} className="sm:size-[14px]" />
             </button>
           </div>
 
           {/* Tabela */}
-          <div className="overflow-x-auto rounded-xl border border-white/5 bg-white/[0.01]">
-            <table className="w-full text-left border-collapse min-w-[1000px]">
+          <div className="overflow-x-auto rounded-xl border border-white/5 bg-white/[0.01] custom-scrollbar">
+            <table className="w-full text-left border-collapse min-w-[800px] sm:min-w-[1000px]">
               <thead>
                 <tr className="bg-white/5 border-b border-white/10">
-                  <th className="p-3 w-12 sticky left-0 bg-cyber-black z-10"></th>
-                  <th className="p-3 font-bold text-[11px] uppercase text-muted-foreground sticky left-12 bg-cyber-black z-10 w-64 border-r border-white/5">Nome do Item</th>
+                  <th className="p-2 sm:p-3 w-10 sm:w-12 sticky left-0 bg-cyber-black z-10"></th>
+                  <th className="p-2 sm:p-3 font-bold text-[10px] sm:text-[11px] uppercase text-muted-foreground sticky left-10 sm:left-12 bg-cyber-black z-10 w-48 sm:w-64 border-r border-white/5">Nome do Item</th>
                   {board.columns.map(col => (
-                    <th key={col.id} className="p-3 font-bold text-[11px] uppercase text-muted-foreground text-center border-r border-white/5" style={{ width: col.width }}>
+                    <th key={col.id} className="p-2 sm:p-3 font-bold text-[10px] sm:text-[11px] uppercase text-muted-foreground text-center border-r border-white/5" style={{ width: col.width }}>
                       {col.title}
                     </th>
                   ))}
-                  <th className="p-3 w-10"></th>
+                  <th className="p-2 sm:p-3 w-10"></th>
                 </tr>
               </thead>
               <tbody>
                 {group.items.map(item => (
                   <tr key={item.id} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors group/row">
-                    <td className="p-3 text-center sticky left-0 bg-cyber-black group-hover/row:bg-white/5 transition-colors">
-                      <div className="w-1 h-8 rounded-full mx-auto" style={{ backgroundColor: group.color }} />
+                    <td className="p-2 sm:p-3 text-center sticky left-0 bg-cyber-black group-hover/row:bg-white/5 transition-colors">
+                      <div className="w-1 h-6 sm:h-8 rounded-full mx-auto" style={{ backgroundColor: group.color }} />
                     </td>
-                    <td className="p-3 sticky left-12 bg-cyber-black group-hover/row:bg-white/5 transition-colors border-r border-white/5">
+                    <td className="p-2 sm:p-3 sticky left-10 sm:left-12 bg-cyber-black group-hover/row:bg-white/5 transition-colors border-r border-white/5">
                       <input 
                         id={`item-name-${item.id}`}
                         name={`item-name-${item.id}`}
-                        className="bg-transparent border-none outline-none text-sm font-medium w-full focus:ring-1 focus:ring-primary/50 rounded px-1"
+                        className="bg-transparent border-none outline-none text-xs sm:text-sm font-medium w-full focus:ring-1 focus:ring-primary/50 rounded px-1"
                         value={item.name}
                         onChange={(e) => onUpdateCell(group.id, item.id, 'name', e.target.value)}
                       />
@@ -542,7 +546,7 @@ const BoardView = ({ board, onUpdateCell, onAddItem, onAddGroup, onDeleteItem, o
                       <td key={col.id} className="p-0 border-r border-white/5 text-center align-middle h-full">
                         {col.type === 'status' && (
                           <div 
-                            className={`h-12 flex items-center justify-center text-[11px] font-bold cursor-pointer transition-all hover:brightness-110 active:scale-95`}
+                            className={`h-10 sm:h-12 flex items-center justify-center text-[10px] sm:text-[11px] font-bold cursor-pointer transition-all hover:brightness-110 active:scale-95`}
                             style={{ 
                               backgroundColor: 
                                 item.values[col.id] === 'Pronto' ? '#00c875' : 
@@ -556,12 +560,12 @@ const BoardView = ({ board, onUpdateCell, onAddItem, onAddGroup, onDeleteItem, o
                               onUpdateCell(group.id, item.id, col.id, next);
                             }}
                           >
-                            {item.values[col.id] || 'Não iniciado'}
+                            <span className="truncate px-1">{item.values[col.id] || 'Não iniciado'}</span>
                           </div>
                         )}
                         {col.type === 'priority' && (
                           <div 
-                            className={`h-12 flex items-center justify-center text-[11px] font-bold cursor-pointer transition-all hover:brightness-110`}
+                            className={`h-10 sm:h-12 flex items-center justify-center text-[10px] sm:text-[11px] font-bold cursor-pointer transition-all hover:brightness-110`}
                             style={{ 
                               backgroundColor: 
                                 item.values[col.id] === 'Alta' ? '#401694' : 
@@ -583,25 +587,25 @@ const BoardView = ({ board, onUpdateCell, onAddItem, onAddGroup, onDeleteItem, o
                             id={`item-${item.id}-col-${col.id}`}
                             name={`item-${item.id}-col-${col.id}`}
                             type="number"
-                            className="bg-transparent border-none outline-none text-xs text-center w-full h-12 px-2 focus:bg-white/5"
+                            className="bg-transparent border-none outline-none text-[10px] sm:text-xs text-center w-full h-10 sm:h-12 px-2 focus:bg-white/5"
                             value={item.values[col.id] || ''}
                             onChange={(e) => onUpdateCell(group.id, item.id, col.id, Number(e.target.value))}
                             placeholder="0"
                           />
                         )}
                         {col.type === 'person' && (
-                          <div className="flex items-center justify-center h-12 gap-2 group/person cursor-pointer hover:bg-white/5 px-2">
-                            <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">
+                          <div className="flex items-center justify-center h-10 sm:h-12 gap-1.5 sm:gap-2 group/person cursor-pointer hover:bg-white/5 px-2">
+                            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary/20 flex items-center justify-center text-[9px] sm:text-[10px] font-bold text-primary">
                               {(item.values[col.id] || 'A').charAt(0)}
                             </div>
-                            <span className="text-[11px] text-muted-foreground group-hover/person:text-white transition-colors">{item.values[col.id] || 'Atribuir'}</span>
+                            <span className="text-[10px] sm:text-[11px] text-muted-foreground group-hover/person:text-white transition-colors truncate max-w-[60px]">{item.values[col.id] || 'Atribuir'}</span>
                           </div>
                         )}
                         {col.type === 'timeline' && (
-                          <div className="px-3 h-12 flex items-center justify-center">
-                            <div className="w-full bg-white/10 h-5 rounded-full relative overflow-hidden flex items-center justify-center group/timeline cursor-pointer hover:bg-white/20 transition-colors">
-                              <span className="text-[9px] font-bold relative z-10 text-white/80">
-                                {item.values[col.id]?.from ? `${new Date(item.values[col.id].from).toLocaleDateString('pt-BR', {day: 'numeric', month: 'short'})} - ${new Date(item.values[col.id].to).toLocaleDateString('pt-BR', {day: 'numeric', month: 'short'})}` : 'Definir datas'}
+                          <div className="px-2 sm:px-3 h-10 sm:h-12 flex items-center justify-center">
+                            <div className="w-full bg-white/10 h-4 sm:h-5 rounded-full relative overflow-hidden flex items-center justify-center group/timeline cursor-pointer hover:bg-white/20 transition-colors">
+                              <span className="text-[8px] sm:text-[9px] font-bold relative z-10 text-white/80 truncate px-1">
+                                {item.values[col.id]?.from ? `${new Date(item.values[col.id].from).toLocaleDateString('pt-BR', {day: 'numeric', month: 'short'})} - ${new Date(item.values[col.id].to).toLocaleDateString('pt-BR', {day: 'numeric', month: 'short'})}` : 'Definir'}
                               </span>
                               {item.values[col.id]?.from && (
                                 <div className="absolute inset-0 bg-primary/30" />
@@ -614,27 +618,27 @@ const BoardView = ({ board, onUpdateCell, onAddItem, onAddGroup, onDeleteItem, o
                             id={`item-${item.id}-col-${col.id}`}
                             name={`item-${item.id}-col-${col.id}`}
                             type="date"
-                            className="bg-transparent border-none outline-none text-[11px] text-center w-full h-12 px-2 focus:bg-white/5 text-muted-foreground"
+                            className="bg-transparent border-none outline-none text-[10px] sm:text-[11px] text-center w-full h-10 sm:h-12 px-2 focus:bg-white/5 text-muted-foreground"
                             value={item.values[col.id] || ''}
                             onChange={(e) => onUpdateCell(group.id, item.id, col.id, e.target.value)}
                           />
                         )}
                         {col.type === 'link' && (
-                          <div className="flex items-center justify-center h-12">
+                          <div className="flex items-center justify-center h-10 sm:h-12">
                             {item.values[col.id] ? (
                               <a href={item.values[col.id]} target="_blank" rel="noopener noreferrer" className="text-primary hover:scale-110 transition-transform">
-                                <ExternalLink size={14} />
+                                <ExternalLink size={12} className="sm:size-[14px]" />
                               </a>
                             ) : (
                               <button className="text-muted-foreground hover:text-white transition-colors">
-                                <Plus size={14} />
+                                <Plus size={12} className="sm:size-[14px]" />
                               </button>
                             )}
                           </div>
                         )}
                         {col.type === 'tags' && (
-                          <div className="flex flex-wrap gap-1 justify-center items-center h-12 px-2">
-                            <span className="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-[9px] font-bold uppercase">
+                          <div className="flex flex-wrap gap-1 justify-center items-center h-10 sm:h-12 px-2">
+                            <span className="px-1.5 py-0.5 rounded-full bg-primary/20 text-primary text-[8px] sm:text-[9px] font-bold uppercase truncate max-w-[50px]">
                               {item.values[col.id] || 'Tag'}
                             </span>
                           </div>
@@ -643,7 +647,7 @@ const BoardView = ({ board, onUpdateCell, onAddItem, onAddGroup, onDeleteItem, o
                           <input 
                             id={`item-${item.id}-col-${col.id}`}
                             name={`item-${item.id}-col-${col.id}`}
-                            className="bg-transparent border-none outline-none text-[11px] text-center w-full h-12 px-2 focus:bg-white/5"
+                            className="bg-transparent border-none outline-none text-[10px] sm:text-[11px] text-center w-full h-10 sm:h-12 px-2 focus:bg-white/5"
                             value={item.values[col.id] || ''}
                             onChange={(e) => onUpdateCell(group.id, item.id, col.id, e.target.value)}
                             placeholder="..."
@@ -651,26 +655,26 @@ const BoardView = ({ board, onUpdateCell, onAddItem, onAddGroup, onDeleteItem, o
                         )}
                       </td>
                     ))}
-                    <td className="p-3 text-right">
+                    <td className="p-2 sm:p-3 text-right">
                       <button 
                         onClick={() => onDeleteItem(group.id, item.id)}
                         className="opacity-0 group-hover/row:opacity-100 text-muted-foreground hover:text-red-400 transition-all p-1"
                         title="Excluir Item"
                       >
-                        <Trash2 size={14} />
+                        <Trash2 size={12} className="sm:size-[14px]" />
                       </button>
                     </td>
                   </tr>
                 ))}
                 {/* Rodapé Adicionar Item */}
                 <tr className="border-b border-white/5 hover:bg-white/[0.02] transition-colors group/add">
-                  <td className="p-3 sticky left-0 bg-cyber-black group-hover/add:bg-white/[0.02] z-10"></td>
-                  <td colSpan={board.columns.length + 2} className="p-0 sticky left-12 bg-cyber-black group-hover/add:bg-white/[0.02] z-10">
+                  <td className="p-2 sm:p-3 sticky left-0 bg-cyber-black group-hover/add:bg-white/[0.02] z-10"></td>
+                  <td colSpan={board.columns.length + 2} className="p-0 sticky left-10 sm:left-12 bg-cyber-black group-hover/add:bg-white/[0.02] z-10">
                     <button 
                       onClick={() => onAddItem(group.id)}
-                      className="w-full text-left px-3 py-3 text-xs text-muted-foreground hover:text-white flex items-center gap-2 transition-colors"
+                      className="w-full text-left px-3 py-2.5 sm:py-3 text-[11px] sm:text-xs text-muted-foreground hover:text-white flex items-center gap-2 transition-colors"
                     >
-                      <Plus size={14} /> Adicionar novo item
+                      <Plus size={12} className="sm:size-[14px]" /> Adicionar novo item
                     </button>
                   </td>
                 </tr>
@@ -678,24 +682,24 @@ const BoardView = ({ board, onUpdateCell, onAddItem, onAddGroup, onDeleteItem, o
               {/* Footer de Resumo do Grupo */}
               <tfoot className="bg-white/[0.02]">
                 <tr>
-                  <td className="p-2 sticky left-0 bg-cyber-black z-10"></td>
-                  <td className="p-2 sticky left-12 bg-cyber-black border-r border-white/5 z-10"></td>
+                  <td className="p-1 sm:p-2 sticky left-0 bg-cyber-black z-10"></td>
+                  <td className="p-1 sm:p-2 sticky left-10 sm:left-12 bg-cyber-black border-r border-white/5 z-10"></td>
                   {board.columns.map(col => (
-                    <td key={col.id} className="p-2 border-r border-white/5 text-center">
+                    <td key={col.id} className="p-1 sm:p-2 border-r border-white/5 text-center">
                       {col.type === 'number' && (
-                        <div className="text-[10px] font-mono font-bold text-muted-foreground">
+                        <div className="text-[9px] sm:text-[10px] font-mono font-bold text-muted-foreground truncate px-1">
                           Σ R$ {group.items.reduce((acc, item) => acc + (Number(item.values[col.id]) || 0), 0).toLocaleString('pt-BR')}
                         </div>
                       )}
                       {col.type === 'status' && (
-                        <div className="flex h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                        <div className="flex h-1 sm:h-1.5 w-full bg-white/5 rounded-full overflow-hidden mx-1">
                           <div className="bg-[#00c875]" style={{ width: `${(group.items.filter(i => i.values[col.id] === 'Pronto').length / Math.max(group.items.length, 1)) * 100}%` }} />
                           <div className="bg-[#fdab3d]" style={{ width: `${(group.items.filter(i => i.values[col.id] === 'Trabalhando nisso').length / Math.max(group.items.length, 1)) * 100}%` }} />
                         </div>
                       )}
                     </td>
                   ))}
-                  <td className="p-2"></td>
+                  <td className="p-1 sm:p-2"></td>
                 </tr>
               </tfoot>
             </table>
@@ -713,6 +717,205 @@ const BoardView = ({ board, onUpdateCell, onAddItem, onAddGroup, onDeleteItem, o
   );
 };
 
+const ServerStatsView = ({ API_BASE, getHeaders }: { API_BASE: string, getHeaders: () => any }) => {
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/system/stats`, { headers: getHeaders() });
+        if (res.ok) {
+          const data = await res.json();
+          setStats(data);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar stats do servidor:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+    const interval = setInterval(fetchStats, 10000); // Atualiza a cada 10s
+    return () => clearInterval(interval);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 gap-4">
+        <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+        <p className="text-sm text-muted-foreground animate-pulse">Conectando ao Servidor...</p>
+      </div>
+    );
+  }
+
+  if (!stats) return <div className="text-center py-20 text-muted-foreground">Não foi possível carregar dados do servidor.</div>;
+
+  return (
+    <div className="space-y-4 sm:space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
+        {/* CPU */}
+        <div className="glass p-4 sm:p-6 rounded-2xl border-white/5 space-y-3 sm:space-y-4 relative overflow-hidden group hover:border-white/10 transition-all hover:scale-[1.01]">
+          <div className="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
+            <Cpu size={60} className="sm:size-[80px]" />
+          </div>
+          <div className="flex justify-between items-center">
+            <div className="p-2 sm:p-3 rounded-xl bg-blue-500/10 text-blue-500 shadow-inner group-hover:scale-110 transition-transform">
+              <Cpu size={18} className="sm:size-[24px]" />
+            </div>
+            <div className="text-right">
+              <p className="text-[8px] sm:text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Processador</p>
+              <p className="text-[10px] sm:text-xs font-bold truncate max-w-[80px] sm:max-w-[120px]">{stats.cpu.model.split(' ')[0]}</p>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="flex justify-between text-[10px] sm:text-xs">
+              <span className="text-muted-foreground">Carga (1/5/15m)</span>
+              <span className="font-bold font-mono">{stats.cpu.load[0].toFixed(2)}</span>
+            </div>
+            <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+              <motion.div 
+                initial={{ width: 0 }}
+                animate={{ width: `${Math.min(stats.cpu.load[0] * 10, 100)}%` }}
+                className={`h-full transition-all duration-1000 ${stats.cpu.load[0] > 2 ? 'bg-red-500' : 'bg-blue-500'}`}
+              />
+            </div>
+            <p className="text-[9px] sm:text-[10px] text-muted-foreground flex items-center gap-1">
+              <Activity size={10} className="text-blue-500" /> {stats.cpu.cores} núcleos ativos
+            </p>
+          </div>
+        </div>
+
+        {/* Memory */}
+        <div className="glass p-4 sm:p-6 rounded-2xl border-white/5 space-y-3 sm:space-y-4 relative overflow-hidden group hover:border-white/10 transition-all hover:scale-[1.01]">
+          <div className="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
+            <Database size={60} className="sm:size-[80px]" />
+          </div>
+          <div className="flex justify-between items-center">
+            <div className="p-2 sm:p-3 rounded-xl bg-purple-500/10 text-purple-500 shadow-inner group-hover:scale-110 transition-transform">
+              <Database size={18} className="sm:size-[24px]" />
+            </div>
+            <div className="text-right">
+              <p className="text-[8px] sm:text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Memória RAM</p>
+              <p className="text-[10px] sm:text-xs font-bold">{(stats.memory.total / (1024**3)).toFixed(1)} GB Total</p>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="flex justify-between text-[10px] sm:text-xs">
+              <span className="text-muted-foreground">Uso Atual</span>
+              <span className="font-bold font-mono">{stats.memory.usage}%</span>
+            </div>
+            <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+              <motion.div 
+                initial={{ width: 0 }}
+                animate={{ width: `${stats.memory.usage}%` }}
+                className={`h-full transition-all duration-1000 ${stats.memory.usage > 80 ? 'bg-red-500' : 'bg-purple-500'}`}
+              />
+            </div>
+            <p className="text-[9px] sm:text-[10px] text-muted-foreground flex items-center gap-1">
+              <CheckCircle2 size={10} className="text-purple-500" /> {(stats.memory.free / (1024**3)).toFixed(1)} GB disponíveis
+            </p>
+          </div>
+        </div>
+
+        {/* Uptime */}
+        <div className="glass p-4 sm:p-6 rounded-2xl border-white/5 space-y-3 sm:space-y-4 relative overflow-hidden group hover:border-white/10 transition-all hover:scale-[1.01]">
+          <div className="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
+            <Clock size={60} className="sm:size-[80px]" />
+          </div>
+          <div className="flex justify-between items-center">
+            <div className="p-2 sm:p-3 rounded-xl bg-cyber-emerald/10 text-cyber-emerald shadow-inner group-hover:scale-110 transition-transform">
+              <Clock size={18} className="sm:size-[24px]" />
+            </div>
+            <div className="text-right">
+              <p className="text-[8px] sm:text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Tempo Online</p>
+              <p className="text-[10px] sm:text-xs font-bold">SLA: 99.9%</p>
+            </div>
+          </div>
+          <div className="space-y-1">
+            <h4 className="text-xl sm:text-3xl font-bold font-heading text-cyber-emerald">{(stats.uptime / 86400).toFixed(1)}d</h4>
+            <p className="text-[8px] sm:text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Dias ininterruptos</p>
+          </div>
+          <div className="pt-2 flex items-center gap-2 text-[9px] sm:text-[10px] text-cyber-emerald font-bold">
+            <div className="w-1.5 h-1.5 rounded-full bg-cyber-emerald animate-pulse shadow-[0_0_8px_#00C875]" />
+            Servidor Estável
+          </div>
+        </div>
+
+        {/* OS Info */}
+        <div className="glass p-4 sm:p-6 rounded-2xl border-white/5 space-y-3 sm:space-y-4 relative overflow-hidden group hover:border-white/10 transition-all hover:scale-[1.01]">
+          <div className="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
+            <HardDrive size={60} className="sm:size-[80px]" />
+          </div>
+          <div className="flex justify-between items-center">
+            <div className="p-2 sm:p-3 rounded-xl bg-orange-500/10 text-orange-500 shadow-inner group-hover:scale-110 transition-transform">
+              <HardDrive size={18} className="sm:size-[24px]" />
+            </div>
+            <div className="text-right">
+              <p className="text-[8px] sm:text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Sistema Operacional</p>
+              <p className="text-[10px] sm:text-xs font-bold capitalize truncate max-w-[80px] sm:max-w-none">{stats.platform} {stats.arch}</p>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-[10px] sm:text-xs">
+              <span className="text-muted-foreground">Hostname</span>
+              <span className="font-mono text-[9px] sm:text-[10px] bg-white/5 px-1.5 py-0.5 rounded truncate max-w-[80px] sm:max-w-none">{stats.hostname}</span>
+            </div>
+            <div className="flex items-center justify-between text-[10px] sm:text-xs">
+              <span className="text-muted-foreground">Kernel</span>
+              <span className="font-mono text-[9px] sm:text-[10px] truncate max-w-[80px] sm:max-w-[100px]">{stats.release}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Network & Logs (Placeholder for more data) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 glass p-6 rounded-2xl border-white/5 relative overflow-hidden">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
+              <Network size={16} className="text-primary" /> Atividade de Rede
+            </h3>
+            <div className="flex items-center gap-4 text-[10px] font-bold">
+              <div className="flex items-center gap-1.5 text-cyber-emerald">
+                <div className="w-2 h-2 rounded-full bg-cyber-emerald" /> Upload
+              </div>
+              <div className="flex items-center gap-1.5 text-blue-500">
+                <div className="w-2 h-2 rounded-full bg-blue-500" /> Download
+              </div>
+            </div>
+          </div>
+          <div className="h-40 flex items-center justify-center text-muted-foreground text-xs italic bg-white/[0.02] rounded-xl border border-dashed border-white/10">
+            Gráfico de tráfego em tempo real (Mock)
+          </div>
+        </div>
+
+        <div className="glass p-6 rounded-2xl border-white/5">
+          <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-6 flex items-center gap-2">
+            <ShieldAlert size={16} className="text-cyber-gold" /> Logs de Segurança
+          </h3>
+          <div className="space-y-3">
+            {[
+              { time: '2m ago', msg: 'Sucesso: Login root via SSH', type: 'success' },
+              { time: '15m ago', msg: 'Aviso: Tentativa falha SSH (IP: 192.168.1.1)', type: 'warn' },
+              { time: '1h ago', msg: 'Info: Firewall atualizado', type: 'info' },
+              { time: '2h ago', msg: 'Sucesso: Backup diário concluído', type: 'success' },
+            ].map((log, i) => (
+              <div key={i} className="flex items-start gap-3 text-[10px]">
+                <span className="text-muted-foreground whitespace-nowrap">{log.time}</span>
+                <span className={`${log.type === 'warn' ? 'text-cyber-gold' : log.type === 'success' ? 'text-cyber-emerald' : 'text-blue-500'}`}>
+                  {log.msg}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead }: { 
   projects: Project[], 
   workspaces: Workspace[],
@@ -721,9 +924,12 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead }: {
 }) => {
   const activeWorkspacesCount = workspaces.length;
   const totalLeads = projects.filter(p => p.status === 'prospect').length;
-  const activeProjects = projects.filter(p => p.status === 'active').length;
+  const activeProjectsCount = projects.filter(p => p.status === 'active').length;
   const totalPipelineValue = projects.reduce((acc, p) => acc + (p.value || 0), 0);
   const winRate = projects.length > 0 ? Math.round((projects.filter(p => p.status === 'finished' || p.status === 'active').length / projects.length) * 100) : 0;
+  const mrrEstimated = projects
+    .filter(p => p.status === 'active' || p.status === 'finished')
+    .reduce((acc, p) => acc + (p.value || 0), 0) / 6;
 
   // Gerar dados do gráfico a partir dos projetos finalizados e ativos
   const getMonthlyRevenue = () => {
@@ -768,50 +974,58 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead }: {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
-          <h2 className="text-4xl font-bold font-heading">Business <span className="text-gradient">Insights</span></h2>
-          <p className="text-muted-foreground mt-2">Visão consolidada da sua operação de consultoria.</p>
+          <h2 className="text-2xl sm:text-4xl font-bold font-heading">Business <span className="text-gradient">Insights</span></h2>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-2">Visão consolidada da sua operação de consultoria.</p>
         </div>
         <div className="flex items-center gap-2 px-3 py-1.5 glass rounded-full border-cyber-emerald/20 text-cyber-emerald text-[10px] font-bold uppercase tracking-widest">
           <div className="w-2 h-2 rounded-full bg-cyber-emerald animate-pulse" />
-          Sistema Online & Sincronizado
+          Sistema Online
         </div>
       </div>
 
       {/* KPI Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-2 sm:gap-4">
         {[
-          { label: 'Workspaces Ativos', value: activeWorkspacesCount, sub: '+2 esta semana', icon: Layout, color: 'text-primary' },
-          { label: 'Total de Leads', value: totalLeads, sub: 'Pipeline saudável', icon: Users, color: 'text-cyber-gold' },
-          { label: 'Valor em Pipeline', value: `R$ ${(totalPipelineValue / 1000).toFixed(1)}k`, sub: 'Estimado', icon: DollarSign, color: 'text-cyber-emerald' },
-          { label: 'Taxa de Conversão', value: `${winRate}%`, sub: 'Win rate histórico', icon: Activity, color: 'text-purple-500' },
+          { label: 'Workspaces', value: activeWorkspacesCount, sub: 'Clientes ativos', icon: Layout, color: 'text-primary' },
+          { label: 'Projetos', value: activeProjectsCount, sub: 'Em execução', icon: Kanban, color: 'text-cyber-emerald' },
+          { label: 'Total Leads', value: totalLeads, sub: 'Novas ops', icon: Users, color: 'text-cyber-gold' },
+          { label: 'Pipeline', value: `R$ ${(totalPipelineValue / 1000).toFixed(1)}k`, sub: 'Valor total', icon: DollarSign, color: 'text-blue-500' },
+          { label: 'MRR Est.', value: `R$ ${(mrrEstimated / 1000).toFixed(1)}k`, sub: 'Recorrência', icon: TrendingUp, color: 'text-purple-500' },
+          { label: 'Win Rate', value: `${winRate}%`, sub: 'Conversão', icon: Activity, color: 'text-cyber-emerald' },
         ].map((kpi, i) => (
-          <div key={i} className="glass p-6 rounded-2xl border-white/5 relative overflow-hidden group hover:border-white/10 transition-all">
-            <div className="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity">
-              <kpi.icon size={80} />
+          <div key={i} className="glass p-2.5 sm:p-4 rounded-xl sm:rounded-2xl border-white/5 relative overflow-hidden group hover:border-white/10 transition-all hover:scale-[1.02] duration-300 shadow-lg hover:shadow-primary/5">
+            <div className="absolute -right-2 -top-2 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
+              <kpi.icon size={28} className="sm:size-[50px]" />
             </div>
-            <div className="flex flex-col gap-1">
-              <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">{kpi.label}</p>
-              <h3 className={`text-3xl font-bold ${kpi.color}`}>{kpi.value}</h3>
-              <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1">
-                <ArrowUpRight size={10} /> {kpi.sub}
+            <div className="flex flex-col gap-0 relative z-10">
+              <p className="text-[7px] sm:text-[9px] font-bold uppercase text-muted-foreground tracking-widest truncate">{kpi.label}</p>
+              <h3 className="text-sm sm:text-xl font-bold">{kpi.value}</h3>
+              <p className="text-[7px] sm:text-[9px] text-muted-foreground mt-0.5 flex items-center gap-1">
+                <ArrowUpRight size={8} className="text-cyber-emerald shrink-0" /> <span className="truncate">{kpi.sub}</span>
               </p>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         {/* Chart Area */}
-        <div className="lg:col-span-2 glass p-8 rounded-3xl border-white/5">
-          <div className="flex justify-between items-center mb-8">
+        <div className="xl:col-span-2 glass p-4 sm:p-8 rounded-3xl border-white/5 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] -z-10" />
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
             <div>
-              <h3 className="text-sm font-bold uppercase tracking-widest text-white">Velocidade de Receita</h3>
+              <h3 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
+                <TrendingUp size={16} className="text-primary" /> Velocidade de Receita
+              </h3>
               <p className="text-[10px] text-muted-foreground">Volume de projetos ativos e finalizados por mês</p>
             </div>
-            <div className="px-2 py-1 bg-cyber-emerald/10 text-cyber-emerald text-[9px] font-bold rounded uppercase">Real-time</div>
+            <div className="flex items-center gap-2">
+              <div className="px-2 py-1 bg-cyber-emerald/10 text-cyber-emerald text-[9px] font-bold rounded uppercase border border-cyber-emerald/20">Real-time</div>
+              <div className="px-2 py-1 bg-primary/10 text-primary text-[9px] font-bold rounded uppercase border border-primary/20">2026</div>
+            </div>
           </div>
           
-          <div className="h-[300px] w-full">
+          <div className="h-[250px] sm:h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData}>
                 <defs>
@@ -857,43 +1071,54 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead }: {
         </div>
 
         {/* Command Center */}
-        <div className="space-y-6">
-          <div className="glass p-8 rounded-3xl border-white/5 h-full">
-            <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-6">Command Center</h3>
-            <div className="space-y-3">
+        <div className="space-y-4 sm:space-y-6">
+          <div className="glass p-4 sm:p-8 rounded-2xl sm:rounded-3xl border-white/5 h-full relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-[50px] -z-10 group-hover:bg-primary/10 transition-colors duration-500" />
+            <h3 className="text-xs sm:text-sm font-bold uppercase tracking-widest text-white mb-4 sm:mb-6 flex items-center gap-2">
+              <Zap size={16} className="text-cyber-gold" /> Command Center
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-3 sm:gap-4">
               <button 
                 onClick={() => onNewWorkspace()}
-                className="w-full p-4 rounded-xl bg-primary/10 border border-primary/20 flex items-center gap-3 group hover:bg-primary/20 transition-all text-left"
+                className="w-full p-3 sm:p-4 rounded-xl bg-primary/5 border border-primary/10 flex items-center gap-3 sm:gap-4 group/btn hover:bg-primary/10 hover:border-primary/30 transition-all text-left hover:scale-[1.02] active:scale-[0.98]"
               >
-                <div className="p-2 rounded-lg bg-primary/20 text-primary">
-                  <Plus size={18} />
+                <div className="p-2 sm:p-2.5 rounded-lg bg-primary/10 text-primary group-hover/btn:scale-110 transition-transform">
+                  <Plus size={18} className="sm:size-[20px]" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold">Novo Workspace</p>
-                  <p className="text-[10px] text-muted-foreground">Organizar novo cliente</p>
+                  <p className="text-xs font-bold text-white group-hover/btn:text-primary transition-colors">Novo Workspace</p>
+                  <p className="text-[9px] sm:text-[10px] text-muted-foreground">Organizar cliente</p>
                 </div>
               </button>
               
               <button 
                 onClick={() => onNewLead()}
-                className="w-full p-4 rounded-xl bg-cyber-gold/10 border border-cyber-gold/20 flex items-center gap-3 group hover:bg-cyber-gold/20 transition-all text-left"
+                className="w-full p-3 sm:p-4 rounded-xl bg-cyber-gold/5 border border-cyber-gold/10 flex items-center gap-3 sm:gap-4 group/btn hover:bg-cyber-gold/10 hover:border-cyber-gold/30 transition-all text-left hover:scale-[1.02] active:scale-[0.98]"
               >
-                <div className="p-2 rounded-lg bg-cyber-gold/20 text-cyber-gold">
-                  <MousePointer2 size={18} />
+                <div className="p-2 sm:p-2.5 rounded-lg bg-cyber-gold/10 text-cyber-gold group-hover/btn:scale-110 transition-transform">
+                  <MousePointer2 size={18} className="sm:size-[20px]" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold">Injetar Lead</p>
-                  <p className="text-[10px] text-muted-foreground">Novo prospect detectado</p>
+                  <p className="text-xs font-bold text-white group-hover/btn:text-cyber-gold transition-colors">Injetar Lead</p>
+                  <p className="text-[9px] sm:text-[10px] text-muted-foreground">Novo prospect</p>
                 </div>
               </button>
 
-              <div className="pt-6 border-t border-white/5">
-                <h4 className="text-[10px] font-bold uppercase text-muted-foreground mb-4">Módulos Ativos</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  {['Sales Engine', 'CRM', 'BI', 'Automation'].map((mod, i) => (
-                    <div key={i} className="px-3 py-2 rounded-lg bg-white/5 border border-white/5 text-[10px] font-bold flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-cyber-emerald" />
-                      {mod}
+              <div className="pt-4 sm:pt-6 mt-2 border-t border-white/5">
+                <div className="flex justify-between items-center mb-3 sm:mb-4">
+                  <h4 className="text-[9px] sm:text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Módulos Ativos</h4>
+                  <div className="px-2 py-0.5 rounded-full bg-cyber-emerald/10 text-cyber-emerald text-[7px] sm:text-[8px] font-bold border border-cyber-emerald/20">OK</div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                  {[
+                    { name: 'Sales Engine', icon: Target },
+                    { name: 'CRM', icon: Users },
+                    { name: 'BI', icon: Activity },
+                    { name: 'Automation', icon: Zap }
+                  ].map((mod, i) => (
+                    <div key={i} className="px-2 sm:px-3 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl bg-white/[0.02] border border-white/5 text-[8px] sm:text-[10px] font-bold flex items-center gap-1.5 sm:gap-2 hover:bg-white/[0.05] transition-colors cursor-default group/mod">
+                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-cyber-emerald shadow-[0_0_8px_rgba(16,185,129,0.5)] group-hover/mod:scale-125 transition-transform shrink-0" />
+                      <span className="text-muted-foreground group-hover/mod:text-white transition-colors truncate">{mod.name}</span>
                     </div>
                   ))}
                 </div>
@@ -910,7 +1135,9 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead }: {
 
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState<'proposals' | 'crm' | 'ops' | 'erp' | 'board' | 'dashboard' | 'finance'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'proposals' | 'crm' | 'ops' | 'erp' | 'board' | 'dashboard' | 'company' | 'server'>('dashboard');
+  const [dashboardSubTab, setDashboardSubTab] = useState<'insights' | 'finance' | 'server'>('insights');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   
@@ -1405,10 +1632,23 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-cyber-black text-white flex h-screen overflow-hidden">
+    <div className="min-h-screen bg-cyber-black text-white flex h-screen overflow-hidden relative">
+      {/* Mobile Overlay */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsSidebarOpen(false)}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          />
+        )}
+      </AnimatePresence>
+
       {/* Sidebar Navigation - Work OS Style */}
-      <aside className="w-72 glass border-r border-white/5 flex flex-col h-full z-20">
-        <div className="p-6 border-b border-white/5 bg-white/[0.02]">
+      <aside className={`fixed inset-y-0 left-0 w-72 glass border-r border-white/5 flex flex-col h-full z-50 transition-transform duration-300 transform lg:relative lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="p-6 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-cyber-gold flex items-center justify-center shadow-lg shadow-primary/20">
               <Shield className="text-white" size={22} />
@@ -1418,41 +1658,90 @@ export default function AdminDashboard() {
               <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Consultancy v3.0</p>
             </div>
           </div>
+          <button 
+            onClick={() => setIsSidebarOpen(false)}
+            className="lg:hidden p-2 text-muted-foreground hover:text-white transition-colors"
+          >
+            <X size={20} />
+          </button>
         </div>
         
         <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-8">
           {/* Quick Access */}
           <div>
             <p className="px-3 text-[10px] font-bold text-muted-foreground uppercase mb-3 tracking-widest">Acesso Rápido</p>
+            
+            <div className="space-y-1">
+              <button 
+                onClick={() => {
+                  setActiveTab('dashboard');
+                  setIsSidebarOpen(false);
+                }} 
+                className={`w-full flex items-center justify-between px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-all text-[11px] sm:text-sm ${activeTab === 'dashboard' ? 'bg-primary/10 text-primary border border-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
+              >
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <Activity size={16} className="sm:size-[18px]" /> 
+                  <span>Dashboards</span>
+                </div>
+                <ChevronRight size={14} className={`transition-transform duration-300 ${activeTab === 'dashboard' ? 'rotate-90' : ''}`} />
+              </button>
+
+              <AnimatePresence>
+                {activeTab === 'dashboard' && (
+                  <motion.div 
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden pl-9 space-y-1"
+                  >
+                    {[
+                      { id: 'insights', label: 'Insights de Negócio', icon: Activity },
+                      { id: 'finance', label: 'Financeiro (ERP)', icon: PieChart },
+                      { id: 'server', label: 'Status do Servidor', icon: Server },
+                    ].map((sub) => (
+                      <button
+                        key={sub.id}
+                        onClick={() => {
+                          setDashboardSubTab(sub.id as any);
+                          setIsSidebarOpen(false);
+                        }}
+                        className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-md text-[11px] font-medium transition-all ${dashboardSubTab === sub.id ? 'text-white bg-white/5' : 'text-muted-foreground hover:text-white hover:bg-white/5'}`}
+                      >
+                        <sub.icon size={12} />
+                        {sub.label}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
             <button 
-              onClick={() => setActiveTab('dashboard')} 
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all text-sm ${activeTab === 'dashboard' ? 'bg-primary/10 text-primary border border-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
+              onClick={() => {
+                setActiveTab('proposals');
+                setIsSidebarOpen(false);
+              }} 
+              className={`w-full flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-all text-[11px] sm:text-sm mt-1 ${activeTab === 'proposals' ? 'bg-primary/10 text-primary border border-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
             >
-              <Activity size={18} /> Dashboard Insights
+              <FileSignature size={16} className="sm:size-[18px]" /> Propostas & Vendas
             </button>
             <button 
-              onClick={() => setActiveTab('proposals')} 
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all text-sm ${activeTab === 'proposals' ? 'bg-primary/10 text-primary border border-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
+              onClick={() => {
+                setActiveTab('crm');
+                setIsSidebarOpen(false);
+              }} 
+              className={`w-full flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-all text-[11px] sm:text-sm ${activeTab === 'crm' ? 'bg-primary/10 text-primary border border-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
             >
-              <FileSignature size={18} /> Propostas & Vendas
+              <Users size={16} className="sm:size-[18px]" /> CRM & Clientes
             </button>
             <button 
-              onClick={() => setActiveTab('crm')} 
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all text-sm ${activeTab === 'crm' ? 'bg-primary/10 text-primary border border-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
+              onClick={() => {
+                setActiveTab('company');
+                setIsSidebarOpen(false);
+              }} 
+              className={`w-full flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-all text-[11px] sm:text-sm ${activeTab === 'company' ? 'bg-primary/10 text-primary border border-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
             >
-              <Users size={18} /> CRM & Clientes
-            </button>
-            <button 
-              onClick={() => setActiveTab('erp')} 
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all text-sm ${activeTab === 'erp' ? 'bg-primary/10 text-primary border border-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
-            >
-              <PieChart size={18} /> Dashboard Financeiro
-            </button>
-            <button 
-              onClick={() => setActiveTab('finance')} 
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all text-sm ${activeTab === 'finance' ? 'bg-primary/10 text-primary border border-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
-            >
-              <Building size={18} /> Perfil da Empresa
+              <Building size={16} className="sm:size-[18px]" /> Perfil da Empresa
             </button>
           </div>
 
@@ -1482,6 +1771,7 @@ export default function AdminDashboard() {
                         setActiveWorkspaceId(ws.id);
                         setActiveBoardId(board.id);
                         setActiveTab('board');
+                        setIsSidebarOpen(false);
                       }}
                       className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all text-sm pl-8 ${activeBoardId === board.id && activeTab === 'board' ? 'bg-white/10 text-white border border-white/10' : 'text-muted-foreground hover:bg-white/5'}`}
                     >
@@ -1527,30 +1817,36 @@ export default function AdminDashboard() {
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col h-full overflow-hidden bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent">
         {/* Top Header - Contextual */}
-        <header className="h-16 border-b border-white/5 glass flex items-center justify-between px-8 shrink-0">
+        <header className="h-16 border-b border-white/5 glass flex items-center justify-between px-4 lg:px-8 shrink-0">
           <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setIsSidebarOpen(true)}
+              className="lg:hidden p-2 -ml-2 text-muted-foreground hover:text-white transition-colors"
+            >
+              <Menu size={20} />
+            </button>
             {activeTab === 'board' ? (
               <>
-                <div className="p-2 bg-primary/10 rounded-lg text-primary">
+                <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg text-primary shrink-0">
                   {(() => {
                     const Icon = ICON_MAP[activeWorkspace.icon] || Layout;
-                    return <Icon size={20} />;
+                    return <Icon size={16} className="sm:size-[20px]" />;
                   })()}
                 </div>
-                <div>
-                  <h2 className="text-sm font-bold flex items-center gap-2">
-                    {activeWorkspace.name} <ChevronRight size={14} className="text-muted-foreground" /> {activeBoard.name}
+                <div className="min-w-0">
+                  <h2 className="text-[11px] sm:text-sm font-bold flex items-center gap-1 sm:gap-2 truncate">
+                    <span className="truncate">{activeWorkspace.name}</span> <ChevronRight size={12} className="text-muted-foreground shrink-0" /> <span className="truncate">{activeBoard.name}</span>
                   </h2>
-                  <p className="text-[10px] text-muted-foreground">{activeBoard.description}</p>
+                  <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate">{activeBoard.description}</p>
                 </div>
               </>
             ) : (
-              <h2 className="text-sm font-bold uppercase tracking-widest">
+              <h2 className="text-[11px] sm:text-sm font-bold uppercase tracking-widest truncate max-w-[150px] xs:max-w-[200px] sm:max-w-none">
                 {activeTab === 'dashboard' ? 'Business Intelligence & Insights' : 
                  activeTab === 'proposals' ? 'Gerador de Propostas' : 
                  activeTab === 'crm' ? 'Gestão de Relacionamento (CRM)' :
                  activeTab === 'erp' ? 'Dashboard Financeiro (ERP)' :
-                 activeTab === 'finance' ? 'Perfil da Empresa' :
+                 activeTab === 'company' ? 'Perfil da Empresa' :
                  'Configurações da Empresa'}
               </h2>
             )}
@@ -1558,20 +1854,25 @@ export default function AdminDashboard() {
 
           <div className="flex items-center gap-4">
             {isSyncing && (
-              <div className="flex items-center gap-2 text-[10px] text-muted-foreground animate-pulse">
+              <div className="hidden sm:flex items-center gap-2 text-[10px] text-muted-foreground animate-pulse">
                 <Database size={12} />
                 Sincronizando...
               </div>
             )}
             <div className="relative group">
-              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <input 
-                id="search-input"
-                name="search-input"
-                type="text" 
-                placeholder="Pesquisar em tudo..."
-                className="bg-white/5 border border-white/10 rounded-full py-2 pl-10 pr-4 text-xs w-64 focus:outline-none focus:border-primary/50 transition-all"
-              />
+              <button className="md:hidden p-2 rounded-full hover:bg-white/5 text-muted-foreground transition-colors">
+                <Search size={18} />
+              </button>
+              <div className="hidden md:block relative">
+                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <input 
+                  id="search-input"
+                  name="search-input"
+                  type="text" 
+                  placeholder="Pesquisar em tudo..."
+                  className="bg-white/5 border border-white/10 rounded-full py-2 pl-10 pr-4 text-xs w-64 focus:outline-none focus:border-primary/50 transition-all"
+                />
+              </div>
             </div>
             <button className="p-2 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-all">
               <Sparkles size={18} />
@@ -1580,7 +1881,7 @@ export default function AdminDashboard() {
         </header>
 
         {/* Content Container */}
-        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar relative">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-8 custom-scrollbar relative">
           {isLoading && (
             <div className="absolute inset-0 bg-cyber-black/50 backdrop-blur-sm z-50 flex flex-col items-center justify-center gap-4">
               <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
@@ -1589,43 +1890,136 @@ export default function AdminDashboard() {
           )}
           <AnimatePresence mode="wait">
             
-            {/* NOVO MODELO: DASHBOARD INSIGHTS */}
+            {/* NOVO MODELO: DASHBOARD UNIFICADO COM SUB-ABAS */}
             {activeTab === 'dashboard' && (
               <motion.div 
                 key="dashboard" 
                 initial={{ opacity: 0, y: 20 }} 
                 animate={{ opacity: 1, y: 0 }} 
                 exit={{ opacity: 0, y: -20 }}
+                className="space-y-6"
               >
-                <DashboardView 
-                  projects={projects} 
-                  workspaces={workspaces} 
-                  onNewWorkspace={() => {
-                    const name = prompt('Nome do novo cliente/workspace:');
-                    if (name) {
-                      const newWs: Workspace = {
-                        id: `ws-${Date.now()}`,
-                        name,
-                        icon: 'Layout',
-                        boards: [{
-                          id: `board-${Date.now()}`,
-                          name: 'Geral',
-                          columns: PROJECT_COLUMNS,
-                          groups: [{ id: 'g1', title: 'Início', color: '#579BFC', items: [] }]
-                        }]
-                      };
-                      setWorkspaces(prev => [...prev, newWs]);
-                      setActiveWorkspaceId(newWs.id);
-                      setActiveBoardId(newWs.boards[0].id);
-                      setActiveTab('board');
-                      toast.success('Workspace criado!');
-                    }
-                  }}
-                  onNewLead={() => {
-                    setActiveTab('proposals');
-                    toast.info('Preencha o briefing para gerar o lead.');
-                  }}
-                />
+                {/* Dashboard Tabs */}
+                <div className="flex items-center gap-1 p-1 bg-white/5 rounded-xl border border-white/10 w-full sm:w-fit overflow-x-auto scrollbar-hide no-scrollbar">
+                  <button 
+                    onClick={() => setDashboardSubTab('insights')}
+                    className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[9px] sm:text-xs font-bold transition-all flex items-center gap-1.5 sm:gap-2 shrink-0 ${dashboardSubTab === 'insights' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
+                  >
+                    <Activity size={12} className="sm:size-[14px]" /> <span className="hidden xs:inline">Insights de Negócio</span><span className="xs:hidden">Insights</span>
+                  </button>
+                  <button 
+                    onClick={() => setDashboardSubTab('finance')}
+                    className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[9px] sm:text-xs font-bold transition-all flex items-center gap-1.5 sm:gap-2 shrink-0 ${dashboardSubTab === 'finance' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
+                  >
+                    <PieChart size={12} className="sm:size-[14px]" /> Financeiro
+                  </button>
+                  <button 
+                    onClick={() => setDashboardSubTab('server')}
+                    className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[9px] sm:text-xs font-bold transition-all flex items-center gap-1.5 sm:gap-2 shrink-0 ${dashboardSubTab === 'server' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
+                  >
+                    <Server size={12} className="sm:size-[14px]" /> <span className="hidden xs:inline">Status do Servidor</span><span className="xs:hidden">Servidor</span>
+                  </button>
+                </div>
+
+                {dashboardSubTab === 'insights' && (
+                  <DashboardView 
+                    projects={projects} 
+                    workspaces={workspaces} 
+                    onNewWorkspace={() => {
+                      const name = prompt('Nome do novo cliente/workspace:');
+                      if (name) {
+                        const newWs: Workspace = {
+                          id: `ws-${Date.now()}`,
+                          name,
+                          icon: 'Layout',
+                          boards: [{
+                            id: `board-${Date.now()}`,
+                            name: 'Geral',
+                            columns: PROJECT_COLUMNS,
+                            groups: [{ id: 'g1', title: 'Início', color: '#579BFC', items: [] }]
+                          }]
+                        };
+                        setWorkspaces(prev => [...prev, newWs]);
+                        setActiveWorkspaceId(newWs.id);
+                        setActiveBoardId(newWs.boards[0].id);
+                        setActiveTab('board');
+                        toast.success('Workspace criado!');
+                      }
+                    }}
+                    onNewLead={() => {
+                      setActiveTab('proposals');
+                      toast.info('Preencha o briefing para gerar o lead.');
+                    }}
+                  />
+                )}
+
+                {dashboardSubTab === 'finance' && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="glass rounded-2xl p-4 sm:p-6 border-white/5 space-y-3 sm:space-y-4 relative overflow-hidden group hover:border-white/10 transition-all">
+                      <div className="absolute -right-2 -top-2 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <TrendingUp size={40} className="sm:size-[60px]" />
+                      </div>
+                      <div className="flex justify-between items-start">
+                        <div className="p-2 sm:p-3 rounded-xl bg-green-500/10 text-green-500 shadow-inner group-hover:scale-110 transition-transform">
+                          <TrendingUp size={18} className="sm:size-[24px]" />
+                        </div>
+                        <span className="text-[7px] sm:text-[10px] font-bold text-green-500 bg-green-500/10 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">+12.5%</span>
+                      </div>
+                      <div>
+                        <p className="text-[8px] sm:text-xs text-muted-foreground font-bold uppercase tracking-widest truncate">Receita Projetada</p>
+                        <h4 className="text-xl sm:text-3xl font-bold mt-1">R$ 28.400</h4>
+                      </div>
+                      <div className="pt-3 sm:pt-4 border-t border-white/5 flex items-center justify-between text-[8px] sm:text-[10px] font-bold">
+                        <span className="text-muted-foreground uppercase truncate">4 projetos ativos</span>
+                        <button className="text-primary hover:underline shrink-0">DETALHES</button>
+                      </div>
+                    </div>
+
+                    <div className="glass rounded-2xl p-4 sm:p-6 border-white/5 space-y-3 sm:space-y-4 relative overflow-hidden group hover:border-white/10 transition-all">
+                      <div className="absolute -right-2 -top-2 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <CreditCard size={40} className="sm:size-[60px]" />
+                      </div>
+                      <div className="flex justify-between items-start">
+                        <div className="p-2 sm:p-3 rounded-xl bg-blue-500/10 text-blue-500 shadow-inner group-hover:scale-110 transition-transform">
+                          <CreditCard size={18} className="sm:size-[24px]" />
+                        </div>
+                        <span className="text-[7px] sm:text-[10px] font-bold text-blue-500 bg-blue-500/10 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">Em dia</span>
+                      </div>
+                      <div>
+                        <p className="text-[8px] sm:text-xs text-muted-foreground font-bold uppercase tracking-widest truncate">Contas a Receber</p>
+                        <h4 className="text-xl sm:text-3xl font-bold mt-1">R$ 12.150</h4>
+                      </div>
+                      <div className="pt-3 sm:pt-4 border-t border-white/5 flex items-center justify-between text-[8px] sm:text-[10px] font-bold">
+                        <span className="text-muted-foreground uppercase truncate">Próximo: 25/03</span>
+                        <button className="text-primary hover:underline shrink-0">GERENCIAR</button>
+                      </div>
+                    </div>
+
+                    <div className="glass rounded-2xl p-4 sm:p-6 border-white/5 space-y-3 sm:space-y-4 relative overflow-hidden group hover:border-white/10 transition-all sm:col-span-2 lg:col-span-1">
+                      <div className="absolute -right-2 -top-2 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <Zap size={40} className="sm:size-[60px]" />
+                      </div>
+                      <div className="flex justify-between items-start">
+                        <div className="p-2 sm:p-3 rounded-xl bg-orange-500/10 text-orange-500 shadow-inner group-hover:scale-110 transition-transform">
+                          <Zap size={18} className="sm:size-[24px]" />
+                        </div>
+                        <span className="text-[7px] sm:text-[10px] font-bold text-orange-500 bg-orange-500/10 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">-5.2%</span>
+                      </div>
+                      <div>
+                        <p className="text-[8px] sm:text-xs text-muted-foreground font-bold uppercase tracking-widest truncate">Custos Operacionais</p>
+                        <h4 className="text-xl sm:text-3xl font-bold mt-1">R$ 3.820</h4>
+                      </div>
+                      <div className="pt-3 sm:pt-4 border-t border-white/5 flex items-center justify-between text-[8px] sm:text-[10px] font-bold">
+                        <span className="text-muted-foreground uppercase truncate">Infra & APIs</span>
+                        <button className="text-primary hover:underline shrink-0">OTIMIZAR</button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {dashboardSubTab === 'server' && (
+                  <ServerStatsView API_BASE={API_BASE} getHeaders={getHeaders} />
+                )}
               </motion.div>
             )}
 
@@ -1638,22 +2032,22 @@ export default function AdminDashboard() {
                 exit={{ opacity: 0, x: -20 }}
                 className="space-y-8"
               >
-                <div className="flex justify-between items-center mb-4">
-                  <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                  <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                     <button 
                       onClick={() => addNewItem(activeBoard.id, activeBoard.groups[0]?.id)}
-                      className="px-4 py-2 bg-primary text-white text-xs font-bold rounded-lg flex items-center gap-2 hover:bg-primary-dark transition-all"
+                      className="px-3 sm:px-4 py-2 bg-primary text-white text-[10px] sm:text-xs font-bold rounded-lg flex items-center gap-1.5 sm:gap-2 hover:bg-primary-dark transition-all shadow-lg shadow-primary/20 shrink-0"
                     >
-                      <Plus size={16} /> Novo Item
+                      <Plus size={14} className="sm:size-[16px]" /> Novo Item
                     </button>
-                    <button className="px-4 py-2 glass border border-white/10 text-xs font-bold rounded-lg flex items-center gap-2 hover:bg-white/5 transition-all">
-                      <Search size={16} /> Filtrar
+                    <button className="px-3 sm:px-4 py-2 glass border border-white/10 text-[10px] sm:text-xs font-bold rounded-lg flex items-center gap-1.5 sm:gap-2 hover:bg-white/5 transition-all shrink-0">
+                      <Search size={14} className="sm:size-[16px]" /> Filtrar
                     </button>
-                    <button className="px-4 py-2 glass border border-white/10 text-xs font-bold rounded-lg flex items-center gap-2 hover:bg-white/5 transition-all">
-                      <Users size={16} /> Personas
+                    <button className="px-3 sm:px-4 py-2 glass border border-white/10 text-[10px] sm:text-xs font-bold rounded-lg flex items-center gap-1.5 sm:gap-2 hover:bg-white/5 transition-all shrink-0">
+                      <Users size={14} className="sm:size-[16px]" /> Personas
                     </button>
                   </div>
-                  <div className="flex gap-1 p-1 bg-white/5 rounded-lg border border-white/10">
+                  <div className="flex gap-1 p-1 bg-white/5 rounded-lg border border-white/10 self-end sm:self-auto">
                     <button className="p-1.5 rounded bg-white/10 text-white"><Layout size={14} /></button>
                     <button className="p-1.5 rounded text-muted-foreground hover:bg-white/5"><Kanban size={14} /></button>
                     <button className="p-1.5 rounded text-muted-foreground hover:bg-white/5"><Calendar size={14} /></button>
@@ -1673,23 +2067,23 @@ export default function AdminDashboard() {
 
             {/* ABA 1: PROPOSTAS & VENDAS (MANTIDA MAS REFATORADA) */}
             {activeTab === 'proposals' && (
-              <motion.div key="proposals" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="max-w-6xl mx-auto space-y-8">
+              <motion.div key="proposals" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="max-w-6xl mx-auto space-y-6 sm:space-y-8">
                 {/* O conteúdo das propostas será renderizado aqui */}
               <div className="flex justify-between items-end">
                 <div>
-                  <h2 className="text-4xl font-bold font-heading">Sales <span className="text-gradient">Engine</span></h2>
-                  <p className="text-muted-foreground mt-2">Converta briefing em contratos profissionais em segundos.</p>
+                  <h2 className="text-2xl sm:text-4xl font-bold font-heading">Sales <span className="text-gradient">Engine</span></h2>
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-2">Converta briefing em contratos profissionais em segundos.</p>
                 </div>
               </div>
 
-              <div className="grid lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
                 <div className="lg:col-span-2 space-y-6">
                   {/* Dados do Cliente */}
-                  <div className="glass rounded-2xl p-8 border-white/5">
-                    <h3 className="text-lg font-semibold mb-6 flex items-center gap-2 text-primary">
+                  <div className="glass rounded-2xl p-4 sm:p-8 border-white/5">
+                    <h3 className="text-base sm:text-lg font-semibold mb-6 flex items-center gap-2 text-primary">
                       <Target size={20} /> Perfil do Cliente & Projeto
                     </h3>
-                    <div className="grid md:grid-cols-2 gap-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
                       <div className="space-y-1.5">
                         <label className="text-[10px] uppercase font-bold text-muted-foreground">Nome/Empresa</label>
                         <input 
@@ -1757,16 +2151,16 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* Argumentação Estratégica Baseada em Perfil */}
-                  <div className="glass rounded-2xl p-6 border-cyber-gold/20 bg-cyber-gold/5 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                      <MessageSquareQuote size={80} />
+                  <div className="glass rounded-2xl p-4 sm:p-6 border-cyber-gold/20 bg-cyber-gold/5 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-3 sm:p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                      <MessageSquareQuote size={60} className="sm:size-[80px]" />
                     </div>
-                    <h3 className="text-sm font-bold uppercase text-cyber-gold mb-4 flex items-center gap-2">
-                      <Bot size={18} /> Argumentação Sugerida (IA)
+                    <h3 className="text-[11px] sm:text-sm font-bold uppercase text-cyber-gold mb-3 sm:mb-4 flex items-center gap-2">
+                      <Bot size={16} className="sm:size-[18px]" /> Argumentação Sugerida (IA)
                     </h3>
-                    <p className="text-sm leading-relaxed text-muted-foreground italic">
+                    <p className="text-[11px] sm:text-sm leading-relaxed text-muted-foreground italic">
                       {clientData.profile === 'technical' ? 
-                        "Foqué na arquitetura escalável e na redução da dívida técnica. Mencione o uso de n8n para orquestração e Python para processamento pesado, garantindo performance e facilidade de manutenção." :
+                        "Foque na arquitetura escalável e na redução da dívida técnica. Mencione o uso de n8n para orquestração e Python para processamento pesado, garantindo performance e facilidade de manutenção." :
                         clientData.profile === 'executive' ?
                         "O foco deve ser ROI e redução de Headcount. Mostre como a automação de 20h semanais se traduz em economia de R$ 45k/ano e aceleração do Time-to-Market." :
                         "Foque na experiência do usuário e eliminação de tarefas repetitivas. Mostre como o Dashboard vai dar clareza total sobre o que está acontecendo no dia a dia sem esforço manual."
@@ -1775,54 +2169,54 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* Seleção de Módulos (Grid Moderno) */}
-                  <div className="grid md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     {AVAILABLE_MODULES.map(mod => (
-                      <div key={mod.id} onClick={() => toggleModule(mod.id)} className={`p-5 rounded-2xl border transition-all cursor-pointer group relative overflow-hidden ${selectedModules.includes(mod.id) ? 'bg-primary/10 border-primary/50 ring-1 ring-primary/20' : 'bg-white/5 border-white/10 hover:border-white/20'}`}>
-                        <div className="flex justify-between items-start mb-2">
-                          <h4 className="font-bold text-sm group-hover:text-primary transition-colors">{mod.name}</h4>
-                          <span className="text-primary text-xs font-mono font-bold">R$ {mod.price}</span>
+                      <div key={mod.id} onClick={() => toggleModule(mod.id)} className={`p-4 sm:p-5 rounded-2xl border transition-all cursor-pointer group relative overflow-hidden ${selectedModules.includes(mod.id) ? 'bg-primary/10 border-primary/50 ring-1 ring-primary/20' : 'bg-white/5 border-white/10 hover:border-white/20'}`}>
+                        <div className="flex justify-between items-start mb-1.5 sm:mb-2">
+                          <h4 className="font-bold text-[13px] sm:text-sm group-hover:text-primary transition-colors">{mod.name}</h4>
+                          <span className="text-primary text-[10px] sm:text-xs font-mono font-bold">R$ {mod.price}</span>
                         </div>
-                        <p className="text-[11px] text-muted-foreground leading-relaxed pr-4">{mod.description}</p>
-                        {selectedModules.includes(mod.id) && <CheckCircle2 size={16} className="absolute bottom-4 right-4 text-primary" />}
+                        <p className="text-[10px] sm:text-[11px] text-muted-foreground leading-relaxed pr-4">{mod.description}</p>
+                        {selectedModules.includes(mod.id) && <CheckCircle2 size={14} className="sm:size-[16px] absolute bottom-3 sm:bottom-4 right-3 sm:right-4 text-primary" />}
                       </div>
                     ))}
                   </div>
                 </div>
 
                 {/* Resumo & Call to Action */}
-                <div className="space-y-6">
-                  <div className="glass rounded-2xl p-8 border-primary/20 sticky top-8 bg-gradient-to-b from-white/[0.03] to-transparent">
-                    <h3 className="font-bold mb-6 flex items-center justify-between text-lg">
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="glass rounded-2xl p-6 sm:p-8 border-primary/20 sticky top-8 bg-gradient-to-b from-white/[0.03] to-transparent">
+                    <h3 className="font-bold mb-4 sm:mb-6 flex items-center justify-between text-base sm:text-lg">
                       Budget Builder
-                      <TrendingUp className="text-cyber-gold" size={20} />
+                      <TrendingUp className="text-cyber-gold" size={18} className="sm:size-[20px]" />
                     </h3>
-                    <div className="space-y-4 mb-10">
-                      {selectedModules.length === 0 && <p className="text-xs text-muted-foreground italic text-center py-4">Selecione módulos para compor o valor...</p>}
+                    <div className="space-y-3 sm:space-y-4 mb-8 sm:mb-10">
+                      {selectedModules.length === 0 && <p className="text-[10px] sm:text-xs text-muted-foreground italic text-center py-3 sm:py-4">Selecione módulos para compor o valor...</p>}
                       {selectedModules.map(id => {
                         const m = AVAILABLE_MODULES.find(x => x.id === id);
                         return (
-                          <div key={id} className="flex justify-between text-xs items-center group">
-                            <span className="text-muted-foreground group-hover:text-white transition-colors">{m?.name}</span>
-                            <span className="font-mono">R$ {m?.price}</span>
+                          <div key={id} className="flex justify-between text-[11px] sm:text-xs items-center group">
+                            <span className="text-muted-foreground group-hover:text-white transition-colors truncate pr-2">{m?.name}</span>
+                            <span className="font-mono shrink-0">R$ {m?.price}</span>
                           </div>
                         );
                       })}
-                      <div className="pt-6 border-t border-white/10 flex justify-between font-black text-2xl text-cyber-gold">
-                        <span className="font-heading uppercase text-xs self-center">Total</span>
+                      <div className="pt-4 sm:pt-6 border-t border-white/10 flex justify-between font-black text-xl sm:text-2xl text-cyber-gold">
+                        <span className="font-heading uppercase text-[10px] sm:text-xs self-center">Total</span>
                         <span>R$ {totalValue.toLocaleString('pt-BR')}</span>
                       </div>
                     </div>
                     
-                    <div className="space-y-3">
-                      <button onClick={() => setShowPreview(true)} className="w-full bg-primary text-white py-4 rounded-xl font-bold flex items-center justify-center gap-3 hover:shadow-xl hover:shadow-primary/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0">
-                        <Eye size={20} /> Visualizar Proposta
+                    <div className="space-y-2.5 sm:space-y-3">
+                      <button onClick={() => setShowPreview(true)} className="w-full bg-primary text-white py-3 sm:py-4 rounded-xl font-bold flex items-center justify-center gap-2 sm:gap-3 hover:shadow-xl hover:shadow-primary/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-xs sm:text-base">
+                        <Eye size={18} className="sm:size-[20px]" /> Visualizar Proposta
                       </button>
-                      <div className="grid grid-cols-2 gap-3">
-                        <button onClick={() => saveAsProject('full')} className="glass py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-white/10 transition-all border border-white/10 text-xs">
-                          <Save size={16} /> Salvar Pipeline
+                      <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                        <button onClick={() => saveAsProject('full')} className="glass py-3 sm:py-4 rounded-xl font-bold flex items-center justify-center gap-1.5 sm:gap-2 hover:bg-white/10 transition-all border border-white/10 text-[10px] sm:text-xs">
+                          <Save size={14} className="sm:size-[16px]" /> Salvar Pipeline
                         </button>
-                        <button onClick={() => saveAsProject('fast')} className="bg-cyber-gold/20 text-cyber-gold py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-cyber-gold/30 transition-all border border-cyber-gold/30 text-xs">
-                          <Sparkles size={16} /> Preparar Reunião
+                        <button onClick={() => saveAsProject('fast')} className="bg-cyber-gold/20 text-cyber-gold py-3 sm:py-4 rounded-xl font-bold flex items-center justify-center gap-1.5 sm:gap-2 hover:bg-cyber-gold/30 transition-all border border-cyber-gold/30 text-[10px] sm:text-xs">
+                          <Sparkles size={14} className="sm:size-[16px]" /> Preparar Reunião
                         </button>
                       </div>
                     </div>
@@ -1834,11 +2228,11 @@ export default function AdminDashboard() {
 
           {/* ABA 2: CRM & RELACIONAMENTOS */}
           {activeTab === 'crm' && (
-            <motion.div key="crm" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="max-w-6xl mx-auto space-y-8">
-              <div className="flex justify-between items-center">
+            <motion.div key="crm" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="max-w-6xl mx-auto space-y-6 sm:space-y-8">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6">
                 <div>
-                  <h2 className="text-4xl font-bold font-heading">Relationship <span className="text-gradient">Intelligence</span></h2>
-                  <p className="text-muted-foreground mt-2">Mapeie stakeholders e mantenha o contexto de cada conversa.</p>
+                  <h2 className="text-2xl sm:text-4xl font-bold font-heading">Relationship <span className="text-gradient">Intelligence</span></h2>
+                  <p className="text-[10px] sm:text-sm text-muted-foreground mt-2">Mapeie stakeholders e mantenha o contexto de cada conversa.</p>
                 </div>
                 <button 
                   onClick={() => {
@@ -1846,23 +2240,22 @@ export default function AdminDashboard() {
                     setSelectedModules([]);
                     setActiveTab('proposals');
                   }}
-                  className="bg-primary px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:brightness-110 transition-all"
+                  className="w-full sm:w-auto bg-primary px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:brightness-110 transition-all text-xs sm:text-sm"
                 >
-                  <Plus size={20} /> Adicionar Cliente
+                  <Plus size={18} className="sm:size-[20px]" /> Adicionar Cliente
                 </button>
               </div>
 
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {projects.map(project => (
-                  <div key={project.id} onClick={() => { setSelectedProject(project); setActiveTab('ops'); }} className="glass rounded-2xl p-6 border-white/5 hover:border-primary/20 transition-all group cursor-pointer relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                  <div key={project.id} onClick={() => { setSelectedProject(project); setActiveTab('ops'); }} className="glass rounded-2xl p-4 sm:p-6 border-white/5 hover:border-primary/20 transition-all group cursor-pointer relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-3 sm:p-4 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity flex gap-1.5 sm:gap-2">
                       <button 
                         onClick={(e) => {
                           e.stopPropagation();
-                          // Abrir modal de edição (a implementar) ou carregar dados na aba de propostas para editar
                           setClientData({
                             name: project.clientName,
-                            cnpj: '', // Precisaríamos adicionar CNPJ ao modelo Project se quisermos persistir
+                            cnpj: '',
                             email: '',
                             projectTitle: project.projectName,
                             brief: project.meetingNotes[0]?.content || '',
@@ -1871,44 +2264,44 @@ export default function AdminDashboard() {
                           setActiveTab('proposals');
                           toast.info("Dados carregados para edição na aba Propostas.");
                         }}
-                        className="p-2 glass rounded-lg hover:bg-primary/20 transition-all text-primary"
+                        className="p-1.5 sm:p-2 glass rounded-lg hover:bg-primary/20 transition-all text-primary"
                         title="Editar Projeto"
                       >
-                        <Settings size={18} />
+                        <Settings size={14} className="sm:size-[18px]" />
                       </button>
                       <button 
                           onClick={(e) => {
                             e.stopPropagation();
                             deleteProject(project.id);
                           }}
-                          className="p-2 glass rounded-lg hover:bg-red-500/20 transition-all text-red-500"
+                          className="p-1.5 sm:p-2 glass rounded-lg hover:bg-red-500/20 transition-all text-red-500"
                           title="Excluir Projeto"
                         >
-                          <Trash2 size={18} />
+                          <Trash2 size={14} className="sm:size-[18px]" />
                         </button>
                         <button 
                           onClick={(e) => {
                             e.stopPropagation();
                             window.open(`/portal/${project.id}`, '_blank');
                           }}
-                          className="p-2 glass rounded-lg hover:bg-primary/20 transition-all text-primary"
+                          className="p-1.5 sm:p-2 glass rounded-lg hover:bg-primary/20 transition-all text-primary"
                           title="Ver Portal do Cliente"
                         >
-                          <ExternalLink size={18} />
+                          <ExternalLink size={14} className="sm:size-[18px]" />
                         </button>
                     </div>
-                    <div className="flex justify-between items-start mb-6">
-                      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary/20 transition-colors">
-                        <Building size={24} className="text-primary" />
+                    <div className="flex justify-between items-start mb-4 sm:mb-6">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary/20 transition-colors">
+                        <Building size={20} className="sm:size-[24px] text-primary" />
                       </div>
-                      <div className="flex flex-col items-end gap-2">
+                      <div className="flex flex-col items-end gap-1.5 sm:gap-2">
                         <select 
                           id={`project-status-${project.id}`}
                           name={`project-status-${project.id}`}
                           value={project.status} 
                           onClick={(e) => e.stopPropagation()}
                           onChange={(e) => updateProjectStatus(project.id, e.target.value as Project['status'])}
-                          className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded border-none outline-none cursor-pointer transition-colors ${
+                          className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-widest px-1.5 sm:px-2 py-0.5 sm:py-1 rounded border-none outline-none cursor-pointer transition-colors ${
                             project.status === 'active' ? 'bg-cyber-emerald/10 text-cyber-emerald' : 
                             project.status === 'prospect' ? 'bg-cyber-gold/10 text-cyber-gold' : 
                             'bg-white/10 text-muted-foreground'
@@ -1918,45 +2311,48 @@ export default function AdminDashboard() {
                           <option value="active" className="bg-cyber-black">Ativo</option>
                           <option value="finished" className="bg-cyber-black">Finalizado</option>
                         </select>
-                        <div className="flex items-center gap-1 text-[9px] text-muted-foreground font-bold">
+                        <div className="flex items-center gap-1 text-[8px] sm:text-[9px] text-muted-foreground font-bold">
                           <Clock size={10} /> {new Date(project.deadline).toLocaleDateString('pt-BR')}
                         </div>
                       </div>
                     </div>
                     
-                    <h3 className="text-xl font-bold mb-1">{project.clientName}</h3>
-                    <p className="text-xs text-muted-foreground mb-6 line-clamp-1">{project.projectName}</p>
+                    <h3 className="text-lg sm:text-xl font-bold mb-0.5 sm:mb-1 truncate">{project.clientName}</h3>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground mb-4 sm:mb-6 line-clamp-1">{project.projectName}</p>
 
-                    <div className="space-y-6">
-                      {/* Stakeholders Mapping */}
-                      <div className="space-y-3">
-                        <h4 className="text-[10px] font-bold uppercase text-muted-foreground flex items-center gap-2">
-                          <Network size={14} /> Stakeholders Principais
+                    <div className="space-y-4 sm:space-y-6">
+                      <div className="space-y-2 sm:space-y-3">
+                        <h4 className="text-[9px] sm:text-[10px] font-bold uppercase text-muted-foreground flex items-center gap-1.5 sm:gap-2">
+                          <Network size={12} className="sm:size-[14px]" /> Stakeholders Principais
                         </h4>
-                        <div className="flex flex-wrap gap-2">
-                          {project.stakeholders.map((sh, i) => (
-                            <div key={i} className="glass px-3 py-1.5 rounded-lg border-white/5 flex items-center gap-2 group/sh">
-                              <div className={`w-1.5 h-1.5 rounded-full ${sh.influence === 'high' ? 'bg-red-500' : 'bg-cyber-gold'}`} />
-                              <span className="text-[10px] font-medium">{sh.name}</span>
+                        <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                          {project.stakeholders.slice(0, 3).map((sh, i) => (
+                            <div key={i} className="glass px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border-white/5 flex items-center gap-1.5 sm:gap-2 group/sh">
+                              <div className={`w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full ${sh.influence === 'high' ? 'bg-red-500' : 'bg-cyber-gold'}`} />
+                              <span className="text-[9px] sm:text-[10px] font-medium truncate max-w-[60px] sm:max-w-none">{sh.name}</span>
                             </div>
                           ))}
+                          {project.stakeholders.length > 3 && (
+                            <div className="glass px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border-white/5 text-[9px] sm:text-[10px] font-bold text-muted-foreground">
+                              +{project.stakeholders.length - 3}
+                            </div>
+                          )}
                         </div>
                       </div>
 
-                      {/* Últimas Notas & Documentos */}
-                      <div className="space-y-3">
+                      <div className="space-y-2 sm:space-y-3">
                         <div className="flex justify-between items-center">
-                          <h4 className="text-[10px] font-bold uppercase text-muted-foreground flex items-center gap-2">
-                            <History size={14} /> Memória & Docs
+                          <h4 className="text-[9px] sm:text-[10px] font-bold uppercase text-muted-foreground flex items-center gap-1.5 sm:gap-2">
+                            <History size={12} className="sm:size-[14px]" /> Memória & Docs
                           </h4>
                           {project.documents && project.documents.length > 0 && (
-                            <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded flex items-center gap-1">
-                              <Paperclip size={10} /> {project.documents.length}
+                            <span className="text-[8px] sm:text-[9px] bg-primary/20 text-primary px-1 sm:px-1.5 py-0.5 rounded flex items-center gap-1">
+                              <Paperclip size={8} className="sm:size-[10px]" /> {project.documents.length}
                             </span>
                           )}
                         </div>
-                        <div className="bg-white/[0.02] rounded-xl p-3 border border-white/5">
-                          <p className="text-[11px] text-muted-foreground italic line-clamp-2">
+                        <div className="bg-white/[0.02] rounded-xl p-2.5 sm:p-3 border border-white/5">
+                          <p className="text-[10px] sm:text-[11px] text-muted-foreground italic line-clamp-2">
                             "{project.brief}"
                           </p>
                         </div>
@@ -1970,26 +2366,26 @@ export default function AdminDashboard() {
 
           {/* ABA 3: OPERAÇÕES & PROJETOS */}
           {activeTab === 'ops' && (
-            <motion.div key="ops" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="max-w-6xl mx-auto space-y-8">
+            <motion.div key="ops" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="max-w-6xl mx-auto space-y-6 sm:space-y-8">
               {!selectedProject ? (
                 <>
-                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6">
                     <div>
-                      <h2 className="text-4xl font-bold font-heading">Operations <span className="text-gradient">Center</span></h2>
-                      <p className="text-muted-foreground mt-2">Gerencie a entrega e execução técnica dos seus projetos.</p>
+                      <h2 className="text-2xl sm:text-4xl font-bold font-heading">Operations <span className="text-gradient">Center</span></h2>
+                      <p className="text-[10px] sm:text-sm text-muted-foreground mt-2">Gerencie a entrega e execução técnica dos seus projetos.</p>
                     </div>
                     
-                    <div className="flex flex-col md:flex-row gap-4 flex-1 max-w-2xl">
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 flex-1 max-w-2xl">
                       <div className="relative flex-1 group">
-                        <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                        <Search size={14} className="sm:size-[16px] absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" />
                         <input 
                           id="ops-search"
                           name="ops-search"
                           type="text" 
-                          placeholder="Buscar por empresa ou projeto..." 
+                          placeholder="Buscar cliente ou projeto..." 
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
-                          className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 outline-none focus:border-primary/50 transition-all text-sm"
+                          className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 outline-none focus:border-primary/50 transition-all text-[11px] sm:text-sm"
                         />
                       </div>
                       <select 
@@ -1997,7 +2393,7 @@ export default function AdminDashboard() {
                         name="ops-status-filter"
                         value={filterStatus}
                         onChange={(e) => setFilterStatus(e.target.value as any)}
-                        className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-all text-sm min-w-[140px]"
+                        className="bg-white/5 border border-white/10 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 outline-none focus:border-primary/50 transition-all text-[11px] sm:text-sm min-w-[120px] sm:min-w-[140px]"
                       >
                         <option value="all" className="bg-cyber-black">Todos Status</option>
                         <option value="active" className="bg-cyber-black">Ativos</option>
@@ -2007,7 +2403,7 @@ export default function AdminDashboard() {
                     </div>
                   </div>
 
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                     {projects
                       .filter(p => {
                         const matchesSearch = p.clientName.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -2016,15 +2412,15 @@ export default function AdminDashboard() {
                         return matchesSearch && matchesStatus;
                       })
                       .map(project => (
-                      <div key={project.id} onClick={() => setSelectedProject(project)} className="glass rounded-2xl p-6 border-white/5 hover:border-primary/20 transition-all cursor-pointer group relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <ChevronRight size={18} className="text-primary" />
+                      <div key={project.id} onClick={() => setSelectedProject(project)} className="glass rounded-2xl p-4 sm:p-6 border-white/5 hover:border-primary/20 transition-all cursor-pointer group relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-3 sm:p-4 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                          <ChevronRight size={16} className="sm:size-[18px] text-primary" />
                         </div>
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20">
-                            <Kanban size={20} className="text-primary" />
+                        <div className="flex justify-between items-start mb-3 sm:mb-4">
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20">
+                            <Kanban size={16} className="sm:size-[20px] text-primary" />
                           </div>
-                          <span className={`text-[10px] font-bold px-2 py-1 rounded ${
+                          <span className={`text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded ${
                             project.status === 'active' ? 'text-cyber-emerald bg-cyber-emerald/10' :
                             project.status === 'prospect' ? 'text-cyber-gold bg-cyber-gold/10' :
                             'text-muted-foreground bg-white/10'
@@ -2032,61 +2428,61 @@ export default function AdminDashboard() {
                             {project.status.toUpperCase()}
                           </span>
                         </div>
-                        <h3 className="font-bold text-lg">{project.projectName}</h3>
-                        <p className="text-xs text-muted-foreground mb-4">{project.clientName}</p>
-                        <div className="space-y-2">
-                          <div className="flex justify-between text-[10px] font-bold">
+                        <h3 className="font-bold text-base sm:text-lg truncate">{project.projectName}</h3>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground mb-3 sm:mb-4 truncate">{project.clientName}</p>
+                        <div className="space-y-1.5 sm:space-y-2">
+                          <div className="flex justify-between text-[9px] sm:text-[10px] font-bold">
                             <span className="text-muted-foreground uppercase">Progresso</span>
                             <span className="text-primary">{calculateProgress(project)}%</span>
                           </div>
-                          <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+                          <div className="w-full bg-white/5 h-1 sm:h-1.5 rounded-full overflow-hidden">
                             <div className="bg-primary h-full transition-all duration-500" style={{ width: `${calculateProgress(project)}%` }} />
                           </div>
-                          <div className="flex justify-between text-[9px] text-muted-foreground font-mono">
+                          <div className="flex justify-between text-[8px] sm:text-[9px] text-muted-foreground font-mono">
                             <span>{project.tasks.filter(t => t.status === 'done').length}/{project.tasks.length} tarefas</span>
                           </div>
                         </div>
                       </div>
                     ))}
                     {projects.length === 0 && (
-                      <div className="col-span-full py-20 text-center glass rounded-3xl border-dashed border-white/10">
-                        <Zap size={40} className="mx-auto text-muted-foreground mb-4 opacity-20" />
-                        <p className="text-muted-foreground">Nenhum projeto encontrado.</p>
-                        <button onClick={() => setActiveTab('proposals')} className="text-primary font-bold text-sm mt-4 hover:underline">Criar nova proposta</button>
+                      <div className="col-span-full py-12 sm:py-20 text-center glass rounded-3xl border-dashed border-white/10">
+                        <Zap size={32} className="sm:size-[40px] mx-auto text-muted-foreground mb-3 sm:mb-4 opacity-20" />
+                        <p className="text-[11px] sm:text-sm text-muted-foreground">Nenhum projeto encontrado.</p>
+                        <button onClick={() => setActiveTab('proposals')} className="text-primary font-bold text-[11px] sm:text-sm mt-3 sm:mt-4 hover:underline">Criar nova proposta</button>
                       </div>
                     )}
                   </div>
                 </>
               ) : (
                 <>
-                  <div className="flex items-center gap-4 mb-2">
-                    <button onClick={() => setSelectedProject(null)} className="text-muted-foreground hover:text-white transition-colors">
-                      <ChevronRight size={20} className="rotate-180" />
+                  <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+                    <button onClick={() => setSelectedProject(null)} className="p-1.5 sm:p-2 glass rounded-lg text-muted-foreground hover:text-white transition-colors">
+                      <ChevronRight size={18} className="sm:size-[20px] rotate-180" />
                     </button>
-                    <div>
-                      <h2 className="text-4xl font-bold font-heading">{selectedProject.projectName}</h2>
-                      <p className="text-muted-foreground mt-1">Gestão operacional para <span className="text-primary font-bold">{selectedProject.clientName}</span></p>
+                    <div className="min-w-0">
+                      <h2 className="text-lg sm:text-4xl font-bold font-heading truncate">{selectedProject.projectName}</h2>
+                      <p className="text-[9px] sm:text-sm text-muted-foreground mt-1 truncate">Gestão operacional para <span className="text-primary font-bold">{selectedProject.clientName}</span></p>
                     </div>
                   </div>
 
-                  <div className="grid lg:grid-cols-3 gap-8">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
                     {/* Coluna 1 & 2: Tasks & Accesses */}
-                    <div className="lg:col-span-2 space-y-8">
+                    <div className="lg:col-span-2 space-y-4 sm:space-y-8">
                       {/* Briefing do Projeto */}
-                      <div className="glass rounded-2xl p-8 border-white/5 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-4 opacity-5">
-                          <MessageSquareQuote size={120} />
+                      <div className="glass rounded-2xl p-4 sm:p-8 border-white/5 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                          <MessageSquareQuote size={80} className="sm:size-[120px]" />
                         </div>
-                        <h3 className="font-bold flex items-center gap-2 mb-4"><FileText size={20} className="text-primary" /> Briefing do Projeto</h3>
-                        <p className="text-sm text-muted-foreground leading-relaxed italic">
+                        <h3 className="text-sm sm:text-base font-bold flex items-center gap-2 mb-3 sm:mb-4"><FileText size={18} className="sm:size-[20px] text-primary" /> Briefing do Projeto</h3>
+                        <p className="text-[11px] sm:text-sm text-muted-foreground leading-relaxed italic">
                           "{selectedProject.brief}"
                         </p>
                       </div>
 
                       {/* Stakeholders */}
-                      <div className="glass rounded-2xl p-8 border-white/5">
-                        <div className="flex justify-between items-center mb-6">
-                          <h3 className="font-bold flex items-center gap-2"><Users size={20} className="text-primary" /> Stakeholders (Decisores)</h3>
+                      <div className="glass rounded-2xl p-4 sm:p-8 border-white/5">
+                        <div className="flex justify-between items-center mb-4 sm:mb-6">
+                          <h3 className="text-sm sm:text-base font-bold flex items-center gap-2"><Users size={18} className="sm:size-[20px] text-primary" /> Stakeholders</h3>
                           <button 
                             onClick={() => {
                               const name = prompt("Nome do Stakeholder:");
@@ -2098,21 +2494,21 @@ export default function AdminDashboard() {
                                 } : p));
                               }
                             }}
-                            className="text-[10px] font-bold text-primary flex items-center gap-1 hover:underline"
+                            className="text-[9px] sm:text-[10px] font-bold text-primary flex items-center gap-1 hover:underline"
                           >
-                            <Plus size={12} /> Adicionar
+                            <Plus size={10} className="sm:size-[12px]" /> Adicionar
                           </button>
                         </div>
-                        <div className="grid md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                           {selectedProject.stakeholders?.map((s, i) => (
-                            <div key={i} className="p-4 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between group hover:border-white/10 transition-all">
-                              <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                            <div key={i} className="p-3 sm:p-4 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between group hover:border-white/10 transition-all">
+                              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-[10px] sm:text-base shrink-0">
                                   {s.name.charAt(0)}
                                 </div>
-                                <div>
-                                  <p className="text-sm font-bold">{s.name}</p>
-                                  <p className="text-[10px] text-muted-foreground">{s.role}</p>
+                                <div className="min-w-0">
+                                  <p className="text-[11px] sm:text-sm font-bold truncate">{s.name}</p>
+                                  <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate">{s.role}</p>
                                 </div>
                               </div>
                               <button 
@@ -2122,43 +2518,43 @@ export default function AdminDashboard() {
                                     stakeholders: p.stakeholders.filter((_, idx) => idx !== i)
                                   } : p));
                                 }}
-                                className="opacity-0 group-hover:opacity-100 p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition-all"
+                                className="opacity-100 sm:opacity-0 group-hover:opacity-100 p-1.5 sm:p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition-all shrink-0"
                               >
-                                <Trash2 size={14} />
+                                <Trash2 size={12} className="sm:size-[14px]" />
                               </button>
                             </div>
                           ))}
                           {(!selectedProject.stakeholders || selectedProject.stakeholders.length === 0) && (
-                            <p className="col-span-full text-xs text-muted-foreground italic py-4">Nenhum stakeholder cadastrado.</p>
+                            <p className="col-span-full text-[10px] sm:text-xs text-muted-foreground italic py-2 sm:py-4 text-center sm:text-left">Nenhum stakeholder cadastrado.</p>
                           )}
                         </div>
                       </div>
 
                       {/* Kanban Simplificado */}
-                      <div className="glass rounded-2xl p-8 border-white/5">
-                        <div className="flex justify-between items-center mb-6">
-                          <h3 className="font-bold flex items-center gap-2"><Kanban size={20} className="text-primary" /> Próximos Passos</h3>
-                          <button className="text-xs font-bold text-primary hover:underline">+ Nova Tarefa</button>
+                      <div className="glass rounded-2xl p-4 sm:p-8 border-white/5">
+                        <div className="flex justify-between items-center mb-4 sm:mb-6">
+                          <h3 className="text-sm sm:text-base font-bold flex items-center gap-2"><Kanban size={18} className="sm:size-[20px] text-primary" /> Próximos Passos</h3>
+                          <button className="text-[10px] sm:text-xs font-bold text-primary hover:underline">+ Nova Tarefa</button>
                         </div>
-                        <div className="space-y-4">
+                        <div className="space-y-3 sm:space-y-4">
                           {selectedProject.tasks.map(task => (
-                            <div key={task.id} className="p-4 rounded-xl bg-white/5 border border-white/5 group hover:border-white/10 transition-all space-y-3">
-                              <div className="flex items-center gap-4">
+                            <div key={task.id} className="p-3 sm:p-4 rounded-xl bg-white/5 border border-white/5 group hover:border-white/10 transition-all space-y-2 sm:space-y-3">
+                              <div className="flex items-center gap-3 sm:gap-4">
                                 <button 
                                   onClick={() => updateTaskStatus(selectedProject.id, task.id, task.status === 'done' ? 'todo' : 'done')}
-                                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${task.status === 'done' ? 'bg-cyber-emerald border-cyber-emerald shadow-lg shadow-cyber-emerald/20' : 'border-white/20 hover:border-primary'}`}
+                                  className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center transition-all shrink-0 ${task.status === 'done' ? 'bg-cyber-emerald border-cyber-emerald shadow-lg shadow-cyber-emerald/20' : 'border-white/20 hover:border-primary'}`}
                                 >
-                                  {task.status === 'done' && <CheckCircle2 size={14} className="text-white" />}
+                                  {task.status === 'done' && <CheckCircle2 size={12} className="text-white" />}
                                 </button>
-                                <div className="flex-1">
-                                  <span className={`text-sm font-bold ${task.status === 'done' ? 'text-muted-foreground line-through opacity-50' : 'text-white'}`}>{task.title}</span>
+                                <div className="flex-1 min-w-0">
+                                  <span className={`text-[11px] sm:text-sm font-bold block truncate ${task.status === 'done' ? 'text-muted-foreground line-through opacity-50' : 'text-white'}`}>{task.title}</span>
                                 </div>
                                 <select 
                                   id={`task-status-${task.id}`}
                                   name={`task-status-${task.id}`}
                                   value={task.status} 
                                   onChange={(e) => updateTaskStatus(selectedProject.id, task.id, e.target.value as any)}
-                                  className={`text-[10px] font-bold uppercase px-2 py-1 rounded outline-none border-none cursor-pointer ${
+                                  className={`text-[9px] sm:text-[10px] font-bold uppercase px-1.5 sm:px-2 py-0.5 sm:py-1 rounded outline-none border-none cursor-pointer shrink-0 ${
                                     task.status === 'done' ? 'bg-cyber-emerald/10 text-cyber-emerald' : 
                                     task.status === 'doing' ? 'bg-primary/20 text-primary' : 
                                     'bg-white/10 text-muted-foreground'
@@ -2170,9 +2566,9 @@ export default function AdminDashboard() {
                                 </select>
                               </div>
                               
-                              <div className="flex flex-wrap gap-4 pl-10">
+                              <div className="flex flex-wrap gap-3 sm:gap-4 pl-8 sm:pl-10">
                                 <div className="space-y-1">
-                                  <label className="text-[9px] uppercase font-bold text-muted-foreground flex items-center gap-1">
+                                  <label className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground flex items-center gap-1">
                                     <Calendar size={10} /> Início
                                   </label>
                                   <input 
@@ -2181,11 +2577,11 @@ export default function AdminDashboard() {
                                     type="date" 
                                     value={task.startDate || ''} 
                                     onChange={(e) => updateTaskDates(selectedProject.id, task.id, 'startDate', e.target.value)}
-                                    className="bg-transparent border-none text-[11px] text-muted-foreground outline-none focus:text-white transition-colors"
+                                    className="bg-transparent border-none text-[10px] sm:text-[11px] text-muted-foreground outline-none focus:text-white transition-colors"
                                   />
                                 </div>
                                 <div className="space-y-1">
-                                  <label className="text-[9px] uppercase font-bold text-muted-foreground flex items-center gap-1">
+                                  <label className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground flex items-center gap-1">
                                     <Target size={10} /> Fim Previsto
                                   </label>
                                   <input 
@@ -2194,7 +2590,7 @@ export default function AdminDashboard() {
                                     type="date" 
                                     value={task.endDate || ''} 
                                     onChange={(e) => updateTaskDates(selectedProject.id, task.id, 'endDate', e.target.value)}
-                                    className="bg-transparent border-none text-[11px] text-muted-foreground outline-none focus:text-white transition-colors"
+                                    className="bg-transparent border-none text-[10px] sm:text-[11px] text-muted-foreground outline-none focus:text-white transition-colors"
                                   />
                                 </div>
                               </div>
@@ -2204,20 +2600,20 @@ export default function AdminDashboard() {
                       </div>
 
                       {/* Acessos Técnicos */}
-                      <div className="glass rounded-2xl p-8 border-white/5">
-                        <div className="flex justify-between items-center mb-6">
-                          <h3 className="font-bold flex items-center gap-2"><Key size={20} className="text-cyber-gold" /> Chaves & Acessos</h3>
-                          <button className="text-xs font-bold text-cyber-gold hover:underline">+ Novo Acesso</button>
+                      <div className="glass rounded-2xl p-4 sm:p-8 border-white/5">
+                        <div className="flex justify-between items-center mb-4 sm:mb-6">
+                          <h3 className="text-sm sm:text-base font-bold flex items-center gap-2"><Key size={18} className="sm:size-[20px] text-cyber-gold" /> Chaves & Acessos</h3>
+                          <button className="text-[10px] sm:text-xs font-bold text-cyber-gold hover:underline">+ Novo Acesso</button>
                         </div>
-                        <div className="grid md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                           {selectedProject.accesses.map((access, i) => (
-                            <div key={i} className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-2 group relative">
-                              <div className="flex justify-between text-[10px] font-bold uppercase text-muted-foreground">
+                            <div key={i} className="p-3 sm:p-4 rounded-xl bg-white/5 border border-white/5 space-y-1.5 sm:space-y-2 group relative">
+                              <div className="flex justify-between text-[9px] sm:text-[10px] font-bold uppercase text-muted-foreground">
                                 <span>{access.type}</span>
-                                <button className="opacity-0 group-hover:opacity-100 transition-opacity text-primary">Copiar</button>
+                                <button className="opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity text-primary">Copiar</button>
                               </div>
-                              <p className="text-xs font-bold">{access.label}</p>
-                              <code className="text-[10px] bg-black/40 p-2 rounded block font-mono text-cyber-gold/80 truncate">
+                              <p className="text-[11px] sm:text-xs font-bold truncate">{access.label}</p>
+                              <code className="text-[9px] sm:text-[10px] bg-black/40 p-1.5 sm:p-2 rounded block font-mono text-cyber-gold/80 truncate">
                                 {access.credentials}
                               </code>
                             </div>
@@ -2226,42 +2622,42 @@ export default function AdminDashboard() {
                       </div>
 
                       {/* Documentos & Anexos */}
-                      <div className="glass rounded-2xl p-8 border-white/5">
-                        <div className="flex justify-between items-center mb-6">
-                          <h3 className="font-bold flex items-center gap-2"><Paperclip size={20} className="text-primary" /> Documentos & Contratos</h3>
-                          <button className="text-xs font-bold text-primary hover:underline flex items-center gap-1">
-                            <FileUp size={14} /> Upload
+                      <div className="glass rounded-2xl p-4 sm:p-8 border-white/5">
+                        <div className="flex justify-between items-center mb-4 sm:mb-6">
+                          <h3 className="text-sm sm:text-base font-bold flex items-center gap-2"><Paperclip size={18} className="sm:size-[20px] text-primary" /> Documentos & Contratos</h3>
+                          <button className="text-[10px] sm:text-xs font-bold text-primary hover:underline flex items-center gap-1">
+                            <FileUp size={12} className="sm:size-[14px]" /> Upload
                           </button>
                         </div>
-                        <div className="grid md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                           {selectedProject.documents && selectedProject.documents.length > 0 ? (
                             selectedProject.documents.map((doc) => (
-                              <div key={doc.id} className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-3 group hover:bg-white/10 transition-all cursor-pointer">
-                                <div className="flex items-start gap-3">
-                                  <div className={`p-2 rounded-lg ${
+                              <div key={doc.id} className="p-3 sm:p-4 rounded-xl bg-white/5 border border-white/5 space-y-2 sm:space-y-3 group hover:bg-white/10 transition-all cursor-pointer">
+                                <div className="flex items-start gap-2 sm:gap-3">
+                                  <div className={`p-1.5 sm:p-2 rounded-lg shrink-0 ${
                                     doc.type === 'contract' ? 'bg-primary/20 text-primary' : 
                                     doc.type === 'briefing' ? 'bg-cyber-gold/20 text-cyber-gold' : 
                                     'bg-white/10 text-white'
                                   }`}>
-                                    {doc.type === 'contract' ? <FileCheck size={18} /> : 
-                                     doc.type === 'briefing' ? <FileText size={18} /> : 
-                                     <FileCode size={18} />}
+                                    {doc.type === 'contract' ? <FileCheck size={16} className="sm:size-[18px]" /> : 
+                                     doc.type === 'briefing' ? <FileText size={16} className="sm:size-[18px]" /> : 
+                                     <FileCode size={16} className="sm:size-[18px]" />}
                                   </div>
                                   <div className="flex-1 min-w-0">
-                                    <p className="text-xs font-bold truncate">{doc.name}</p>
-                                    <p className="text-[10px] text-muted-foreground uppercase mt-0.5">{doc.type} • {doc.size}</p>
+                                    <p className="text-[11px] sm:text-xs font-bold truncate">{doc.name}</p>
+                                    <p className="text-[8px] sm:text-[10px] text-muted-foreground uppercase mt-0.5 truncate">{doc.type} • {doc.size}</p>
                                   </div>
                                 </div>
                                 <div className="flex justify-between items-center pt-2 border-t border-white/5">
-                                  <span className="text-[10px] text-muted-foreground">{new Date(doc.date).toLocaleDateString('pt-BR')}</span>
-                                  <button className="text-[10px] font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity">BAIXAR</button>
+                                  <span className="text-[8px] sm:text-[10px] text-muted-foreground">{new Date(doc.date).toLocaleDateString('pt-BR')}</span>
+                                  <button className="text-[9px] sm:text-[10px] font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity">BAIXAR</button>
                                 </div>
                               </div>
                             ))
                           ) : (
-                            <div className="md:col-span-2 py-8 text-center border-2 border-dashed border-white/5 rounded-2xl">
-                              <FileUp size={24} className="mx-auto text-muted-foreground mb-2 opacity-20" />
-                              <p className="text-xs text-muted-foreground">Nenhum documento anexado ainda.</p>
+                            <div className="sm:col-span-2 py-6 sm:py-8 text-center border-2 border-dashed border-white/5 rounded-2xl">
+                              <FileUp size={20} className="sm:size-[24px] mx-auto text-muted-foreground mb-2 opacity-20" />
+                              <p className="text-[10px] sm:text-xs text-muted-foreground">Nenhum documento anexado ainda.</p>
                             </div>
                           )}
                         </div>
@@ -2269,57 +2665,57 @@ export default function AdminDashboard() {
                     </div>
 
                     {/* Coluna 3: Métricas & Prazos */}
-                    <div className="space-y-6">
-                      <div className="glass rounded-2xl p-8 border-white/5 bg-gradient-to-b from-white/[0.03] to-transparent space-y-6">
+                    <div className="space-y-4 sm:space-y-6">
+                      <div className="glass rounded-2xl p-4 sm:p-8 border-white/5 bg-gradient-to-b from-white/[0.03] to-transparent space-y-4 sm:space-y-6">
                         <div>
-                          <h4 className="text-[10px] font-bold uppercase text-muted-foreground mb-4">Status da Entrega</h4>
-                          <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                          <h4 className="text-[9px] sm:text-[10px] font-bold uppercase text-muted-foreground mb-3 sm:mb-4">Status da Entrega</h4>
+                          <div className="w-full bg-white/5 h-1.5 sm:h-2 rounded-full overflow-hidden">
                             <div 
                               className="bg-primary h-full transition-all duration-700 ease-out" 
                               style={{ width: `${calculateProgress(selectedProject)}%` }} 
                             />
                           </div>
-                          <div className="flex justify-between mt-2 text-[10px] font-bold">
+                          <div className="flex justify-between mt-2 text-[9px] sm:text-[10px] font-bold">
                             <span>{calculateProgress(selectedProject)}% CONCLUÍDO</span>
-                            <span className="text-primary">FASE {selectedProject.tasks.filter(t => t.status === 'done').length}/{selectedProject.tasks.length}</span>
+                            <span className="text-primary truncate ml-2">FASE {selectedProject.tasks.filter(t => t.status === 'done').length}/{selectedProject.tasks.length}</span>
                           </div>
                         </div>
 
-                        <div className="pt-6 border-t border-white/5 space-y-4">
-                          <div className="flex items-center gap-3">
-                            <Calendar size={18} className="text-muted-foreground" />
-                            <div>
-                              <p className="text-[10px] font-bold text-muted-foreground uppercase">Deadline</p>
-                              <p className="text-sm font-bold">{new Date(selectedProject.deadline).toLocaleDateString('pt-BR')}</p>
+                        <div className="pt-4 sm:pt-6 border-t border-white/5 space-y-3 sm:space-y-4">
+                          <div className="flex items-center gap-2 sm:gap-3">
+                            <Calendar size={16} className="sm:size-[18px] text-muted-foreground shrink-0" />
+                            <div className="min-w-0">
+                              <p className="text-[9px] sm:text-[10px] font-bold text-muted-foreground uppercase">Deadline</p>
+                              <p className="text-[11px] sm:text-sm font-bold truncate">{new Date(selectedProject.deadline).toLocaleDateString('pt-BR')}</p>
                             </div>
                           </div>
-                          <div className="flex items-center gap-3">
-                            <DollarSign size={18} className="text-muted-foreground" />
-                            <div>
-                              <p className="text-[10px] font-bold text-muted-foreground uppercase">Valor do Contrato</p>
-                              <p className="text-sm font-bold text-cyber-emerald">R$ {selectedProject.value.toLocaleString('pt-BR')}</p>
+                          <div className="flex items-center gap-2 sm:gap-3">
+                            <DollarSign size={16} className="sm:size-[18px] text-muted-foreground shrink-0" />
+                            <div className="min-w-0">
+                              <p className="text-[9px] sm:text-[10px] font-bold text-muted-foreground uppercase">Valor do Contrato</p>
+                              <p className="text-[11px] sm:text-sm font-bold text-cyber-emerald truncate">R$ {selectedProject.value.toLocaleString('pt-BR')}</p>
                             </div>
                           </div>
                         </div>
 
                         <button 
                           onClick={() => window.open(`/portal/${selectedProject.id}`, '_blank')}
-                          className="w-full py-4 rounded-xl bg-white/5 border border-white/10 font-bold text-xs hover:bg-white/10 transition-all"
+                          className="w-full py-3 sm:py-4 rounded-xl bg-white/5 border border-white/10 font-bold text-[11px] sm:text-xs hover:bg-white/10 transition-all"
                         >
                           Abrir Portal do Cliente
                         </button>
                       </div>
 
                       {/* Custos Operacionais */}
-                      <div className="glass rounded-2xl p-6 border-white/5 bg-red-500/5 space-y-4">
-                        <h4 className="text-[10px] font-bold uppercase text-red-400 flex items-center gap-2">
-                          <PieChart size={14} /> Custos do Projeto
+                      <div className="glass rounded-2xl p-4 sm:p-6 border-white/5 bg-red-500/5 space-y-3 sm:space-y-4">
+                        <h4 className="text-[9px] sm:text-[10px] font-bold uppercase text-red-400 flex items-center gap-2">
+                          <PieChart size={12} className="sm:size-[14px]" /> Custos do Projeto
                         </h4>
-                        <div className="space-y-2">
+                        <div className="space-y-1.5 sm:space-y-2">
                           {selectedProject.costs.map((cost, i) => (
-                            <div key={i} className="flex justify-between text-[11px]">
-                              <span className="text-muted-foreground">{cost.label}</span>
-                              <span className="font-mono text-red-400">R$ {cost.value}</span>
+                            <div key={i} className="flex justify-between text-[10px] sm:text-[11px]">
+                              <span className="text-muted-foreground truncate mr-2">{cost.label}</span>
+                              <span className="font-mono text-red-400 shrink-0">R$ {cost.value}</span>
                             </div>
                           ))}
                         </div>
@@ -2333,33 +2729,33 @@ export default function AdminDashboard() {
 
           {/* ABA 5: ERP & GESTÃO GLOBAL */}
           {activeTab === 'erp' && (
-            <motion.div key="erp" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-6xl mx-auto space-y-8">
-              <div className="flex justify-between items-end">
+            <motion.div key="erp" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-6xl mx-auto space-y-4 sm:space-y-8">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
                 <div>
-                  <h2 className="text-4xl font-bold font-heading">Global <span className="text-gradient">ERP</span></h2>
-                  <p className="text-muted-foreground mt-2">Gestão 360º: Financeiro, Terceirizados e Infraestrutura.</p>
+                  <h2 className="text-2xl sm:text-4xl font-bold font-heading">Global <span className="text-gradient">ERP</span></h2>
+                  <p className="text-[10px] sm:text-sm text-muted-foreground mt-1 sm:mt-2">Gestão 360º: Financeiro, Terceirizados e Infraestrutura.</p>
                 </div>
-                <div className="flex gap-3">
-                  <div className="glass px-6 py-4 rounded-2xl border-white/5 flex items-center gap-4">
+                <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+                  <div className="glass px-4 sm:px-6 py-3 sm:py-4 rounded-2xl border-white/5 flex items-center gap-3 sm:gap-4 w-full sm:w-auto justify-between sm:justify-start">
                     <div>
-                      <p className="text-[10px] font-bold text-muted-foreground uppercase">Receita Total</p>
-                      <p className="text-xl font-bold text-cyber-emerald">R$ {projects.reduce((acc, p) => acc + p.value, 0).toLocaleString('pt-BR')}</p>
+                      <p className="text-[8px] sm:text-[10px] font-bold text-muted-foreground uppercase">Receita Total</p>
+                      <p className="text-sm sm:text-xl font-bold text-cyber-emerald">R$ {projects.reduce((acc, p) => acc + p.value, 0).toLocaleString('pt-BR')}</p>
                     </div>
-                    <div className="w-px h-8 bg-white/10" />
+                    <div className="w-px h-6 sm:h-8 bg-white/10" />
                     <div>
-                      <p className="text-[10px] font-bold text-muted-foreground uppercase">Custos Atuais</p>
-                      <p className="text-xl font-bold text-red-400">R$ {projects.reduce((acc, p) => acc + (p.costs?.reduce((cAcc, c) => cAcc + c.value, 0) || 0), 0).toLocaleString('pt-BR')}</p>
+                      <p className="text-[8px] sm:text-[10px] font-bold text-muted-foreground uppercase">Custos Atuais</p>
+                      <p className="text-sm sm:text-xl font-bold text-red-400">R$ {projects.reduce((acc, p) => acc + (p.costs?.reduce((cAcc, c) => cAcc + c.value, 0) || 0), 0).toLocaleString('pt-BR')}</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="grid lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
                 {/* Módulo Financeiro Consolidado */}
-                <div className="lg:col-span-2 space-y-6">
-                  <div className="glass rounded-3xl p-8 border-white/5 space-y-6">
+                <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+                  <div className="glass rounded-2xl sm:rounded-3xl p-4 sm:p-8 border-white/5 space-y-4 sm:space-y-6">
                     <div className="flex justify-between items-center">
-                      <h3 className="font-bold flex items-center gap-2 text-lg"><TrendingUp size={22} className="text-primary" /> Fluxo de Caixa por Projeto</h3>
+                      <h3 className="font-bold flex items-center gap-2 text-sm sm:text-lg"><TrendingUp size={18} className="text-primary sm:size-[22px]" /> Fluxo de Caixa por Projeto</h3>
                       <button 
                         onClick={() => {
                           const wsFinance = workspaces.find(w => w.id === 'ws-finance');
@@ -2370,39 +2766,39 @@ export default function AdminDashboard() {
                             setActiveTab('board');
                           }
                         }}
-                        className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+                        className="text-[10px] sm:text-xs font-bold text-primary hover:underline flex items-center gap-1"
                       >
-                        Ver Detalhes no Quadro <ChevronRight size={14} />
+                        <span className="hidden xs:inline">Ver Detalhes no Quadro</span><span className="xs:hidden">Detalhes</span> <ChevronRight size={12} className="sm:size-[14px]" />
                       </button>
                     </div>
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left border-collapse">
+                    <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+                      <table className="w-full text-left border-collapse min-w-[500px] sm:min-w-full">
                         <thead>
                           <tr className="border-b border-white/5">
-                            <th className="py-4 text-[10px] font-bold text-muted-foreground uppercase">Projeto</th>
-                            <th className="py-4 text-[10px] font-bold text-muted-foreground uppercase">Valor</th>
-                            <th className="py-4 text-[10px] font-bold text-muted-foreground uppercase">Custos (Tec/Terceiros)</th>
-                            <th className="py-4 text-[10px] font-bold text-muted-foreground uppercase">Margem</th>
-                            <th className="py-4 text-[10px] font-bold text-muted-foreground uppercase text-right">Status</th>
+                            <th className="py-3 sm:py-4 text-[8px] sm:text-[10px] font-bold text-muted-foreground uppercase">Projeto</th>
+                            <th className="py-3 sm:py-4 text-[8px] sm:text-[10px] font-bold text-muted-foreground uppercase">Valor</th>
+                            <th className="py-3 sm:py-4 text-[8px] sm:text-[10px] font-bold text-muted-foreground uppercase">Custos</th>
+                            <th className="py-3 sm:py-4 text-[8px] sm:text-[10px] font-bold text-muted-foreground uppercase">Margem</th>
+                            <th className="py-3 sm:py-4 text-[8px] sm:text-[10px] font-bold text-muted-foreground uppercase text-right">Status</th>
                           </tr>
                         </thead>
-                        <tbody className="text-sm">
+                        <tbody className="text-[11px] sm:text-sm">
                           {projects.map(p => {
                             const costs = p.costs?.reduce((acc, c) => acc + c.value, 0) || 0;
                             const margin = p.value - costs;
                             const marginPerc = Math.round((margin / p.value) * 100);
                             return (
                               <tr key={p.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
-                                <td className="py-4 font-bold">{p.projectName}</td>
-                                <td className="py-4 font-mono">R$ {p.value.toLocaleString('pt-BR')}</td>
-                                <td className="py-4 font-mono text-red-400">R$ {costs.toLocaleString('pt-BR')}</td>
-                                <td className="py-4">
+                                <td className="py-3 sm:py-4 font-bold truncate max-w-[100px] sm:max-w-none">{p.projectName}</td>
+                                <td className="py-3 sm:py-4 font-mono">R$ {p.value.toLocaleString('pt-BR')}</td>
+                                <td className="py-3 sm:py-4 font-mono text-red-400">R$ {costs.toLocaleString('pt-BR')}</td>
+                                <td className="py-3 sm:py-4">
                                   <span className={`font-mono ${marginPerc > 50 ? 'text-cyber-emerald' : 'text-cyber-gold'}`}>
-                                    R$ {margin.toLocaleString('pt-BR')} ({marginPerc}%)
+                                    R$ {margin.toLocaleString('pt-BR')} <span className="hidden xs:inline">({marginPerc}%)</span>
                                   </span>
                                 </td>
-                                <td className="py-4 text-right">
-                                  <span className={`text-[10px] px-2 py-1 rounded uppercase font-bold ${
+                                <td className="py-3 sm:py-4 text-right">
+                                  <span className={`text-[8px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 sm:py-1 rounded uppercase font-bold ${
                                     p.status === 'active' ? 'bg-primary/20 text-primary' : 
                                     p.status === 'finished' ? 'bg-cyber-emerald/20 text-cyber-emerald' : 
                                     'bg-white/10 text-muted-foreground'
@@ -2419,9 +2815,9 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* Gestão de Terceirizados & Parceiros */}
-                  <div className="glass rounded-3xl p-8 border-white/5 space-y-6">
+                  <div className="glass rounded-2xl sm:rounded-3xl p-4 sm:p-8 border-white/5 space-y-4 sm:space-y-6">
                     <div className="flex justify-between items-center">
-                      <h3 className="font-bold flex items-center gap-2 text-lg"><Briefcase size={22} className="text-cyber-gold" /> Terceirizados & Squads</h3>
+                      <h3 className="font-bold flex items-center gap-2 text-sm sm:text-lg"><Briefcase size={18} className="text-cyber-gold sm:size-[22px]" /> Terceirizados & Squads</h3>
                       <button 
                         onClick={() => {
                           const wsFinance = workspaces.find(w => w.id === 'ws-finance');
@@ -2434,74 +2830,74 @@ export default function AdminDashboard() {
                         }}
                         className="text-[10px] font-bold text-primary flex items-center gap-1 hover:underline"
                       >
-                        Ver no Quadro <ChevronRight size={14} />
+                        <span className="hidden xs:inline">Ver no Quadro</span><span className="xs:hidden">Quadro</span> <ChevronRight size={12} className="sm:size-[14px]" />
                       </button>
                     </div>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div className="p-4 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-between group">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                      <div className="p-3 sm:p-4 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-between group">
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-xl bg-cyber-gold/10 flex items-center justify-center text-cyber-gold border border-cyber-gold/20">
-                            <Code2 size={24} />
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-cyber-gold/10 flex items-center justify-center text-cyber-gold border border-cyber-gold/20 shrink-0">
+                            <Code2 size={20} className="sm:size-[24px]" />
                           </div>
-                          <div>
-                            <p className="font-bold">Marcos Silva</p>
-                            <p className="text-[10px] text-muted-foreground uppercase">Dev Fullstack • Freelancer</p>
+                          <div className="min-w-0">
+                            <p className="font-bold text-sm sm:text-base truncate">Marcos Silva</p>
+                            <p className="text-[9px] sm:text-[10px] text-muted-foreground uppercase truncate">Dev Fullstack • Freelancer</p>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="text-xs font-mono text-cyber-gold">R$ 120/hora</p>
-                          <p className="text-[9px] text-muted-foreground">Alocado: Projeto ETL</p>
+                        <div className="text-right shrink-0 ml-2">
+                          <p className="text-[10px] sm:text-xs font-mono text-cyber-gold">R$ 120/hora</p>
+                          <p className="text-[8px] sm:text-[9px] text-muted-foreground">Alocado: Projeto ETL</p>
                         </div>
                       </div>
-                      <div className="p-4 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center border-dashed opacity-50">
-                        <p className="text-xs text-muted-foreground italic">Nenhum outro parceiro ativo no momento.</p>
+                      <div className="p-3 sm:p-4 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center border-dashed opacity-50">
+                        <p className="text-[10px] sm:text-xs text-muted-foreground italic">Nenhum outro parceiro ativo.</p>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Coluna 3: Custos Fixos & Tecnologia */}
-                <div className="space-y-6">
-                  <div className="glass rounded-3xl p-8 border-white/5 space-y-6">
-                    <h3 className="font-bold flex items-center gap-2 text-sm"><Bot size={18} className="text-primary" /> Stack de Tecnologia (Custos Fixos)</h3>
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center p-3 rounded-xl bg-white/5 border border-white/5">
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 rounded-lg bg-primary/20 text-primary">
-                            <Database size={14} />
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="glass rounded-2xl sm:rounded-3xl p-4 sm:p-8 border-white/5 space-y-4 sm:space-y-6">
+                    <h3 className="font-bold flex items-center gap-2 text-xs sm:text-sm"><Bot size={16} className="text-primary sm:size-[18px]" /> Stack de Tecnologia</h3>
+                    <div className="space-y-3 sm:space-y-4">
+                      <div className="flex justify-between items-center p-2.5 sm:p-3 rounded-xl bg-white/5 border border-white/5">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="p-1.5 sm:p-2 rounded-lg bg-primary/20 text-primary shrink-0">
+                            <Database size={12} className="sm:size-[14px]" />
                           </div>
-                          <span className="text-xs font-bold">PostgreSQL Cloud</span>
+                          <span className="text-[10px] sm:text-xs font-bold truncate">PostgreSQL Cloud</span>
                         </div>
-                        <span className="text-xs font-mono text-red-400">R$ 80/mês</span>
+                        <span className="text-[10px] sm:text-xs font-mono text-red-400 shrink-0 ml-2">R$ 80/mês</span>
                       </div>
-                      <div className="flex justify-between items-center p-3 rounded-xl bg-white/5 border border-white/5">
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 rounded-lg bg-primary/20 text-primary">
-                            <Bot size={14} />
+                      <div className="flex justify-between items-center p-2.5 sm:p-3 rounded-xl bg-white/5 border border-white/5">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="p-1.5 sm:p-2 rounded-lg bg-primary/20 text-primary shrink-0">
+                            <Bot size={12} className="sm:size-[14px]" />
                           </div>
-                          <span className="text-xs font-bold">OpenAI API (Base)</span>
+                          <span className="text-[10px] sm:text-xs font-bold truncate">OpenAI API (Base)</span>
                         </div>
-                        <span className="text-xs font-mono text-red-400">R$ 150/mês</span>
+                        <span className="text-[10px] sm:text-xs font-mono text-red-400 shrink-0 ml-2">R$ 150/mês</span>
                       </div>
-                      <div className="flex justify-between items-center p-3 rounded-xl bg-white/5 border border-white/5">
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 rounded-lg bg-primary/20 text-primary">
-                            <Zap size={14} />
+                      <div className="flex justify-between items-center p-2.5 sm:p-3 rounded-xl bg-white/5 border border-white/5">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="p-1.5 sm:p-2 rounded-lg bg-primary/20 text-primary shrink-0">
+                            <Zap size={12} className="sm:size-[14px]" />
                           </div>
-                          <span className="text-xs font-bold">VPS DigitalOcean</span>
+                          <span className="text-[10px] sm:text-xs font-bold truncate">VPS DigitalOcean</span>
                         </div>
-                        <span className="text-xs font-mono text-red-400">R$ 60/mês</span>
+                        <span className="text-[10px] sm:text-xs font-mono text-red-400 shrink-0 ml-2">R$ 60/mês</span>
                       </div>
                     </div>
-                    <div className="pt-4 border-t border-white/5 flex justify-between items-center">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase">Total Operacional Fixo</span>
-                      <span className="text-sm font-bold text-red-400">R$ 290/mês</span>
+                    <div className="pt-3 sm:pt-4 border-t border-white/5 flex justify-between items-center">
+                      <span className="text-[8px] sm:text-[10px] font-bold text-muted-foreground uppercase">Total Operacional Fixo</span>
+                      <span className="text-xs sm:text-sm font-bold text-red-400">R$ 290/mês</span>
                     </div>
                   </div>
 
-                  <div className="glass rounded-3xl p-8 border-primary/20 bg-primary/5 space-y-4">
-                    <h4 className="text-xs font-bold flex items-center gap-2"><Sparkles size={16} className="text-primary" /> Insight do ERP</h4>
-                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  <div className="glass rounded-2xl sm:rounded-3xl p-4 sm:p-8 border-primary/20 bg-primary/5 space-y-3 sm:space-y-4">
+                    <h4 className="text-[10px] sm:text-xs font-bold flex items-center gap-2"><Sparkles size={14} className="text-primary sm:size-[16px]" /> Insight do ERP</h4>
+                    <p className="text-[10px] sm:text-[11px] text-muted-foreground leading-relaxed">
                       Sua margem média atual é de <span className="text-cyber-emerald font-bold">78%</span>. 
                       O projeto "Automação de ETL" é o mais lucrativo. 
                       Considere migrar a VPS para um plano anual para economizar 15% nos custos fixos.
@@ -2513,63 +2909,63 @@ export default function AdminDashboard() {
           )}
 
           {/* ABA 4: FINANCEIRO & PERFIL */}
-          {activeTab === 'finance' && (
-            <motion.div key="finance" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-4xl mx-auto space-y-8">
-              <h2 className="text-4xl font-bold font-heading">Business <span className="text-gradient">Settings</span></h2>
+          {activeTab === 'company' && (
+            <motion.div key="company" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-4xl mx-auto space-y-4 sm:space-y-8">
+              <h2 className="text-2xl sm:text-4xl font-bold font-heading">Business <span className="text-gradient">Settings</span></h2>
               
-              <div className="grid md:grid-cols-2 gap-8">
-                <div className="glass rounded-2xl p-8 border-white/5 space-y-6">
-                  <h3 className="font-bold flex items-center gap-2"><Building size={20} className="text-primary" /> Perfil da Consultoria</h3>
-                  <div className="space-y-4">
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] uppercase font-bold text-muted-foreground">Nome Fantasia</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
+                <div className="glass rounded-2xl p-4 sm:p-8 border-white/5 space-y-4 sm:space-y-6">
+                  <h3 className="font-bold flex items-center gap-2 text-sm sm:text-base"><Building size={18} className="text-primary sm:size-[20px]" /> Perfil da Consultoria</h3>
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="space-y-1 sm:space-y-1.5">
+                      <label className="text-[8px] sm:text-[10px] uppercase font-bold text-muted-foreground">Nome Fantasia</label>
                       <input 
                         id="company-name"
                         name="company-name"
                         value={company.name} 
                         onChange={e => setCompany({...company, name: e.target.value})} 
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-all text-sm" 
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 outline-none focus:border-primary/50 transition-all text-[11px] sm:text-sm" 
                       />
                     </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] uppercase font-bold text-muted-foreground">CNPJ</label>
+                    <div className="space-y-1 sm:space-y-1.5">
+                      <label className="text-[8px] sm:text-[10px] uppercase font-bold text-muted-foreground">CNPJ</label>
                       <input 
                         id="company-cnpj"
                         name="company-cnpj"
                         value={company.cnpj} 
                         onChange={e => setCompany({...company, cnpj: maskCNPJ(e.target.value)})} 
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-all text-sm" 
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 outline-none focus:border-primary/50 transition-all text-[11px] sm:text-sm" 
                         placeholder="00.000.000/0000-00"
                       />
                     </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] uppercase font-bold text-muted-foreground">E-mail Profissional</label>
+                    <div className="space-y-1 sm:space-y-1.5">
+                      <label className="text-[8px] sm:text-[10px] uppercase font-bold text-muted-foreground">E-mail Profissional</label>
                       <input 
                         id="company-email"
                         name="company-email"
                         value={company.email} 
                         onChange={e => setCompany({...company, email: e.target.value})} 
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-all text-sm" 
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 outline-none focus:border-primary/50 transition-all text-[11px] sm:text-sm" 
                       />
                     </div>
                   </div>
                 </div>
 
-                <div className="glass rounded-2xl p-8 border-white/5 space-y-6">
-                  <h3 className="font-bold flex items-center gap-2"><CreditCard size={20} className="text-cyber-gold" /> Dados de Pagamento</h3>
-                  <div className="space-y-4">
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] uppercase font-bold text-muted-foreground">Instruções de Faturamento (Pix/Banco)</label>
+                <div className="glass rounded-2xl p-4 sm:p-8 border-white/5 space-y-4 sm:space-y-6">
+                  <h3 className="font-bold flex items-center gap-2 text-sm sm:text-base"><CreditCard size={18} className="text-cyber-gold sm:size-[20px]" /> Dados de Pagamento</h3>
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="space-y-1 sm:space-y-1.5">
+                      <label className="text-[8px] sm:text-[10px] uppercase font-bold text-muted-foreground">Instruções de Faturamento (Pix/Banco)</label>
                       <textarea 
                         id="company-bank-info"
                         name="company-bank-info"
                         value={company.bankInfo} 
                         onChange={e => setCompany({...company, bankInfo: e.target.value})} 
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-all text-sm h-32 resize-none" 
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 outline-none focus:border-primary/50 transition-all text-[11px] sm:text-sm h-24 sm:h-32 resize-none" 
                       />
                     </div>
-                    <button className="w-full bg-primary py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2">
-                      <Save size={18} /> Salvar Configurações
+                    <button className="w-full bg-primary py-3 sm:py-4 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+                      <Save size={16} className="sm:size-[18px]" /> Salvar Configurações
                     </button>
                   </div>
                 </div>
