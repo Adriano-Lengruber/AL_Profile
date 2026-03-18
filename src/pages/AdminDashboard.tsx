@@ -32,6 +32,7 @@ import {
   History,
   Target,
   FileSignature,
+  Menu,
   Building,
   CreditCard,
   MessageSquareQuote,
@@ -499,16 +500,16 @@ const BoardView = ({ board, onUpdateCell, onAddItem, onAddGroup, onDeleteItem, o
       {board.groups.map(group => (
         <div key={group.id} className="space-y-0 relative group/g">
           {/* Header do Grupo */}
-          <div className="flex items-center gap-2 sm:gap-3 mb-2 group/title">
-            <div className="w-1 h-5 sm:h-6 rounded-full" style={{ backgroundColor: group.color }} />
-            <h3 className="text-sm sm:text-lg font-bold" style={{ color: group.color }}>{group.title}</h3>
-            <span className="text-[9px] sm:text-[10px] text-muted-foreground font-bold uppercase tracking-wider">{group.items.length} itens</span>
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 group/title overflow-hidden">
+            <div className="w-1 h-5 sm:h-6 rounded-full shrink-0" style={{ backgroundColor: group.color }} />
+            <h3 className="text-xs sm:text-lg font-bold truncate" style={{ color: group.color }}>{group.title}</h3>
+            <span className="text-[8px] sm:text-[10px] text-muted-foreground font-bold uppercase tracking-wider shrink-0">{group.items.length} itens</span>
             <button 
               onClick={() => onDeleteGroup(group.id)}
-              className="opacity-0 group-hover/g:opacity-100 p-1 hover:text-red-500 transition-all ml-1 sm:ml-2"
+              className="opacity-0 group-hover/g:opacity-100 p-1 hover:text-red-500 transition-all ml-1 sm:ml-2 shrink-0"
               title="Remover Grupo"
             >
-              <Trash2 size={12} className="sm:size-[14px]" />
+              <Trash2 size={10} className="sm:size-[14px]" />
             </button>
           </div>
 
@@ -1012,14 +1013,14 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead }: {
         {/* Chart Area */}
         <div className="xl:col-span-2 glass p-4 sm:p-8 rounded-3xl border-white/5 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] -z-10" />
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-            <div>
-              <h3 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
-                <TrendingUp size={16} className="text-primary" /> Velocidade de Receita
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
+            <div className="min-w-0 w-full">
+              <h3 className="text-[10px] sm:text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2 truncate">
+                <TrendingUp size={16} className="text-primary shrink-0" /> <span className="truncate">Velocidade de Receita</span>
               </h3>
-              <p className="text-[10px] text-muted-foreground">Volume de projetos ativos e finalizados por mês</p>
+              <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate">Volume de projetos ativos e finalizados por mês</p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               <div className="px-2 py-1 bg-cyber-emerald/10 text-cyber-emerald text-[9px] font-bold rounded uppercase border border-cyber-emerald/20">Real-time</div>
               <div className="px-2 py-1 bg-primary/10 text-primary text-[9px] font-bold rounded uppercase border border-primary/20">2026</div>
             </div>
@@ -1040,20 +1041,29 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead }: {
                   dataKey="name" 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fontSize: 10, fill: '#888' }}
+                  tick={{ fontSize: 9, fill: '#888' }}
                   dy={10}
+                  minTickGap={10}
                 />
                 {/* @ts-expect-error - Recharts types incompatibility with React 18 */}
                 <YAxis 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fontSize: 10, fill: '#888' }}
-                  tickFormatter={(val) => `R$ ${val >= 1000 ? (val/1000).toFixed(1) + 'k' : val}`}
+                  tick={{ fontSize: 9, fill: '#888' }}
+                  width={35}
+                  tickFormatter={(val) => `R$ ${val >= 1000 ? (val/1000).toFixed(0) + 'k' : val}`}
                 />
                 {/* @ts-expect-error - Recharts types incompatibility with React 18 */}
                 <RechartsTooltip 
-                  contentStyle={{ backgroundColor: '#050505', border: '1px solid #ffffff10', borderRadius: '12px', fontSize: '12px' }}
-                  itemStyle={{ color: '#0066FF' }}
+                  contentStyle={{ 
+                    backgroundColor: 'rgba(5, 5, 5, 0.9)', 
+                    border: '1px solid rgba(255, 255, 255, 0.1)', 
+                    borderRadius: '12px', 
+                    fontSize: '10px',
+                    backdropFilter: 'blur(4px)',
+                    padding: '8px'
+                  }}
+                  itemStyle={{ color: '#0066FF', padding: 0 }}
                   formatter={(value: any) => [`R$ ${Number(value).toLocaleString('pt-BR')}`, 'Receita']}
                 />
                 {/* @ts-expect-error - Recharts types incompatibility with React 18 */}
@@ -1072,12 +1082,12 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead }: {
 
         {/* Command Center */}
         <div className="space-y-4 sm:space-y-6 h-full">
-          <div className="glass p-5 sm:p-8 rounded-[2rem] border-white/5 h-full relative overflow-hidden group">
+          <div className="glass p-4 sm:p-8 rounded-[2rem] border-white/5 h-full relative overflow-hidden group">
             {/* Background Glow */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[60px] -z-10 group-hover:bg-primary/20 transition-all duration-700" />
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-cyber-gold/5 blur-[40px] -z-10" />
             
-            <h3 className="text-[10px] sm:text-xs font-black uppercase tracking-[0.3em] text-white/40 mb-6 flex items-center gap-2">
+            <h3 className="text-[10px] sm:text-xs font-black uppercase tracking-[0.3em] text-white/50 mb-4 sm:mb-6 flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-cyber-gold animate-pulse" />
               Command Center
             </h3>
@@ -2055,21 +2065,21 @@ export default function AdminDashboard() {
                   <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                     <button 
                       onClick={() => addNewItem(activeBoard.id, activeBoard.groups[0]?.id)}
-                      className="px-3 sm:px-4 py-2 bg-primary text-white text-[10px] sm:text-xs font-bold rounded-lg flex items-center gap-1.5 sm:gap-2 hover:bg-primary-dark transition-all shadow-lg shadow-primary/20 shrink-0"
+                      className="px-2.5 sm:px-4 py-2 bg-primary text-white text-[9px] sm:text-xs font-bold rounded-lg flex items-center gap-1.5 sm:gap-2 hover:bg-primary-dark transition-all shadow-lg shadow-primary/20 shrink-0"
                     >
-                      <Plus size={14} className="sm:size-[16px]" /> Novo Item
+                      <Plus size={12} className="sm:size-[16px]" /> Novo Item
                     </button>
-                    <button className="px-3 sm:px-4 py-2 glass border border-white/10 text-[10px] sm:text-xs font-bold rounded-lg flex items-center gap-1.5 sm:gap-2 hover:bg-white/5 transition-all shrink-0">
-                      <Search size={14} className="sm:size-[16px]" /> Filtrar
+                    <button className="px-2.5 sm:px-4 py-2 glass border border-white/10 text-[9px] sm:text-xs font-bold rounded-lg flex items-center gap-1.5 sm:gap-2 hover:bg-white/5 transition-all shrink-0">
+                      <Search size={12} className="sm:size-[16px]" /> Filtrar
                     </button>
-                    <button className="px-3 sm:px-4 py-2 glass border border-white/10 text-[10px] sm:text-xs font-bold rounded-lg flex items-center gap-1.5 sm:gap-2 hover:bg-white/5 transition-all shrink-0">
-                      <Users size={14} className="sm:size-[16px]" /> Personas
+                    <button className="px-2.5 sm:px-4 py-2 glass border border-white/10 text-[9px] sm:text-xs font-bold rounded-lg flex items-center gap-1.5 sm:gap-2 hover:bg-white/5 transition-all shrink-0">
+                      <Users size={12} className="sm:size-[16px]" /> Personas
                     </button>
                   </div>
-                  <div className="flex gap-1 p-1 bg-white/5 rounded-lg border border-white/10 self-end sm:self-auto">
-                    <button className="p-1.5 rounded bg-white/10 text-white"><Layout size={14} /></button>
-                    <button className="p-1.5 rounded text-muted-foreground hover:bg-white/5"><Kanban size={14} /></button>
-                    <button className="p-1.5 rounded text-muted-foreground hover:bg-white/5"><Calendar size={14} /></button>
+                  <div className="flex gap-1 p-1 bg-white/5 rounded-lg border border-white/10 self-start sm:self-auto overflow-x-auto">
+                    <button className="p-1.5 rounded bg-white/10 text-white shrink-0"><Layout size={12} className="sm:size-[14px]" /></button>
+                    <button className="p-1.5 rounded text-muted-foreground hover:bg-white/5 shrink-0"><Kanban size={12} className="sm:size-[14px]" /></button>
+                    <button className="p-1.5 rounded text-muted-foreground hover:bg-white/5 shrink-0"><Calendar size={12} className="sm:size-[14px]" /></button>
                   </div>
                 </div>
 
@@ -2204,10 +2214,10 @@ export default function AdminDashboard() {
 
                 {/* Resumo & Call to Action */}
                 <div className="space-y-4 sm:space-y-6">
-                  <div className="glass rounded-2xl p-6 sm:p-8 border-primary/20 sticky top-8 bg-gradient-to-b from-white/[0.03] to-transparent">
+                  <div className="glass rounded-2xl p-6 sm:p-8 border-primary/20 lg:sticky lg:top-8 bg-gradient-to-b from-white/[0.03] to-transparent">
                     <h3 className="font-bold mb-4 sm:mb-6 flex items-center justify-between text-base sm:text-lg">
                       Budget Builder
-                      <TrendingUp className="text-cyber-gold" size={18} className="sm:size-[20px]" />
+                      <TrendingUp className="text-cyber-gold size-[18px] sm:size-[20px]" />
                     </h3>
                     <div className="space-y-3 sm:space-y-4 mb-8 sm:mb-10">
                       {selectedModules.length === 0 && <p className="text-[10px] sm:text-xs text-muted-foreground italic text-center py-3 sm:py-4">Selecione módulos para compor o valor...</p>}
@@ -2248,22 +2258,22 @@ export default function AdminDashboard() {
           {/* ABA 2: CRM & RELACIONAMENTOS */}
           {activeTab === 'crm' && (
             <motion.div key="crm" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="max-w-6xl mx-auto space-y-6 sm:space-y-8">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6">
-                <div>
-                  <h2 className="text-2xl sm:text-4xl font-bold font-heading">Relationship <span className="text-gradient">Intelligence</span></h2>
-                  <p className="text-[10px] sm:text-sm text-muted-foreground mt-2">Mapeie stakeholders e mantenha o contexto de cada conversa.</p>
-                </div>
-                <button 
-                  onClick={() => {
-                    setClientData({ name: '', cnpj: '', email: '', projectTitle: '', brief: '', profile: 'technical' });
-                    setSelectedModules([]);
-                    setActiveTab('proposals');
-                  }}
-                  className="w-full sm:w-auto bg-primary px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:brightness-110 transition-all text-xs sm:text-sm"
-                >
-                  <Plus size={18} className="sm:size-[20px]" /> Adicionar Cliente
-                </button>
-              </div>
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6 overflow-hidden">
+                    <div className="min-w-0 w-full">
+                      <h2 className="text-2xl sm:text-4xl font-bold font-heading truncate">Relationship <span className="text-gradient">Intelligence</span></h2>
+                      <p className="text-[10px] sm:text-sm text-muted-foreground mt-2 truncate">Mapeie stakeholders e mantenha o contexto de cada conversa.</p>
+                    </div>
+                    <button 
+                      onClick={() => {
+                        setClientData({ name: '', cnpj: '', email: '', projectTitle: '', brief: '', profile: 'technical' });
+                        setSelectedModules([]);
+                        setActiveTab('proposals');
+                      }}
+                      className="w-full sm:w-auto bg-primary px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:brightness-110 transition-all text-xs sm:text-sm shrink-0 shadow-lg shadow-primary/20"
+                    >
+                      <Plus size={18} className="sm:size-[20px]" /> Adicionar Cliente
+                    </button>
+                  </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {projects.map(project => (
