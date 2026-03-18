@@ -1071,54 +1071,73 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead }: {
         </div>
 
         {/* Command Center */}
-        <div className="space-y-4 sm:space-y-6">
-          <div className="glass p-4 sm:p-8 rounded-2xl sm:rounded-3xl border-white/5 h-full relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-[50px] -z-10 group-hover:bg-primary/10 transition-colors duration-500" />
-            <h3 className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-white/50 mb-4 sm:mb-6 flex items-center gap-2">
-              <Zap size={14} className="text-cyber-gold" /> Command Center
+        <div className="space-y-4 sm:space-y-6 h-full">
+          <div className="glass p-5 sm:p-8 rounded-[2rem] border-white/5 h-full relative overflow-hidden group">
+            {/* Background Glow */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[60px] -z-10 group-hover:bg-primary/20 transition-all duration-700" />
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-cyber-gold/5 blur-[40px] -z-10" />
+            
+            <h3 className="text-[10px] sm:text-xs font-black uppercase tracking-[0.3em] text-white/40 mb-6 flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-cyber-gold animate-pulse" />
+              Command Center
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-2 sm:gap-4">
-              <button 
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-3 sm:gap-4">
+              <motion.button 
+                whileHover={{ scale: 1.02, translateY: -2 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => onNewWorkspace()}
-                className="w-full p-2.5 sm:p-4 rounded-xl bg-primary/5 border border-primary/10 flex items-center gap-3 sm:gap-4 group/btn hover:bg-primary/10 hover:border-primary/30 transition-all text-left hover:scale-[1.02] active:scale-[0.98] shadow-sm"
+                className="w-full p-3 sm:p-4 rounded-2xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 flex items-center gap-3 sm:gap-4 group/btn hover:border-primary/40 transition-all text-left shadow-lg shadow-primary/5"
               >
-                <div className="p-1.5 sm:p-2.5 rounded-lg bg-primary/10 text-primary group-hover/btn:scale-110 transition-transform shrink-0">
-                  <Plus size={16} className="sm:size-[20px]" />
+                <div className="p-2 sm:p-2.5 rounded-xl bg-primary/20 text-primary group-hover/btn:bg-primary group-hover/btn:text-white transition-all shrink-0 shadow-inner">
+                  <Plus size={18} className="sm:size-[20px]" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[11px] sm:text-xs font-bold text-white group-hover/btn:text-primary transition-colors truncate">Novo Workspace</p>
-                  <p className="text-[8px] sm:text-[10px] text-muted-foreground truncate">Organizar cliente</p>
+                  <p className="text-[11px] sm:text-xs font-black text-white group-hover/btn:text-primary transition-colors truncate uppercase tracking-wider">Novo Workspace</p>
+                  <p className="text-[8px] sm:text-[10px] text-muted-foreground truncate font-medium">Setup rápido de cliente</p>
                 </div>
-              </button>
+              </motion.button>
               
-              <button 
+              <motion.button 
+                whileHover={{ scale: 1.02, translateY: -2 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => onNewLead()}
-                className="w-full p-2.5 sm:p-4 rounded-xl bg-cyber-gold/5 border border-cyber-gold/10 flex items-center gap-3 sm:gap-4 group/btn hover:bg-cyber-gold/10 hover:border-cyber-gold/30 transition-all text-left hover:scale-[1.02] active:scale-[0.98] shadow-sm"
+                className="w-full p-3 sm:p-4 rounded-2xl bg-gradient-to-br from-cyber-gold/10 to-transparent border border-cyber-gold/20 flex items-center gap-3 sm:gap-4 group/btn hover:border-cyber-gold/40 transition-all text-left shadow-lg shadow-cyber-gold/5"
               >
-                <div className="p-1.5 sm:p-2.5 rounded-lg bg-cyber-gold/10 text-cyber-gold group-hover/btn:scale-110 transition-transform shrink-0">
-                  <MousePointer2 size={16} className="sm:size-[20px]" />
+                <div className="p-2 sm:p-2.5 rounded-xl bg-cyber-gold/20 text-cyber-gold group-hover/btn:bg-cyber-gold group-hover/btn:text-cyber-black transition-all shrink-0 shadow-inner">
+                  <MousePointer2 size={18} className="sm:size-[20px]" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[11px] sm:text-xs font-bold text-white group-hover/btn:text-cyber-gold transition-colors truncate">Injetar Lead</p>
-                  <p className="text-[8px] sm:text-[10px] text-muted-foreground truncate">Novo prospect</p>
+                  <p className="text-[11px] sm:text-xs font-black text-white group-hover/btn:text-cyber-gold transition-colors truncate uppercase tracking-wider">Injetar Lead</p>
+                  <p className="text-[8px] sm:text-[10px] text-muted-foreground truncate font-medium">Captura de oportunidade</p>
                 </div>
-              </button>
+              </motion.button>
 
-              <div className="pt-3 sm:pt-6 mt-1 sm:mt-2 border-t border-white/5">
-                <div className="flex justify-between items-center mb-2 sm:mb-4">
-                  <h4 className="text-[8px] sm:text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Módulos Ativos</h4>
-                  <div className="px-1.5 py-0.5 rounded-full bg-cyber-emerald/10 text-cyber-emerald text-[6px] sm:text-[8px] font-bold border border-cyber-emerald/20 animate-pulse">LIVE</div>
+              <div className="pt-5 sm:pt-6 mt-2 sm:mt-4 border-t border-white/5 relative">
+                <div className="flex justify-between items-center mb-4">
+                  <div className="flex flex-col">
+                    <h4 className="text-[8px] sm:text-[10px] font-black uppercase text-white/50 tracking-[0.2em]">Sistemas Ativos</h4>
+                    <p className="text-[6px] sm:text-[8px] text-muted-foreground font-medium uppercase mt-0.5">Auto-scaling enabled</p>
+                  </div>
+                  <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-cyber-emerald/10 border border-cyber-emerald/20">
+                    <div className="w-1 h-1 rounded-full bg-cyber-emerald animate-pulse" />
+                    <span className="text-cyber-emerald text-[7px] sm:text-[8px] font-black uppercase tracking-tighter">Live Ops</span>
+                  </div>
                 </div>
-                <div className="grid grid-cols-2 gap-1.5 sm:gap-3">
+                
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
                   {[
-                    { name: 'Sales Engine', icon: Target },
-                    { name: 'CRM', icon: Users },
-                    { name: 'BI', icon: Activity },
-                    { name: 'Automation', icon: Zap }
+                    { name: 'Sales Engine', icon: Target, active: true },
+                    { name: 'CRM Core', icon: Users, active: true },
+                    { name: 'BI Layer', icon: Activity, active: true },
+                    { name: 'Automation', icon: Zap, active: true }
                   ].map((mod, i) => (
-                    <div key={i} className="px-1.5 sm:px-3 py-1 sm:py-2.5 rounded-lg sm:rounded-xl bg-white/[0.02] border border-white/5 text-[7px] sm:text-[10px] font-bold flex items-center gap-1 sm:gap-2 hover:bg-white/[0.05] transition-colors cursor-default group/mod min-w-0">
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-cyber-emerald shadow-[0_0_8px_rgba(16,185,129,0.5)] group-hover/mod:scale-125 transition-transform shrink-0" />
-                      <span className="text-muted-foreground group-hover/mod:text-white transition-colors truncate">{mod.name}</span>
+                    <div key={i} className="px-2 sm:px-3 py-2 sm:py-3 rounded-xl bg-white/[0.03] border border-white/5 text-[8px] sm:text-[10px] font-bold flex flex-col gap-2 hover:bg-white/[0.08] hover:border-white/10 transition-all cursor-default group/mod">
+                      <div className="flex justify-between items-center w-full">
+                        <mod.icon size={12} className="text-muted-foreground group-hover/mod:text-primary transition-colors" />
+                        <div className="w-1 h-1 rounded-full bg-cyber-emerald shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                      </div>
+                      <span className="text-muted-foreground group-hover/mod:text-white transition-colors truncate uppercase tracking-tighter">{mod.name}</span>
                     </div>
                   ))}
                 </div>
