@@ -338,6 +338,45 @@ const Project = mongoose.model('Project', projectSchema);
 const Company = mongoose.model('Company', companySchema);
 const Collaboration = mongoose.model('Collaboration', collaborationSchema);
 
+const resolveActiveCollaboration = async (userDoc) => {
+  if (!userDoc?._id) return null;
+
+  const normalizedEmail = normalizeEmail(userDoc.email);
+  const acceptedCollaboration = await Collaboration.findOne({
+    status: 'accepted',
+    $or: [
+      { userId: userDoc._id },
+      { email: normalizedEmail }
+    ]
+  }).sort({ acceptedAt: -1, createdAt: -1 });
+
+  if (acceptedCollaboration) {
+    if (!acceptedCollaboration.userId || String(acceptedCollaboration.userId) !== String(userDoc._id)) {
+      acceptedCollaboration.userId = userDoc._id;
+      await acceptedCollaboration.save();
+    }
+
+    return acceptedCollaboration;
+  }
+
+  const approvedCollaboration = await Collaboration.findOne({
+    email: normalizedEmail,
+    status: 'approved'
+  }).sort({ createdAt: -1 });
+
+  if (!approvedCollaboration) {
+    return null;
+  }
+
+  approvedCollaboration.userId = userDoc._id;
+  approvedCollaboration.status = 'accepted';
+  approvedCollaboration.acceptedAt = new Date();
+  approvedCollaboration.revokedAt = null;
+  await approvedCollaboration.save();
+
+  return approvedCollaboration;
+};
+
 const buildAccessPayload = async (userDoc) => {
   if (!userDoc) return null;
 
@@ -354,13 +393,7 @@ const buildAccessPayload = async (userDoc) => {
     };
   }
 
-  const collaboration = await Collaboration.findOne({
-    status: 'accepted',
-    $or: [
-      { userId: user._id },
-      { email: normalizedEmail }
-    ]
-  }).sort({ acceptedAt: -1, createdAt: -1 });
+  const collaboration = await resolveActiveCollaboration(user);
 
   if (!collaboration) {
     return {

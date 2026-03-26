@@ -2026,6 +2026,11 @@ export default function AdminDashboard() {
   const canViewFinance = permissions.financeView;
   const canViewServer = permissions.serverView;
   const canManageTeam = isOwner && permissions.teamManage;
+  const profileStatusLabel = isOwner
+    ? 'Owner do ambiente'
+    : canAccessAdmin
+      ? 'Colaborador com acesso'
+      : 'Aguardando liberação';
   const availableTabs = useMemo<Record<AdminTab, boolean>>(() => ({
     dashboard: canViewDashboard,
     proposals: canEditProjects,
@@ -3230,7 +3235,7 @@ export default function AdminDashboard() {
               </div>
               <div className="overflow-hidden">
                 <p className="text-xs font-bold truncate">{user?.username || company.name}</p>
-                <p className="text-[10px] text-muted-foreground truncate">{isOwner ? 'Owner do ambiente' : 'Colaborador aprovado'}</p>
+                <p className="text-[10px] text-muted-foreground truncate">{profileStatusLabel}</p>
               </div>
             </div>
             <button 
