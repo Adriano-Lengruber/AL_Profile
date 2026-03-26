@@ -8,6 +8,43 @@ Este documento apresenta o plano de evoluções para o portfólio de Adriano Len
 - **Frameworks**: Radix UI, Framer Motion, Three.js
 - **Seções atuais**: Hero, Sobre, Serviços, Currículo, Projetos, Blog, Contato
 
+## Atualização da Plataforma Colaborativa
+
+### Escopo Entregue
+- Painel `/admin` preparado para múltiplos atores com distinção entre **Owner** e **Colaboradores aprovados**
+- Convites administrativos aprovados por e-mail com vínculo ao login/cadastro do usuário
+- Permissões granulares por módulo para dashboard, CRM, projetos, workspaces, empresa, financeiro, conteúdo, servidor e equipe
+- Interface inicial de **Equipe & Permissões** no Admin Dashboard para aprovar convites, revisar papéis e revogar acessos
+- Feedback visual para contas autenticadas sem liberação administrativa, evitando acesso indevido aos módulos internos
+
+### Papéis Atualmente Suportados
+- **owner**: acesso total ao ambiente e gestão da equipe
+- **manager**: visão ampla operacional/comercial com edição das áreas permitidas
+- **editor**: foco em execução e atualização do dia a dia
+- **viewer**: leitura controlada sem ações críticas
+
+### Regras de Acesso
+- O e-mail definido como owner no backend continua sendo a autoridade principal do ambiente
+- Colaboradores só entram no admin quando o convite estiver aceito/aprovado
+- Ações críticas agora respeitam permissão antes de carregar dados, sincronizar ou exibir botões destrutivos
+- A aba de equipe fica reservada ao owner com permissão de gerenciamento
+
+### Fluxo Operacional
+1. Owner aprova um colaborador e gera o link de acesso
+2. O colaborador faz login/cadastro com o mesmo e-mail aprovado
+3. O backend resolve o contexto administrativo e devolve o pacote de permissões
+4. O frontend libera apenas os módulos compatíveis com o papel e as flags ativas
+
+### Pontos de Backend e Frontend Afetados
+- **Backend**: `server/index.js` concentra convites, colaboração, roles, permissions e bloqueios por endpoint
+- **Frontend**: `src/pages/AdminDashboard.tsx` aplica a leitura das permissões, a navegação condicional e a gestão inicial da equipe
+- **Auth**: `src/hooks/auth-context.ts` mantém o contrato de `adminAccess` usado em toda a experiência autenticada
+
+### Validação Executada
+- Diagnósticos da IDE sem erros
+- `npx eslint src server --ext .ts,.tsx,.js,.cjs`
+- `npx tsc -b`
+
 ---
 
 ## 1. Git e Versionamento

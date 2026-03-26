@@ -36,20 +36,53 @@ interface Project {
   meetingNotes: { date: string; content: string }[];
 }
 
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
+
+const normalizeProject = (project: Partial<Project>): Project => ({
+  id: project.id || '',
+  clientName: project.clientName || 'Cliente',
+  projectName: project.projectName || 'Projeto',
+  brief: project.brief || '',
+  status: project.status || 'prospect',
+  value: typeof project.value === 'number' ? project.value : 0,
+  deadline: project.deadline || 'A definir',
+  tasks: Array.isArray(project.tasks) ? project.tasks : [],
+  meetingNotes: Array.isArray(project.meetingNotes) ? project.meetingNotes : [],
+});
+
 export default function ClientPortal() {
   const { id } = useParams();
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simular carregamento do localStorage
-    const saved = localStorage.getItem('al_projects');
-    if (saved) {
-      const projects: Project[] = JSON.parse(saved);
-      const found = projects.find(p => p.id === id);
-      if (found) setProject(found);
-    }
-    setLoading(false);
+    const loadProject = async () => {
+      try {
+        const response = await fetch(`${API_BASE}/public/projects/${id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setProject(normalizeProject(data));
+          return;
+        }
+      } catch (error) {
+        console.error('Erro ao carregar portal via API:', error);
+      }
+
+      const saved = localStorage.getItem('al_projects');
+      if (saved) {
+        try {
+          const projects: Project[] = JSON.parse(saved);
+          const found = projects.find(p => p.id === id);
+          if (found) {
+            setProject(normalizeProject(found));
+          }
+        } catch (error) {
+          console.error('Erro ao carregar portal local:', error);
+        }
+      }
+    };
+
+    loadProject().finally(() => setLoading(false));
   }, [id]);
 
   if (loading) return <div className="min-h-screen bg-cyber-black text-white flex items-center justify-center">Carregando portal...</div>;
@@ -143,7 +176,7 @@ export default function ClientPortal() {
               </div>
 
               <div className="space-y-4">
-                {project.tasks.map((task, i) => (
+                {project.tasks.length > 0 ? project.tasks.map((task, i) => (
                   <motion.div 
                     key={task.id}
                     initial={{ opacity: 0, x: -10 }}
@@ -173,7 +206,11 @@ export default function ClientPortal() {
                       </div>
                     </div>
                   </motion.div>
-                ))}
+                )) : (
+                  <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-6 text-center text-sm text-muted-foreground">
+                    Nenhuma etapa foi publicada para este projeto ainda.
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -187,7 +224,7 @@ export default function ClientPortal() {
                 Histórico de Alinhamento
               </h3>
               <div className="space-y-6 relative before:absolute before:left-2 before:top-2 before:bottom-2 before:w-[1px] before:bg-white/10">
-                {project.meetingNotes.map((note, i) => (
+                {project.meetingNotes.length > 0 ? project.meetingNotes.map((note, i) => (
                   <div key={i} className="relative pl-8">
                     <div className="absolute left-0 top-1.5 w-4 h-4 rounded-full bg-cyber-black border-2 border-cyber-gold" />
                     <p className="text-[10px] font-bold text-cyber-gold uppercase mb-1">{note.date}</p>
@@ -195,7 +232,14 @@ export default function ClientPortal() {
                       {note.content}
                     </p>
                   </div>
-                ))}
+                )) : (
+                  <div className="relative pl-8">
+                    <div className="absolute left-0 top-1.5 w-4 h-4 rounded-full bg-cyber-black border-2 border-white/20" />
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Ainda não há registros de alinhamento publicados neste portal.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 

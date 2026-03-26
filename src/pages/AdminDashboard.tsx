@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { 
   FileText, 
   Settings, 
@@ -191,6 +192,64 @@ interface ProjectDocument {
   size: string;
 }
 
+type MeetingType = 'discovery' | 'kickoff' | 'followup' | 'delivery' | 'postDelivery';
+
+interface ProjectMeetingNote {
+  date: string;
+  content: string;
+  title?: string;
+  kind?: MeetingType;
+  outcome?: string;
+  nextStep?: string;
+}
+
+type ProjectPaymentStatus = 'draft' | 'pending' | 'partial' | 'paid' | 'overdue';
+
+interface ProjectInstallment {
+  id: string;
+  label: string;
+  amount: number;
+  dueDate: string;
+  status: 'pending' | 'paid' | 'overdue';
+}
+
+interface ProjectFinancials {
+  proposalValue: number;
+  paymentMethod: string;
+  invoiceStatus: 'pending' | 'issued' | 'paid';
+  installments: ProjectInstallment[];
+}
+
+interface ProjectPostDeliveryStep {
+  id: string;
+  title: string;
+  area: 'testimonial' | 'case' | 'portfolio' | 'referral' | 'upsell';
+  done: boolean;
+}
+
+type PlaybookTemplateId = 'consulting' | 'automation' | 'analytics' | 'retainer';
+
+interface ProjectPlaybookStep {
+  id: string;
+  title: string;
+  description: string;
+  done: boolean;
+}
+
+interface ProjectPlaybook {
+  templateId: PlaybookTemplateId;
+  steps: ProjectPlaybookStep[];
+}
+
+type ProjectStage = 'lead' | 'diagnosis' | 'proposal' | 'onboarding' | 'delivery' | 'launch' | 'relationship';
+
+interface ProjectWorkflowStep {
+  id: string;
+  title: string;
+  area: 'commercial' | 'onboarding' | 'delivery' | 'launch' | 'relationship';
+  done: boolean;
+}
+
 interface Project {
   id: string;
   clientName: string;
@@ -203,8 +262,15 @@ interface Project {
   tasks: ProjectTask[];
   costs: { label: string; value: number }[];
   stakeholders: Stakeholder[];
-  meetingNotes: { date: string; content: string }[];
+  meetingNotes: ProjectMeetingNote[];
   documents: ProjectDocument[];
+  stage: ProjectStage;
+  nextAction: string;
+  followUpDate: string;
+  workflowSteps: ProjectWorkflowStep[];
+  financials: ProjectFinancials;
+  postDeliverySteps: ProjectPostDeliveryStep[];
+  playbook: ProjectPlaybook;
 }
 
 interface CompanyProfile {
@@ -214,6 +280,65 @@ interface CompanyProfile {
   email: string;
   bankInfo: string;
 }
+
+interface CollaborationMember {
+  id: string;
+  email: string;
+  role: 'manager' | 'editor' | 'finance' | 'viewer';
+  status: 'approved' | 'accepted' | 'revoked';
+  note: string;
+  permissions: {
+    dashboardView: boolean;
+    crmView: boolean;
+    projectsView: boolean;
+    projectsEdit: boolean;
+    workspacesView: boolean;
+    workspacesEdit: boolean;
+    companyView: boolean;
+    companyEdit: boolean;
+    financeView: boolean;
+    postsEdit: boolean;
+    serverView: boolean;
+    teamManage: boolean;
+  };
+  createdAt?: string;
+  acceptedAt?: string | null;
+  inviteLink: string | null;
+  user?: {
+    id: string;
+    username: string;
+    email: string;
+    avatar: string;
+    bio: string;
+  } | null;
+}
+
+const ROLE_OPTIONS: Array<{ value: CollaborationMember['role']; label: string; description: string }> = [
+  { value: 'manager', label: 'Manager', description: 'Opera comercial, projetos, empresa e visão financeira.' },
+  { value: 'editor', label: 'Editor', description: 'Trabalha conteúdo, CRM e projetos sem administração completa.' },
+  { value: 'finance', label: 'Financeiro', description: 'Acompanha receita, empresa e propostas em modo controlado.' },
+  { value: 'viewer', label: 'Viewer', description: 'Acompanha a operação sem editar áreas sensíveis.' }
+];
+
+const PERMISSION_CATALOG: Array<{
+  key: keyof CollaborationMember['permissions'];
+  label: string;
+  summary: string;
+  impact: string;
+}> = [
+  { key: 'dashboardView', label: 'Dashboards', summary: 'Entra na visão executiva do negócio.', impact: 'Indicadores, follow-ups e visão consolidada.' },
+  { key: 'crmView', label: 'CRM & Clientes', summary: 'Consulta pipeline, clientes e histórico.', impact: 'Relacionamento, agenda e acompanhamento comercial.' },
+  { key: 'projectsView', label: 'Projetos', summary: 'Visualiza projetos e entregas.', impact: 'Escopo, tarefas, stakeholders e playbook.' },
+  { key: 'projectsEdit', label: 'Editar Projetos', summary: 'Cria, altera e remove pipeline/projetos.', impact: 'Propostas, avanço operacional e dados do projeto.' },
+  { key: 'workspacesView', label: 'Workspaces', summary: 'Abre boards e espaços de trabalho.', impact: 'Quadros operacionais e organização interna.' },
+  { key: 'workspacesEdit', label: 'Editar Workspaces', summary: 'Altera boards, itens e estrutura.', impact: 'Operação de entrega e colaboração diária.' },
+  { key: 'companyView', label: 'Perfil da Empresa', summary: 'Consulta dados institucionais.', impact: 'Informações comerciais e de faturamento.' },
+  { key: 'companyEdit', label: 'Editar Empresa', summary: 'Atualiza cadastro e faturamento.', impact: 'White label, dados corporativos e billing.' },
+  { key: 'financeView', label: 'Financeiro', summary: 'Acessa visão ERP e métricas financeiras.', impact: 'Receita, contas e previsões.' },
+  { key: 'postsEdit', label: 'Blog/Conteúdo', summary: 'Pode moderar posts existentes.', impact: 'Operação editorial e consistência de marca.' },
+  { key: 'serverView', label: 'Servidor', summary: 'Consulta status técnico do ambiente.', impact: 'Infraestrutura, disponibilidade e monitoramento.' },
+  { key: 'teamManage', label: 'Equipe', summary: 'Gerencia convites e permissões.', impact: 'Modelo multiator e expansão white label.' }
+];
 
 // --- Dados Iniciais (Mocks) ---
 
@@ -254,12 +379,64 @@ const INITIAL_PROJECTS: Project[] = [
       { name: 'Fernanda Lima', role: 'Financeiro', influence: 'medium', preference: 'Redução de custos operacionais e ROI' }
     ],
     meetingNotes: [
-      { date: '2026-03-10', content: 'Ricardo demonstrou preocupação com a latência das APIs legadas. Sugeri cache com Redis.' },
-      { date: '2026-03-05', content: 'Definição de cronograma. Primeira entrega em 15 dias.' }
+      {
+        date: '2026-03-10',
+        title: 'Validação técnica da integração',
+        kind: 'followup',
+        content: 'Ricardo demonstrou preocupação com a latência das APIs legadas. Sugeri cache com Redis.',
+        outcome: 'Aprovado um teste controlado de desempenho antes da próxima entrega.',
+        nextStep: 'Apresentar benchmark da API e fluxo com cache.'
+      },
+      {
+        date: '2026-03-05',
+        title: 'Kickoff operacional',
+        kind: 'kickoff',
+        content: 'Definição de cronograma. Primeira entrega em 15 dias.',
+        outcome: 'Cliente aprovou marcos semanais e canal único de alinhamento.',
+        nextStep: 'Subir ambiente inicial e compartilhar plano de execução.'
+      }
     ],
     documents: [
       { id: 'doc1', name: 'Contrato Assinado - v1.pdf', type: 'contract', date: '2026-03-05', size: '1.2MB' },
       { id: 'doc2', name: 'Briefing Técnico - Global RJ.pdf', type: 'briefing', date: '2026-03-01', size: '450KB' }
+    ],
+    stage: 'delivery',
+    nextAction: 'Fechar o dashboard analítico e validar com o cliente',
+    followUpDate: '2026-03-28',
+    financials: {
+      proposalValue: 8500,
+      paymentMethod: 'Pix + transferência',
+      invoiceStatus: 'issued',
+      installments: [
+        { id: 'inst-1', label: 'Sinal', amount: 3500, dueDate: '2026-03-08', status: 'paid' },
+        { id: 'inst-2', label: 'Entrega parcial', amount: 2500, dueDate: '2026-03-28', status: 'pending' },
+        { id: 'inst-3', label: 'Entrega final', amount: 2500, dueDate: '2026-04-15', status: 'pending' }
+      ]
+    },
+    postDeliverySteps: [
+      { id: 'testimonial', title: 'Solicitar depoimento do cliente', area: 'testimonial', done: false },
+      { id: 'case', title: 'Transformar o projeto em case', area: 'case', done: false },
+      { id: 'portfolio', title: 'Atualizar portfólio e landing pessoal', area: 'portfolio', done: false },
+      { id: 'referral', title: 'Pedir indicação ou ponte comercial', area: 'referral', done: false },
+      { id: 'upsell', title: 'Abrir próxima oferta ou retenção', area: 'upsell', done: false }
+    ],
+    playbook: {
+      templateId: 'automation',
+      steps: [
+        { id: 'playbook-briefing', title: 'Consolidar briefing técnico e fontes de dados', description: 'Transformar dores do cliente em fluxo operacional validado.', done: true },
+        { id: 'playbook-stack', title: 'Definir stack, ambiente e segurança do fluxo', description: 'Fechar n8n, banco, credenciais, observabilidade e backups.', done: true },
+        { id: 'playbook-mvp', title: 'Entregar MVP automatizado com validação', description: 'Subir primeira versão do fluxo e validar com dados reais.', done: false },
+        { id: 'playbook-handover', title: 'Preparar handoff, treinamento e SOP final', description: 'Registrar operação, uso e manutenção para o cliente.', done: false }
+      ]
+    },
+    workflowSteps: [
+      { id: 'discovery', title: 'Conduzir reunião de descoberta', area: 'commercial', done: true },
+      { id: 'proposal', title: 'Enviar proposta e alinhar escopo', area: 'commercial', done: true },
+      { id: 'kickoff', title: 'Formalizar contrato e onboarding', area: 'onboarding', done: true },
+      { id: 'delivery', title: 'Executar entrega principal', area: 'delivery', done: false },
+      { id: 'validation', title: 'Validar resultado com o cliente', area: 'delivery', done: false },
+      { id: 'launch', title: 'Publicar entrega, case ou divulgação', area: 'launch', done: false },
+      { id: 'upsell', title: 'Abrir follow-up, retenção ou upsell', area: 'relationship', done: false }
     ]
   }
 ];
@@ -270,6 +447,412 @@ const INITIAL_COMPANY: CompanyProfile = {
   address: 'Rio de Janeiro, RJ',
   email: 'contato@al-profile.com',
   bankInfo: 'Pix: contato@al-profile.com'
+};
+
+const getTodayDate = () => new Date().toISOString().split('T')[0];
+
+const PROJECT_STAGE_OPTIONS: { value: ProjectStage; label: string }[] = [
+  { value: 'lead', label: 'Lead' },
+  { value: 'diagnosis', label: 'Diagnóstico' },
+  { value: 'proposal', label: 'Proposta' },
+  { value: 'onboarding', label: 'Onboarding' },
+  { value: 'delivery', label: 'Entrega' },
+  { value: 'launch', label: 'Divulgação' },
+  { value: 'relationship', label: 'Relacionamento' }
+];
+
+const MEETING_TYPE_OPTIONS: { value: MeetingType; label: string }[] = [
+  { value: 'discovery', label: 'Descoberta' },
+  { value: 'kickoff', label: 'Kickoff' },
+  { value: 'followup', label: 'Follow-up' },
+  { value: 'delivery', label: 'Entrega' },
+  { value: 'postDelivery', label: 'Pós-entrega' }
+];
+
+const DEFAULT_WORKFLOW_STEPS: Omit<ProjectWorkflowStep, 'done'>[] = [
+  { id: 'discovery', title: 'Conduzir reunião de descoberta', area: 'commercial' },
+  { id: 'proposal', title: 'Enviar proposta e alinhar escopo', area: 'commercial' },
+  { id: 'kickoff', title: 'Formalizar contrato e onboarding', area: 'onboarding' },
+  { id: 'delivery', title: 'Executar entrega principal', area: 'delivery' },
+  { id: 'validation', title: 'Validar resultado com o cliente', area: 'delivery' },
+  { id: 'launch', title: 'Publicar entrega, case ou divulgação', area: 'launch' },
+  { id: 'upsell', title: 'Abrir follow-up, retenção ou upsell', area: 'relationship' }
+];
+
+const DEFAULT_POST_DELIVERY_STEPS: Omit<ProjectPostDeliveryStep, 'done'>[] = [
+  { id: 'testimonial', title: 'Solicitar depoimento do cliente', area: 'testimonial' },
+  { id: 'case', title: 'Transformar o projeto em case', area: 'case' },
+  { id: 'portfolio', title: 'Atualizar portfólio e landing pessoal', area: 'portfolio' },
+  { id: 'referral', title: 'Pedir indicação ou ponte comercial', area: 'referral' },
+  { id: 'upsell', title: 'Abrir próxima oferta ou retenção', area: 'upsell' }
+];
+
+const PLAYBOOK_TEMPLATES: Record<PlaybookTemplateId, { label: string; description: string; steps: Omit<ProjectPlaybookStep, 'done'>[] }> = {
+  consulting: {
+    label: 'Consultoria',
+    description: 'Ideal para diagnóstico, escopo, plano de ação e entrega consultiva.',
+    steps: [
+      { id: 'playbook-discovery', title: 'Mapear dores, contexto e decisão', description: 'Consolidar entrevistas, metas e stakeholders-chave.' },
+      { id: 'playbook-proposal', title: 'Fechar proposta com escopo e critérios', description: 'Definir entregáveis, cronograma, riscos e premissas.' },
+      { id: 'playbook-diagnosis', title: 'Executar diagnóstico e recomendações', description: 'Estruturar análise, plano e prioridades do cliente.' },
+      { id: 'playbook-presentation', title: 'Apresentar plano e próximos passos', description: 'Converter a entrega em decisão prática e continuidade.' }
+    ]
+  },
+  automation: {
+    label: 'Automação',
+    description: 'Fluxo para projetos com integrações, n8n, APIs e operação recorrente.',
+    steps: [
+      { id: 'playbook-briefing', title: 'Consolidar briefing técnico e fontes de dados', description: 'Transformar dores do cliente em fluxo operacional validado.' },
+      { id: 'playbook-stack', title: 'Definir stack, ambiente e segurança do fluxo', description: 'Fechar n8n, banco, credenciais, observabilidade e backups.' },
+      { id: 'playbook-mvp', title: 'Entregar MVP automatizado com validação', description: 'Subir primeira versão do fluxo e validar com dados reais.' },
+      { id: 'playbook-handover', title: 'Preparar handoff, treinamento e SOP final', description: 'Registrar operação, uso e manutenção para o cliente.' }
+    ]
+  },
+  analytics: {
+    label: 'Dashboard',
+    description: 'Modelo para BI, indicadores, dashboards e camada analítica.',
+    steps: [
+      { id: 'playbook-kpi', title: 'Definir KPIs e regras do negócio', description: 'Fechar métricas, fontes e visão executiva com o cliente.' },
+      { id: 'playbook-modeling', title: 'Modelar dados e estrutura analítica', description: 'Organizar tabelas, dimensões, filtros e consistência.' },
+      { id: 'playbook-visuals', title: 'Construir painéis com narrativa', description: 'Montar dashboards acionáveis e fáceis de usar.' },
+      { id: 'playbook-adoption', title: 'Validar adoção e rotina de uso', description: 'Treinar cliente e consolidar cadência de leitura dos dados.' }
+    ]
+  },
+  retainer: {
+    label: 'Recorrência',
+    description: 'Para suporte contínuo, manutenção e crescimento mensal.',
+    steps: [
+      { id: 'playbook-scope', title: 'Definir escopo mensal e SLAs', description: 'Alinhar entregas recorrentes, limites e prioridades.' },
+      { id: 'playbook-backlog', title: 'Organizar backlog e agenda mensal', description: 'Separar melhorias, correções e oportunidades do período.' },
+      { id: 'playbook-review', title: 'Executar review e reportar valor', description: 'Mostrar resultado, horas, impacto e próximos passos.' },
+      { id: 'playbook-renewal', title: 'Abrir renovação, upsell e expansão', description: 'Transformar operação recorrente em conta crescente.' }
+    ]
+  }
+};
+
+const getStageFromStatus = (status?: Project['status']): ProjectStage => {
+  if (status === 'active') return 'delivery';
+  if (status === 'finished') return 'relationship';
+  return 'proposal';
+};
+
+const getDefaultNextAction = (status?: Project['status']) => {
+  if (status === 'active') return 'Fechar a próxima entrega crítica do projeto';
+  if (status === 'finished') return 'Publicar resultado, pedir depoimento e abrir upsell';
+  return 'Agendar follow-up comercial e avançar proposta';
+};
+
+const getDefaultFollowUpDate = (deadline?: string) => {
+  if (deadline && deadline !== 'A definir' && !Number.isNaN(new Date(deadline).getTime())) {
+    return deadline;
+  }
+
+  const nextWeek = new Date();
+  nextWeek.setDate(nextWeek.getDate() + 7);
+  return nextWeek.toISOString().split('T')[0];
+};
+
+const createWorkflowSteps = (status?: Project['status'], workflowSteps?: Partial<ProjectWorkflowStep>[]) => {
+  const doneByStatus = status === 'finished'
+    ? ['discovery', 'proposal', 'kickoff', 'delivery', 'validation', 'launch']
+    : status === 'active'
+      ? ['discovery', 'proposal', 'kickoff']
+      : ['discovery'];
+
+  const existing = new Map((Array.isArray(workflowSteps) ? workflowSteps : []).map(step => [step.id, step]));
+
+  return DEFAULT_WORKFLOW_STEPS.map(step => {
+    const saved = existing.get(step.id);
+    return {
+      id: step.id,
+      title: typeof saved?.title === 'string' && saved.title.trim() ? saved.title : step.title,
+      area: saved?.area && ['commercial', 'onboarding', 'delivery', 'launch', 'relationship'].includes(saved.area)
+        ? saved.area
+        : step.area,
+      done: typeof saved?.done === 'boolean' ? saved.done : doneByStatus.includes(step.id)
+    } as ProjectWorkflowStep;
+  });
+};
+
+const createPostDeliverySteps = (status?: Project['status'], postDeliverySteps?: Partial<ProjectPostDeliveryStep>[]) => {
+  const doneByStatus = status === 'finished'
+    ? ['testimonial']
+    : [];
+
+  const existing = new Map((Array.isArray(postDeliverySteps) ? postDeliverySteps : []).map(step => [step.id, step]));
+
+  return DEFAULT_POST_DELIVERY_STEPS.map(step => {
+    const saved = existing.get(step.id);
+    return {
+      id: step.id,
+      title: typeof saved?.title === 'string' && saved.title.trim() ? saved.title : step.title,
+      area: saved?.area && ['testimonial', 'case', 'portfolio', 'referral', 'upsell'].includes(saved.area)
+        ? saved.area
+        : step.area,
+      done: typeof saved?.done === 'boolean' ? saved.done : doneByStatus.includes(step.id)
+    } as ProjectPostDeliveryStep;
+  });
+};
+
+const getSuggestedPlaybookTemplate = (project?: Partial<Project>) => {
+  const projectName = typeof project?.projectName === 'string' ? project.projectName.toLowerCase() : '';
+  const brief = typeof project?.brief === 'string' ? project.brief.toLowerCase() : '';
+  const taskTitles = Array.isArray(project?.tasks)
+    ? project.tasks.map(task => typeof task?.title === 'string' ? task.title.toLowerCase() : '').join(' ')
+    : '';
+  const context = `${projectName} ${brief} ${taskTitles}`;
+
+  if (context.includes('dashboard') || context.includes('bi') || context.includes('métrica') || context.includes('analít')) {
+    return 'analytics' as PlaybookTemplateId;
+  }
+
+  if (context.includes('autom') || context.includes('n8n') || context.includes('api') || context.includes('integra')) {
+    return 'automation' as PlaybookTemplateId;
+  }
+
+  if (context.includes('suporte') || context.includes('manutenção') || context.includes('recorr')) {
+    return 'retainer' as PlaybookTemplateId;
+  }
+
+  return 'consulting' as PlaybookTemplateId;
+};
+
+const createProjectPlaybook = (project?: Partial<Project>) => {
+  const templateId = project?.playbook?.templateId && PLAYBOOK_TEMPLATES[project.playbook.templateId]
+    ? project.playbook.templateId
+    : getSuggestedPlaybookTemplate(project);
+
+  const template = PLAYBOOK_TEMPLATES[templateId];
+  const existingSteps = Array.isArray(project?.playbook?.steps) ? project.playbook.steps : [];
+  const existing = new Map(existingSteps.map(step => [step.id, step]));
+  const doneByStatus = project?.status === 'finished' ? template.steps.slice(0, 3).map(step => step.id) : project?.status === 'active' ? [template.steps[0]?.id, template.steps[1]?.id].filter(Boolean) : [];
+
+  return {
+    templateId,
+    steps: template.steps.map(step => {
+      const saved = existing.get(step.id);
+      return {
+        id: step.id,
+        title: typeof saved?.title === 'string' && saved.title.trim() ? saved.title : step.title,
+        description: typeof saved?.description === 'string' && saved.description.trim() ? saved.description : step.description,
+        done: typeof saved?.done === 'boolean' ? saved.done : doneByStatus.includes(step.id)
+      } as ProjectPlaybookStep;
+    })
+  } as ProjectPlaybook;
+};
+
+const formatProjectDate = (value?: string) => {
+  if (!value || value === 'A definir') return 'A definir';
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  return parsed.toLocaleDateString('pt-BR');
+};
+
+const getDateTimestamp = (value?: string) => {
+  if (!value || value === 'A definir') return null;
+  const parsed = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed.getTime();
+};
+
+const getShiftedDate = (days: number, baseDate?: string) => {
+  const baseTimestamp = getDateTimestamp(baseDate);
+  const base = baseTimestamp ? new Date(baseTimestamp) : new Date();
+  base.setDate(base.getDate() + days);
+  return base.toISOString().split('T')[0];
+};
+
+const getFollowUpMeta = (value?: string) => {
+  const timestamp = getDateTimestamp(value);
+  if (!timestamp) {
+    return {
+      label: 'Sem data',
+      tone: 'text-muted-foreground',
+      badge: 'bg-white/5 border-white/10',
+      rank: 4
+    };
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const diffDays = Math.round((timestamp - today.getTime()) / 86400000);
+
+  if (diffDays < 0) {
+    return {
+      label: `${Math.abs(diffDays)}d atrasado`,
+      tone: 'text-red-400',
+      badge: 'bg-red-500/10 border-red-500/20',
+      rank: 0
+    };
+  }
+
+  if (diffDays === 0) {
+    return {
+      label: 'Hoje',
+      tone: 'text-cyber-gold',
+      badge: 'bg-cyber-gold/10 border-cyber-gold/20',
+      rank: 1
+    };
+  }
+
+  if (diffDays <= 3) {
+    return {
+      label: `${diffDays}d`,
+      tone: 'text-primary',
+      badge: 'bg-primary/10 border-primary/20',
+      rank: 2
+    };
+  }
+
+  return {
+    label: `${diffDays}d`,
+    tone: 'text-cyber-emerald',
+    badge: 'bg-cyber-emerald/10 border-cyber-emerald/20',
+    rank: 3
+  };
+};
+
+const getSuggestedNextAction = (project: Project) => {
+  if (project.status === 'prospect') return 'Registrar retorno comercial e mover o lead para próxima etapa';
+  if (project.status === 'finished') return 'Pedir depoimento, publicar case e abrir oportunidade recorrente';
+  return 'Executar os combinados do follow-up e fechar a próxima entrega';
+};
+
+const getMeetingTypeStyle = (kind?: MeetingType) => {
+  if (kind === 'discovery') return 'bg-cyber-gold/10 text-cyber-gold border-cyber-gold/20';
+  if (kind === 'kickoff') return 'bg-primary/10 text-primary border-primary/20';
+  if (kind === 'delivery') return 'bg-cyber-emerald/10 text-cyber-emerald border-cyber-emerald/20';
+  if (kind === 'postDelivery') return 'bg-fuchsia-500/10 text-fuchsia-300 border-fuchsia-500/20';
+  return 'bg-white/10 text-white/80 border-white/10';
+};
+
+const getEffectiveInstallmentStatus = (installment: ProjectInstallment) => {
+  if (installment.status === 'paid') return 'paid';
+  const dueTimestamp = getDateTimestamp(installment.dueDate);
+  if (dueTimestamp && dueTimestamp < new Date().setHours(0, 0, 0, 0)) return 'overdue';
+  return installment.status;
+};
+
+const getInstallmentStatusStyle = (status: ProjectInstallment['status']) => {
+  if (status === 'paid') return 'bg-cyber-emerald/10 text-cyber-emerald border-cyber-emerald/20';
+  if (status === 'overdue') return 'bg-red-500/10 text-red-400 border-red-500/20';
+  return 'bg-cyber-gold/10 text-cyber-gold border-cyber-gold/20';
+};
+
+const getProjectCostsTotal = (project: Project) => project.costs?.reduce((acc, cost) => acc + cost.value, 0) || 0;
+
+const getProjectReceivedTotal = (project: Project) => (
+  project.financials.installments.reduce((acc, installment) => (
+    getEffectiveInstallmentStatus(installment) === 'paid' ? acc + installment.amount : acc
+  ), 0)
+);
+
+const getProjectOutstandingTotal = (project: Project) => Math.max(0, project.financials.proposalValue - getProjectReceivedTotal(project));
+
+const getProjectMarginTotal = (project: Project) => project.financials.proposalValue - getProjectCostsTotal(project);
+
+const getProjectMarginPercentage = (project: Project) => {
+  if (!project.financials.proposalValue) return 0;
+  return Math.round((getProjectMarginTotal(project) / project.financials.proposalValue) * 100);
+};
+
+const getProjectPaymentStatus = (project: Project): ProjectPaymentStatus => {
+  if (!project.financials.proposalValue) return 'draft';
+  const received = getProjectReceivedTotal(project);
+  const hasOverdue = project.financials.installments.some(installment => getEffectiveInstallmentStatus(installment) === 'overdue');
+  if (received >= project.financials.proposalValue) return 'paid';
+  if (hasOverdue) return 'overdue';
+  if (received > 0) return 'partial';
+  return 'pending';
+};
+
+const getPaymentStatusStyle = (status: ProjectPaymentStatus) => {
+  if (status === 'paid') return 'bg-cyber-emerald/10 text-cyber-emerald border-cyber-emerald/20';
+  if (status === 'partial') return 'bg-primary/10 text-primary border-primary/20';
+  if (status === 'overdue') return 'bg-red-500/10 text-red-400 border-red-500/20';
+  if (status === 'draft') return 'bg-white/10 text-muted-foreground border-white/10';
+  return 'bg-cyber-gold/10 text-cyber-gold border-cyber-gold/20';
+};
+
+const getPostDeliveryAreaLabel = (area: ProjectPostDeliveryStep['area']) => {
+  if (area === 'testimonial') return 'Depoimento';
+  if (area === 'case') return 'Case';
+  if (area === 'portfolio') return 'Portfólio';
+  if (area === 'referral') return 'Indicação';
+  return 'Upsell';
+};
+
+const getPlaybookTemplateMeta = (templateId: PlaybookTemplateId) => PLAYBOOK_TEMPLATES[templateId];
+
+const normalizeProject = (project: Partial<Project>): Project => ({
+  id: project.id || `p-${Date.now()}`,
+  clientName: project.clientName || 'Cliente sem nome',
+  projectName: project.projectName || 'Projeto sem nome',
+  brief: project.brief || '',
+  status: project.status || 'prospect',
+  value: typeof project.value === 'number' ? project.value : 0,
+  deadline: project.deadline || 'A definir',
+  accesses: Array.isArray(project.accesses) ? project.accesses : [],
+  tasks: Array.isArray(project.tasks) ? project.tasks : [],
+  costs: Array.isArray(project.costs) ? project.costs : [],
+  stakeholders: Array.isArray(project.stakeholders) ? project.stakeholders : [],
+  meetingNotes: Array.isArray(project.meetingNotes)
+    ? project.meetingNotes.map((note) => ({
+        date: typeof note?.date === 'string' && note.date.trim() ? note.date : getTodayDate(),
+        content: typeof note?.content === 'string' ? note.content : '',
+        title: typeof note?.title === 'string' ? note.title : undefined,
+        kind: typeof note?.kind === 'string' && MEETING_TYPE_OPTIONS.some(option => option.value === note.kind)
+          ? note.kind
+          : undefined,
+        outcome: typeof note?.outcome === 'string' ? note.outcome : undefined,
+        nextStep: typeof note?.nextStep === 'string' ? note.nextStep : undefined
+      }))
+    : [],
+  documents: Array.isArray(project.documents) ? project.documents : [],
+  stage: project.stage || getStageFromStatus(project.status),
+  nextAction: project.nextAction || getDefaultNextAction(project.status),
+  followUpDate: project.followUpDate || getDefaultFollowUpDate(project.deadline),
+  workflowSteps: createWorkflowSteps(project.status, project.workflowSteps),
+  financials: {
+    proposalValue: typeof project.financials?.proposalValue === 'number' ? project.financials.proposalValue : (typeof project.value === 'number' ? project.value : 0),
+    paymentMethod: typeof project.financials?.paymentMethod === 'string' ? project.financials.paymentMethod : 'A definir',
+    invoiceStatus: project.financials?.invoiceStatus === 'issued' || project.financials?.invoiceStatus === 'paid' ? project.financials.invoiceStatus : 'pending',
+    installments: Array.isArray(project.financials?.installments)
+      ? project.financials.installments.map((installment) => ({
+          id: typeof installment?.id === 'string' && installment.id.trim() ? installment.id : `inst-${Date.now()}`,
+          label: typeof installment?.label === 'string' && installment.label.trim() ? installment.label : 'Parcela',
+          amount: typeof installment?.amount === 'number' ? installment.amount : 0,
+          dueDate: typeof installment?.dueDate === 'string' && installment.dueDate.trim() ? installment.dueDate : getTodayDate(),
+          status: installment?.status === 'paid' || installment?.status === 'overdue' ? installment.status : 'pending'
+        }))
+      : []
+  },
+  postDeliverySteps: createPostDeliverySteps(project.status, project.postDeliverySteps),
+  playbook: createProjectPlaybook(project)
+});
+
+const normalizeCompany = (company?: Partial<CompanyProfile> | null): CompanyProfile => ({
+  ...INITIAL_COMPANY,
+  ...company,
+  bankInfo: company?.bankInfo || INITIAL_COMPANY.bankInfo,
+});
+
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
+
+const DEFAULT_PERMISSIONS = PERMISSION_CATALOG.reduce((acc, permission) => {
+  acc[permission.key] = false;
+  return acc;
+}, {} as CollaborationMember['permissions']);
+
+type AdminTab = 'proposals' | 'crm' | 'ops' | 'erp' | 'board' | 'dashboard' | 'company' | 'server' | 'team';
+type DashboardSubTab = 'insights' | 'finance' | 'server';
+
+const getHeaders = () => {
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  };
 };
 
 const PROJECT_COLUMNS: BoardColumn[] = [
@@ -718,7 +1301,7 @@ const BoardView = ({ board, onUpdateCell, onAddItem, onAddGroup, onDeleteItem, o
   );
 };
 
-const ServerStatsView = ({ API_BASE, getHeaders }: { API_BASE: string, getHeaders: () => any }) => {
+const ServerStatsView = () => {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -917,11 +1500,14 @@ const ServerStatsView = ({ API_BASE, getHeaders }: { API_BASE: string, getHeader
   );
 };
 
-const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead }: { 
+const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead, onOpenProject, onSnoozeFollowUp, onCompleteFollowUp }: { 
   projects: Project[], 
   workspaces: Workspace[],
   onNewWorkspace: () => void,
-  onNewLead: () => void
+  onNewLead: () => void,
+  onOpenProject: (projectId: string) => void,
+  onSnoozeFollowUp: (projectId: string, days: number) => void,
+  onCompleteFollowUp: (projectId: string) => void
 }) => {
   const activeWorkspacesCount = workspaces.length;
   const totalLeads = projects.filter(p => p.status === 'prospect').length;
@@ -970,6 +1556,54 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead }: {
   };
 
   const chartData = getMonthlyRevenue();
+  const soloRadarProjects = [...projects]
+    .filter(project => project.nextAction || project.followUpDate)
+    .sort((a, b) => {
+      const aDate = a.followUpDate ? new Date(a.followUpDate).getTime() : Number.MAX_SAFE_INTEGER;
+      const bDate = b.followUpDate ? new Date(b.followUpDate).getTime() : Number.MAX_SAFE_INTEGER;
+      return aDate - bDate;
+    })
+    .slice(0, 4);
+  const followUpProjects = [...projects]
+    .filter(project => getDateTimestamp(project.followUpDate))
+    .sort((a, b) => {
+      const aMeta = getFollowUpMeta(a.followUpDate);
+      const bMeta = getFollowUpMeta(b.followUpDate);
+      if (aMeta.rank !== bMeta.rank) return aMeta.rank - bMeta.rank;
+      return (getDateTimestamp(a.followUpDate) || Number.MAX_SAFE_INTEGER) - (getDateTimestamp(b.followUpDate) || Number.MAX_SAFE_INTEGER);
+    });
+  const overdueFollowUps = followUpProjects.filter(project => getFollowUpMeta(project.followUpDate).rank === 0).length;
+  const todayFollowUps = followUpProjects.filter(project => getFollowUpMeta(project.followUpDate).rank === 1).length;
+  const weekFollowUps = followUpProjects.filter(project => getFollowUpMeta(project.followUpDate).rank <= 2).length;
+  const followUpAgendaGroups = [
+    {
+      id: 'overdue',
+      label: 'Atrasados',
+      description: 'Prioridade máxima para evitar esfriar lead, entrega ou upsell.',
+      empty: 'Nenhum follow-up atrasado.',
+      style: 'border-red-500/20 bg-red-500/5 text-red-400',
+      projects: followUpProjects.filter(project => getFollowUpMeta(project.followUpDate).rank === 0)
+    },
+    {
+      id: 'today',
+      label: 'Hoje',
+      description: 'Contatos que precisam sair ainda hoje.',
+      empty: 'Nada vencendo hoje.',
+      style: 'border-cyber-gold/20 bg-cyber-gold/5 text-cyber-gold',
+      projects: followUpProjects.filter(project => getFollowUpMeta(project.followUpDate).rank === 1)
+    },
+    {
+      id: 'week',
+      label: 'Próximos dias',
+      description: 'Fila curta para fechar a semana com o pipeline em dia.',
+      empty: 'Sem contatos urgentes para os próximos dias.',
+      style: 'border-primary/20 bg-primary/5 text-primary',
+      projects: followUpProjects.filter(project => {
+        const rank = getFollowUpMeta(project.followUpDate).rank;
+        return rank === 2 || rank === 3;
+      }).slice(0, 6)
+    }
+  ];
 
   return (
     <div className="space-y-8">
@@ -1123,6 +1757,48 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead }: {
                 </div>
               </motion.button>
 
+              <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-3 sm:p-4 space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <h4 className="text-[8px] sm:text-[10px] font-black uppercase text-white/60 tracking-[0.2em]">Radar Solo</h4>
+                    <p className="text-[8px] sm:text-[10px] text-muted-foreground">Próximas ações críticas da operação</p>
+                  </div>
+                  <div className="px-2 py-1 rounded-full bg-primary/10 text-primary text-[8px] font-bold uppercase border border-primary/20">
+                    {soloRadarProjects.length} prioridades
+                  </div>
+                </div>
+
+                <div className="space-y-2.5">
+                  {soloRadarProjects.length > 0 ? soloRadarProjects.map(project => {
+                    const completedSteps = project.workflowSteps.filter(step => step.done).length;
+                    return (
+                      <button
+                        key={project.id}
+                        onClick={() => onOpenProject(project.id)}
+                        className="w-full text-left rounded-xl border border-white/5 bg-black/20 px-3 py-3 hover:border-primary/30 hover:bg-primary/5 transition-all"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="text-[10px] sm:text-[11px] font-bold truncate">{project.projectName}</p>
+                            <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate">{project.clientName}</p>
+                          </div>
+                          <span className="text-[8px] font-bold uppercase text-cyber-gold shrink-0">{PROJECT_STAGE_OPTIONS.find(option => option.value === project.stage)?.label || 'Pipeline'}</span>
+                        </div>
+                        <p className="mt-2 text-[9px] sm:text-[10px] text-white/80 line-clamp-2">{project.nextAction || 'Definir próxima ação do projeto'}</p>
+                        <div className="mt-2 flex items-center justify-between text-[8px] sm:text-[9px] text-muted-foreground">
+                          <span>Follow-up: {formatProjectDate(project.followUpDate)}</span>
+                          <span>{completedSteps}/{project.workflowSteps.length} etapas</span>
+                        </div>
+                      </button>
+                    );
+                  }) : (
+                    <div className="rounded-xl border border-dashed border-white/10 px-3 py-4 text-[9px] sm:text-[10px] text-muted-foreground text-center">
+                      Defina próximas ações nos projetos para alimentar o radar da semana.
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <div className="pt-5 sm:pt-6 mt-2 sm:mt-4 border-t border-white/5 relative">
                 <div className="flex justify-between items-center mb-4">
                   <div className="flex flex-col">
@@ -1156,6 +1832,126 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead }: {
           </div>
         </div>
       </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-[1.4fr_0.9fr] gap-4 sm:gap-6">
+        <div className="glass rounded-3xl border-white/5 p-4 sm:p-6 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 className="text-[10px] sm:text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
+                <Calendar size={16} className="text-primary" /> Agenda de Follow-ups
+              </h3>
+              <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-1">Contatos prioritários para manter pipeline, entrega e pós-venda sob controle.</p>
+            </div>
+            <div className="flex flex-wrap gap-2 text-[8px] sm:text-[9px] font-bold uppercase">
+              <span className="px-2.5 py-1 rounded-full border border-red-500/20 bg-red-500/10 text-red-400">{overdueFollowUps} atrasados</span>
+              <span className="px-2.5 py-1 rounded-full border border-cyber-gold/20 bg-cyber-gold/10 text-cyber-gold">{todayFollowUps} hoje</span>
+              <span className="px-2.5 py-1 rounded-full border border-primary/20 bg-primary/10 text-primary">{weekFollowUps} foco da semana</span>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {followUpProjects.length > 0 ? followUpAgendaGroups.map(group => (
+              <div key={group.id} className="rounded-2xl border border-white/5 bg-black/20 p-3 sm:p-4 space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <h4 className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-white/80">{group.label}</h4>
+                    <p className="text-[8px] sm:text-[9px] text-muted-foreground mt-1">{group.description}</p>
+                  </div>
+                  <div className={`px-2.5 py-1 rounded-full border text-[8px] font-bold uppercase ${group.style}`}>
+                    {group.projects.length}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  {group.projects.length > 0 ? group.projects.map(project => {
+                    const meta = getFollowUpMeta(project.followUpDate);
+                    const lastContact = project.meetingNotes[0]?.date;
+
+                    return (
+                      <div key={project.id} className="rounded-2xl border border-white/5 bg-white/[0.03] p-3 sm:p-4 space-y-3 hover:border-white/10 transition-all">
+                        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className="text-[11px] sm:text-sm font-bold truncate">{project.projectName}</p>
+                              <span className={`px-2 py-1 rounded-full border text-[8px] font-bold uppercase ${meta.badge} ${meta.tone}`}>{meta.label}</span>
+                            </div>
+                            <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate">{project.clientName}</p>
+                            <p className="mt-2 text-[10px] sm:text-[11px] text-white/80">{project.nextAction || 'Definir próximo contato com o cliente'}</p>
+                          </div>
+
+                          <div className="text-[8px] sm:text-[9px] text-muted-foreground space-y-1 shrink-0">
+                            <p>Follow-up: {formatProjectDate(project.followUpDate)}</p>
+                            <p>Último contato: {lastContact ? formatProjectDate(lastContact) : 'Sem registro'}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                          <div className="text-[8px] sm:text-[9px] text-muted-foreground">
+                            Fase atual: {PROJECT_STAGE_OPTIONS.find(option => option.value === project.stage)?.label || 'Pipeline'}
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            <button
+                              onClick={() => onOpenProject(project.id)}
+                              className="px-3 py-1.5 rounded-xl border border-white/10 text-[9px] sm:text-[10px] font-bold hover:bg-white/5 transition-all"
+                            >
+                              Abrir projeto
+                            </button>
+                            <button
+                              onClick={() => onSnoozeFollowUp(project.id, 2)}
+                              className="px-3 py-1.5 rounded-xl border border-primary/20 bg-primary/10 text-primary text-[9px] sm:text-[10px] font-bold hover:bg-primary/15 transition-all"
+                            >
+                              +2 dias
+                            </button>
+                            <button
+                              onClick={() => onCompleteFollowUp(project.id)}
+                              className="px-3 py-1.5 rounded-xl border border-cyber-emerald/20 bg-cyber-emerald/10 text-cyber-emerald text-[9px] sm:text-[10px] font-bold hover:bg-cyber-emerald/15 transition-all"
+                            >
+                              Follow-up feito
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }) : (
+                    <div className="rounded-2xl border border-dashed border-white/10 p-4 text-center text-[10px] sm:text-xs text-muted-foreground">
+                      {group.empty}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )) : (
+              <div className="rounded-2xl border border-dashed border-white/10 p-5 text-center text-[10px] sm:text-xs text-muted-foreground">
+                Cadastre datas de follow-up nos projetos para montar sua fila de contatos.
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="glass rounded-3xl border-white/5 p-4 sm:p-6 space-y-4">
+          <div>
+            <h3 className="text-[10px] sm:text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
+              <AlertCircle size={16} className="text-cyber-gold" /> Brechas Detectadas
+            </h3>
+            <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-1">Pontos que mais costumam gerar perda de contexto quando você toca tudo sozinho.</p>
+          </div>
+
+          <div className="space-y-3">
+            {[
+              overdueFollowUps > 0 ? `${overdueFollowUps} follow-up(s) atrasado(s) podem esfriar lead, projeto ou upsell.` : 'Nenhum follow-up atrasado no momento.',
+              projects.filter(project => project.tasks.length === 0).length > 0
+                ? `${projects.filter(project => project.tasks.length === 0).length} projeto(s) sem tarefas detalhadas ainda.`
+                : 'Todos os projetos têm ao menos uma tarefa registrada.',
+              projects.filter(project => !project.nextAction.trim()).length > 0
+                ? `${projects.filter(project => !project.nextAction.trim()).length} projeto(s) sem próxima ação definida.`
+                : 'Todos os projetos têm próxima ação definida.'
+            ].map((insight, index) => (
+              <div key={index} className="rounded-2xl border border-white/5 bg-white/[0.03] px-3 py-3 text-[10px] sm:text-xs text-white/85">
+                {insight}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
@@ -1163,12 +1959,23 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead }: {
 // --- Componentes ---
 
 export default function AdminDashboard() {
-  const { user, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState<'proposals' | 'crm' | 'ops' | 'erp' | 'board' | 'dashboard' | 'company' | 'server'>('dashboard');
-  const [dashboardSubTab, setDashboardSubTab] = useState<'insights' | 'finance' | 'server'>('insights');
+  const { user, logout, updateUser } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
+  const [dashboardSubTab, setDashboardSubTab] = useState<DashboardSubTab>('insights');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [isAcceptingInvite, setIsAcceptingInvite] = useState(false);
+  const [inviteStatus, setInviteStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [collaborators, setCollaborators] = useState<CollaborationMember[]>([]);
+  const [isLoadingCollaborators, setIsLoadingCollaborators] = useState(false);
+  const [inviteForm, setInviteForm] = useState({
+    email: '',
+    role: 'viewer' as CollaborationMember['role'],
+    note: ''
+  });
   
   const [workspaces, setWorkspaces] = useState<Workspace[]>(WORKSPACES);
   const [activeWorkspaceId, setActiveWorkspaceId] = useState(WORKSPACES[1].id); // Default to Operations
@@ -1181,47 +1988,179 @@ export default function AdminDashboard() {
   // Estados para CRM/Ops
   const [projects, setProjects] = useState<Project[]>(INITIAL_PROJECTS);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [meetingForm, setMeetingForm] = useState({
+    date: getTodayDate(),
+    kind: 'followup' as MeetingType,
+    title: '',
+    content: '',
+    outcome: '',
+    nextStep: '',
+    followUpDate: ''
+  });
+  const [financeForm, setFinanceForm] = useState({
+    paymentMethod: 'Pix',
+    invoiceStatus: 'pending' as ProjectFinancials['invoiceStatus'],
+    installmentLabel: 'Sinal',
+    installmentAmount: '',
+    installmentDueDate: getTodayDate()
+  });
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<Project['status'] | 'all'>('all');
   
   // Estados para Empresa
   const [company, setCompany] = useState<CompanyProfile>(INITIAL_COMPANY);
   const [showPreview, setShowPreview] = useState(false);
+  const inviteToken = new URLSearchParams(location.search).get('invite');
+  const access = user?.adminAccess;
+  const permissions = access?.permissions || DEFAULT_PERMISSIONS;
+  const isOwner = !!access?.isOwner;
+  const canAccessAdmin = !!access?.canAccessAdmin;
+  const canViewDashboard = permissions.dashboardView;
+  const canViewCRM = permissions.crmView;
+  const canViewProjects = permissions.projectsView;
+  const canEditProjects = permissions.projectsEdit;
+  const canViewWorkspaces = permissions.workspacesView;
+  const canEditWorkspaces = permissions.workspacesEdit;
+  const canViewCompany = permissions.companyView;
+  const canEditCompany = permissions.companyEdit;
+  const canViewFinance = permissions.financeView;
+  const canViewServer = permissions.serverView;
+  const canManageTeam = isOwner && permissions.teamManage;
+  const availableTabs = useMemo<Record<AdminTab, boolean>>(() => ({
+    dashboard: canViewDashboard,
+    proposals: canEditProjects,
+    crm: canViewCRM,
+    ops: canViewProjects,
+    erp: canViewFinance,
+    board: canViewWorkspaces,
+    company: canViewCompany,
+    server: canViewServer,
+    team: canManageTeam
+  }), [canEditProjects, canManageTeam, canViewCRM, canViewCompany, canViewDashboard, canViewFinance, canViewProjects, canViewServer, canViewWorkspaces]);
+  const availableDashboardSubTabs = useMemo<Record<DashboardSubTab, boolean>>(() => ({
+    insights: canViewDashboard,
+    finance: canViewFinance,
+    server: canViewServer
+  }), [canViewDashboard, canViewFinance, canViewServer]);
 
-  // --- API Integration ---
-  const API_BASE = import.meta.env.VITE_API_URL || '/api';
-  const getHeaders = () => {
-    const token = localStorage.getItem('token');
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+  const openFirstAvailableTab = useCallback(() => {
+    const orderedTabs: AdminTab[] = ['dashboard', 'crm', 'ops', 'board', 'company', 'erp', 'team', 'proposals', 'server'];
+    const nextTab = orderedTabs.find((tab) => availableTabs[tab]);
+    if (nextTab) {
+      setActiveTab(nextTab);
+    }
+  }, [availableTabs]);
+
+  const loadCollaborators = useCallback(async () => {
+    if (!canManageTeam) {
+      setCollaborators([]);
+      return;
+    }
+
+    setIsLoadingCollaborators(true);
+    try {
+      const res = await fetch(`${API_BASE}/collaborations`, { headers: getHeaders() });
+      if (!res.ok) {
+        throw new Error('Erro ao buscar colaboradores');
+      }
+      const data = await res.json();
+      setCollaborators(Array.isArray(data.collaborators) ? data.collaborators : []);
+    } catch (error) {
+      console.error('Erro ao carregar colaboradores:', error);
+      toast.error('Erro ao carregar equipe colaborativa');
+    } finally {
+      setIsLoadingCollaborators(false);
+    }
+  }, [canManageTeam]);
+
+  useEffect(() => {
+    if (!canAccessAdmin || !inviteToken) return;
+    navigate('/admin', { replace: true });
+  }, [canAccessAdmin, inviteToken, navigate]);
+
+  useEffect(() => {
+    if (!inviteToken || canAccessAdmin) return;
+
+    const acceptInvite = async () => {
+      setIsAcceptingInvite(true);
+      setInviteStatus(null);
+      try {
+        const res = await fetch(`${API_BASE}/collaborations/accept`, {
+          method: 'POST',
+          headers: getHeaders(),
+          body: JSON.stringify({ token: inviteToken })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || 'Não foi possível validar o convite');
+        }
+
+        updateUser(data.user);
+        setInviteStatus({ type: 'success', message: data.message || 'Convite aceito com sucesso' });
+        toast.success(data.message || 'Convite aceito com sucesso');
+        navigate('/admin', { replace: true });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Não foi possível validar o convite';
+        setInviteStatus({ type: 'error', message });
+        toast.error(message);
+      } finally {
+        setIsAcceptingInvite(false);
+      }
     };
-  };
+
+    acceptInvite();
+  }, [canAccessAdmin, inviteToken, navigate, updateUser]);
+
+  useEffect(() => {
+    if (!canAccessAdmin) return;
+    if (!availableTabs[activeTab]) {
+      openFirstAvailableTab();
+    }
+  }, [activeTab, availableTabs, canAccessAdmin, openFirstAvailableTab]);
+
+  useEffect(() => {
+    if (!availableDashboardSubTabs[dashboardSubTab]) {
+      if (canViewDashboard) {
+        setDashboardSubTab('insights');
+      } else if (canViewFinance) {
+        setDashboardSubTab('finance');
+      } else if (canViewServer) {
+        setDashboardSubTab('server');
+      }
+    }
+  }, [availableDashboardSubTabs, dashboardSubTab, canViewDashboard, canViewFinance, canViewServer]);
 
   // Load Data from MongoDB
   useEffect(() => {
+    if (!canAccessAdmin) {
+      setIsLoading(false);
+      return;
+    }
+
     const loadAllData = async () => {
       setIsLoading(true);
       try {
         const [wsRes, projRes, compRes] = await Promise.all([
-          fetch(`${API_BASE}/workspaces`, { headers: getHeaders() }),
-          fetch(`${API_BASE}/projects`, { headers: getHeaders() }),
-          fetch(`${API_BASE}/company`, { headers: getHeaders() })
+          canViewWorkspaces ? fetch(`${API_BASE}/workspaces`, { headers: getHeaders() }) : Promise.resolve(null),
+          (canViewProjects || canViewCRM || canViewFinance || canEditProjects) ? fetch(`${API_BASE}/projects`, { headers: getHeaders() }) : Promise.resolve(null),
+          canViewCompany ? fetch(`${API_BASE}/company`, { headers: getHeaders() }) : Promise.resolve(null)
         ]);
 
-        if (wsRes.ok) {
+        if (wsRes?.ok) {
           const wsData = await wsRes.json();
           if (wsData.length > 0) setWorkspaces(wsData);
         }
 
-        if (projRes.ok) {
+        if (projRes?.ok) {
           const projData = await projRes.json();
-          if (projData.length > 0) setProjects(projData);
+          if (projData.length > 0) {
+            setProjects(projData.map(normalizeProject));
+          }
         }
 
-        if (compRes.ok) {
+        if (compRes?.ok) {
           const compData = await compRes.json();
-          if (compData) setCompany(compData);
+          if (compData) setCompany(normalizeCompany(compData));
         }
       } catch (error) {
         console.error('Erro ao carregar dados do MongoDB:', error);
@@ -1232,11 +2171,11 @@ export default function AdminDashboard() {
     };
 
     loadAllData();
-  }, []);
+  }, [canAccessAdmin, canEditProjects, canViewCRM, canViewCompany, canViewFinance, canViewProjects, canViewWorkspaces]);
 
   // Sync Workspaces
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading || !canEditWorkspaces) return;
     const syncWorkspaces = async () => {
       setIsSyncing(true);
       try {
@@ -1258,11 +2197,11 @@ export default function AdminDashboard() {
 
     const timeout = setTimeout(syncWorkspaces, 2000);
     return () => clearTimeout(timeout);
-  }, [workspaces]);
+  }, [canEditWorkspaces, isLoading, workspaces]);
 
   // Sync Projects
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading || !canEditProjects) return;
     const syncProjects = async () => {
       try {
         await Promise.all(projects.map(p => 
@@ -1279,11 +2218,16 @@ export default function AdminDashboard() {
 
     const timeout = setTimeout(syncProjects, 2000);
     return () => clearTimeout(timeout);
-  }, [projects]);
+  }, [canEditProjects, isLoading, projects]);
+
+  useEffect(() => {
+    if (isLoading) return;
+    localStorage.setItem('al_projects', JSON.stringify(projects.map(normalizeProject)));
+  }, [isLoading, projects]);
 
   // Sync Company
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading || !canEditCompany) return;
     const syncCompany = async () => {
       try {
         await fetch(`${API_BASE}/company`, {
@@ -1298,13 +2242,71 @@ export default function AdminDashboard() {
 
     const timeout = setTimeout(syncCompany, 2000);
     return () => clearTimeout(timeout);
-  }, [company]);
+  }, [canEditCompany, company, isLoading]);
+
+  useEffect(() => {
+    if (!canManageTeam) return;
+    loadCollaborators();
+  }, [canManageTeam, loadCollaborators]);
+
+  useEffect(() => {
+    if (!selectedProject) return;
+    const updatedProject = projects.find(project => project.id === selectedProject.id);
+    if (!updatedProject) {
+      setSelectedProject(null);
+      return;
+    }
+    if (updatedProject !== selectedProject) {
+      setSelectedProject(updatedProject);
+    }
+  }, [projects, selectedProject]);
+
+  useEffect(() => {
+    setMeetingForm({
+      date: getTodayDate(),
+      kind: 'followup',
+      title: '',
+      content: '',
+      outcome: '',
+      nextStep: '',
+      followUpDate: selectedProject?.followUpDate || ''
+    });
+  }, [selectedProject?.id, selectedProject?.followUpDate]);
+
+  useEffect(() => {
+    setFinanceForm({
+      paymentMethod: selectedProject?.financials.paymentMethod || 'Pix',
+      invoiceStatus: selectedProject?.financials.invoiceStatus || 'pending',
+      installmentLabel: 'Sinal',
+      installmentAmount: '',
+      installmentDueDate: selectedProject?.followUpDate || getTodayDate()
+    });
+  }, [selectedProject?.id, selectedProject?.financials.paymentMethod, selectedProject?.financials.invoiceStatus, selectedProject?.followUpDate]);
+
+  const ensureWorkspaceEdit = () => {
+    if (canEditWorkspaces) return true;
+    toast.error('Seu acesso permite visualizar workspaces, mas não editar.');
+    return false;
+  };
+
+  const ensureProjectEdit = () => {
+    if (canEditProjects) return true;
+    toast.error('Seu perfil pode acompanhar projetos, mas não alterar dados.');
+    return false;
+  };
+
+  const ensureCompanyEdit = () => {
+    if (canEditCompany) return true;
+    toast.error('Seu acesso à empresa está em modo leitura.');
+    return false;
+  };
 
   const activeWorkspace = workspaces.find(w => w.id === activeWorkspaceId) || workspaces[0] || { id: '', name: '', icon: 'Layout', boards: [] };
   const activeBoard = activeWorkspace.boards?.find(b => b.id === activeBoardId) || activeWorkspace.boards?.[0] || { id: '', name: '', description: '', columns: [], groups: [] };
 
   // Edição Inline do Board
   const updateCellValue = (boardId: string, groupId: string, itemId: string, columnId: string, value: any) => {
+    if (!ensureWorkspaceEdit()) return;
     setWorkspaces(prev => prev.map(ws => ({
       ...ws,
       boards: ws.boards.map(b => b.id === boardId ? {
@@ -1321,6 +2323,7 @@ export default function AdminDashboard() {
   };
 
   const addNewItem = (boardId: string, groupId: string) => {
+    if (!ensureWorkspaceEdit()) return;
     const newItem: BoardItem = {
       id: `i-${Date.now()}`,
       name: 'Novo Item',
@@ -1339,6 +2342,7 @@ export default function AdminDashboard() {
   };
 
   const addNewGroup = (boardId: string) => {
+    if (!ensureWorkspaceEdit()) return;
     const newGroup: BoardGroup = {
       id: `g-${Date.now()}`,
       title: 'Novo Grupo',
@@ -1355,6 +2359,7 @@ export default function AdminDashboard() {
   };
 
   const deleteWorkspace = async (id: string) => {
+    if (!ensureWorkspaceEdit()) return;
     if (!window.confirm('Tem certeza que deseja remover este workspace?')) return;
     try {
       const res = await fetch(`${API_BASE}/workspaces/${id}`, {
@@ -1377,6 +2382,7 @@ export default function AdminDashboard() {
   };
 
   const deleteBoard = async (workspaceId: string, boardId: string) => {
+    if (!ensureWorkspaceEdit()) return;
     if (!window.confirm('Tem certeza que deseja remover este quadro?')) return;
     
     const oldWorkspaces = [...workspaces];
@@ -1416,6 +2422,7 @@ export default function AdminDashboard() {
   };
 
   const deleteProject = async (id: string) => {
+    if (!ensureProjectEdit()) return;
     if (!window.confirm('Tem certeza que deseja remover este projeto?')) return;
     try {
       const res = await fetch(`${API_BASE}/projects/${id}`, {
@@ -1433,6 +2440,7 @@ export default function AdminDashboard() {
   };
 
   const deleteBoardItem = async (boardId: string, groupId: string, itemId: string) => {
+    if (!ensureWorkspaceEdit()) return;
     if (!window.confirm('Tem certeza que deseja remover este item?')) return;
     
     const oldWorkspaces = [...workspaces];
@@ -1468,6 +2476,7 @@ export default function AdminDashboard() {
   };
 
   const deleteBoardGroup = async (boardId: string, groupId: string) => {
+    if (!ensureWorkspaceEdit()) return;
     if (!window.confirm('Remover este grupo e todos os seus itens?')) return;
     
     const oldWorkspaces = [...workspaces];
@@ -1499,6 +2508,90 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleInviteCollaborator = async () => {
+    if (!canManageTeam) {
+      toast.error('Somente o owner pode gerenciar convites.');
+      return;
+    }
+
+    if (!inviteForm.email.trim()) {
+      toast.error('Informe o e-mail do colaborador.');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/collaborations/invite`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({
+          email: inviteForm.email.trim(),
+          role: inviteForm.role,
+          note: inviteForm.note.trim() || undefined
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Erro ao criar convite');
+      }
+
+      toast.success(data.message || 'Convite aprovado e pronto para compartilhamento');
+      setInviteForm({ email: '', role: 'viewer', note: '' });
+      loadCollaborators();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Erro ao criar convite');
+    }
+  };
+
+  const updateCollaborator = async (
+    collaboratorId: string,
+    payload: Partial<Pick<CollaborationMember, 'role' | 'note' | 'permissions' | 'status'>>
+  ) => {
+    if (!canManageTeam) {
+      toast.error('Somente o owner pode alterar permissões.');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/collaborations/${collaboratorId}`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Erro ao atualizar colaborador');
+      }
+
+      setCollaborators(prev => prev.map(item => item.id === data.collaboration.id ? data.collaboration : item));
+      toast.success('Permissões atualizadas.');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Erro ao atualizar colaborador');
+    }
+  };
+
+  const revokeCollaborator = async (collaboratorId: string) => {
+    if (!canManageTeam) {
+      toast.error('Somente o owner pode revogar acessos.');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/collaborations/${collaboratorId}`, {
+        method: 'DELETE',
+        headers: getHeaders()
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Erro ao revogar colaborador');
+      }
+
+      toast.success(data.message || 'Acesso revogado.');
+      loadCollaborators();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Erro ao revogar colaborador');
+    }
+  };
+
   // Funções de Utilidade
   const maskCNPJ = (value: string) => {
     return value
@@ -1512,6 +2605,7 @@ export default function AdminDashboard() {
 
   // Motor de IA (Simulado com Lógica de Palavras-Chave)
   const analyzeBriefing = () => {
+    if (!ensureProjectEdit()) return;
     if (!clientData.brief.trim()) {
       toast.error("Insira um briefing para analisar.");
       return;
@@ -1557,6 +2651,7 @@ export default function AdminDashboard() {
 
   // Salvar Proposta como Projeto
   const saveAsProject = (type: 'full' | 'fast' = 'full') => {
+    if (!ensureProjectEdit()) return;
     if (!clientData.name) {
       toast.error("Preencha ao menos o nome do cliente.");
       return;
@@ -1601,7 +2696,34 @@ export default function AdminDashboard() {
           date: new Date().toISOString().split('T')[0], 
           size: 'Gerando...' 
         }
-      ]
+      ],
+      stage: 'lead',
+      nextAction: type === 'fast' ? 'Conduzir a primeira reunião e registrar dores do cliente' : 'Enviar proposta comercial e alinhar escopo',
+      followUpDate: getTodayDate(),
+      workflowSteps: createWorkflowSteps('prospect'),
+      financials: {
+        proposalValue: totalValue,
+        paymentMethod: 'Pix',
+        invoiceStatus: 'pending',
+        installments: totalValue > 0 ? [{
+          id: `inst-${Date.now()}`,
+          label: type === 'fast' ? 'Sinal da descoberta' : 'Sinal de entrada',
+          amount: totalValue,
+          dueDate: getTodayDate(),
+          status: 'pending'
+        }] : []
+      },
+      postDeliverySteps: createPostDeliverySteps('prospect'),
+      playbook: createProjectPlaybook({
+        status: 'prospect',
+        projectName: clientData.projectTitle,
+        brief: clientData.brief,
+        tasks: selectedModules.length > 0 ? selectedModules.map((id, i) => ({
+          id: `playbook-task-${i}`,
+          title: AVAILABLE_MODULES.find(m => m.id === id)?.name || 'Nova Tarefa',
+          status: 'todo'
+        })) : []
+      })
     };
 
     setProjects(prev => {
@@ -1614,16 +2736,266 @@ export default function AdminDashboard() {
   };
 
   const updateProjectStatus = (id: string, newStatus: Project['status']) => {
-    setProjects(prev => prev.map(p => p.id === id ? { ...p, status: newStatus } : p));
+    if (!ensureProjectEdit()) return;
+    setProjects(prev => prev.map(p => p.id === id ? {
+      ...p,
+      status: newStatus,
+      stage: p.stage === getStageFromStatus(p.status) ? getStageFromStatus(newStatus) : p.stage,
+      workflowSteps: createWorkflowSteps(newStatus, p.workflowSteps),
+      postDeliverySteps: createPostDeliverySteps(newStatus, p.postDeliverySteps),
+      playbook: createProjectPlaybook({ ...p, status: newStatus })
+    } : p));
     toast.success(`Status do projeto atualizado para ${newStatus}`);
   };
 
+  const updateProjectPlanning = (projectId: string, fields: Partial<Pick<Project, 'stage' | 'nextAction' | 'followUpDate'>>) => {
+    if (!ensureProjectEdit()) return;
+    setProjects(prev => prev.map(project => project.id === projectId ? { ...project, ...fields } : project));
+  };
+
+  const toggleWorkflowStep = (projectId: string, stepId: string) => {
+    if (!ensureProjectEdit()) return;
+    setProjects(prev => prev.map(project => {
+      if (project.id !== projectId) return project;
+
+      return {
+        ...project,
+        workflowSteps: project.workflowSteps.map(step => step.id === stepId ? { ...step, done: !step.done } : step)
+      };
+    }));
+  };
+
+  const updateProjectPlaybookTemplate = (projectId: string, templateId: PlaybookTemplateId) => {
+    if (!ensureProjectEdit()) return;
+    setProjects(prev => prev.map(project => (
+      project.id === projectId
+        ? {
+            ...project,
+            playbook: createProjectPlaybook({
+              ...project,
+              playbook: {
+                templateId,
+                steps: []
+              }
+            })
+          }
+        : project
+    )));
+
+    toast.success('Playbook aplicado ao projeto.');
+  };
+
+  const toggleProjectPlaybookStep = (projectId: string, stepId: string) => {
+    if (!ensureProjectEdit()) return;
+    setProjects(prev => prev.map(project => {
+      if (project.id !== projectId) return project;
+
+      const steps = project.playbook.steps.map(step => step.id === stepId ? { ...step, done: !step.done } : step);
+      const nextPendingStep = steps.find(step => !step.done);
+
+      return {
+        ...project,
+        playbook: {
+          ...project.playbook,
+          steps
+        },
+        nextAction: nextPendingStep?.title || project.nextAction
+      };
+    }));
+  };
+
+  const snoozeFollowUp = (projectId: string, days: number) => {
+    if (!ensureProjectEdit()) return;
+    const nextDate = getShiftedDate(days);
+
+    setProjects(prev => prev.map(project => {
+      if (project.id !== projectId) return project;
+
+      return {
+        ...project,
+        followUpDate: nextDate,
+        meetingNotes: [
+          {
+            date: getTodayDate(),
+            content: `Follow-up reagendado para ${formatProjectDate(nextDate)}.`
+          },
+          ...project.meetingNotes
+        ]
+      };
+    }));
+
+    toast.success(`Follow-up reagendado para ${formatProjectDate(nextDate)}.`);
+  };
+
+  const completeFollowUp = (projectId: string) => {
+    if (!ensureProjectEdit()) return;
+    const nextDate = getShiftedDate(7);
+
+    setProjects(prev => prev.map(project => {
+      if (project.id !== projectId) return project;
+
+      return {
+        ...project,
+        followUpDate: nextDate,
+        nextAction: getSuggestedNextAction(project),
+        meetingNotes: [
+          {
+            date: getTodayDate(),
+            content: `Follow-up concluído. Próximo ciclo agendado para ${formatProjectDate(nextDate)}.`
+          },
+          ...project.meetingNotes
+        ]
+      };
+    }));
+
+    toast.success('Follow-up registrado e próximo ciclo planejado.');
+  };
+
+  const registerMeetingNote = (projectId: string) => {
+    if (!ensureProjectEdit()) return;
+    if (!meetingForm.title.trim() || !meetingForm.content.trim()) {
+      toast.error('Preencha pelo menos o título e o resumo da reunião.');
+      return;
+    }
+
+    const nextFollowUpDate = meetingForm.followUpDate.trim();
+    const note: ProjectMeetingNote = {
+      date: meetingForm.date || getTodayDate(),
+      title: meetingForm.title.trim(),
+      kind: meetingForm.kind,
+      content: meetingForm.content.trim(),
+      outcome: meetingForm.outcome.trim() || undefined,
+      nextStep: meetingForm.nextStep.trim() || undefined
+    };
+
+    setProjects(prev => prev.map(project => {
+      if (project.id !== projectId) return project;
+
+      return {
+        ...project,
+        meetingNotes: [note, ...project.meetingNotes],
+        nextAction: meetingForm.nextStep.trim() || project.nextAction,
+        followUpDate: nextFollowUpDate || project.followUpDate
+      };
+    }));
+
+    setMeetingForm({
+      date: getTodayDate(),
+      kind: 'followup',
+      title: '',
+      content: '',
+      outcome: '',
+      nextStep: '',
+      followUpDate: nextFollowUpDate
+    });
+
+    toast.success('Reunião registrada no histórico do projeto.');
+  };
+
+  const updateProjectFinancials = (projectId: string, fields: Partial<ProjectFinancials>) => {
+    if (!ensureProjectEdit()) return;
+    setProjects(prev => prev.map(project => {
+      if (project.id !== projectId) return project;
+
+      const nextFinancials = {
+        ...project.financials,
+        ...fields
+      };
+
+      return {
+        ...project,
+        value: typeof fields.proposalValue === 'number' ? fields.proposalValue : project.value,
+        financials: nextFinancials
+      };
+    }));
+  };
+
+  const addProjectInstallment = (projectId: string) => {
+    if (!ensureProjectEdit()) return;
+    const amount = Number(financeForm.installmentAmount);
+
+    if (!financeForm.installmentLabel.trim() || !financeForm.installmentDueDate || Number.isNaN(amount) || amount <= 0) {
+      toast.error('Preencha descrição, valor e vencimento da parcela.');
+      return;
+    }
+
+    setProjects(prev => prev.map(project => {
+      if (project.id !== projectId) return project;
+
+      return {
+        ...project,
+        financials: {
+          ...project.financials,
+          paymentMethod: financeForm.paymentMethod,
+          invoiceStatus: financeForm.invoiceStatus,
+          installments: [
+            ...project.financials.installments,
+            {
+              id: `inst-${Date.now()}`,
+              label: financeForm.installmentLabel.trim(),
+              amount,
+              dueDate: financeForm.installmentDueDate,
+              status: 'pending'
+            }
+          ]
+        }
+      };
+    }));
+
+    setFinanceForm(prev => ({
+      ...prev,
+      installmentLabel: 'Parcela complementar',
+      installmentAmount: '',
+      installmentDueDate: getShiftedDate(15, prev.installmentDueDate)
+    }));
+
+    toast.success('Parcela adicionada ao projeto.');
+  };
+
+  const updateInstallmentStatus = (projectId: string, installmentId: string, status: ProjectInstallment['status']) => {
+    if (!ensureProjectEdit()) return;
+    setProjects(prev => prev.map(project => {
+      if (project.id !== projectId) return project;
+
+      return {
+        ...project,
+        financials: {
+          ...project.financials,
+          paymentMethod: financeForm.paymentMethod,
+          invoiceStatus: financeForm.invoiceStatus,
+          installments: project.financials.installments.map(installment => installment.id === installmentId ? { ...installment, status } : installment)
+        }
+      };
+    }));
+
+    toast.success(status === 'paid' ? 'Parcela marcada como recebida.' : 'Status da parcela atualizado.');
+  };
+
+  const togglePostDeliveryStep = (projectId: string, stepId: string) => {
+    if (!ensureProjectEdit()) return;
+    setProjects(prev => prev.map(project => {
+      if (project.id !== projectId) return project;
+
+      const updatedSteps = project.postDeliverySteps.map(step => step.id === stepId ? { ...step, done: !step.done } : step);
+      const completedSteps = updatedSteps.filter(step => step.done).length;
+
+      return {
+        ...project,
+        postDeliverySteps: updatedSteps,
+        nextAction: completedSteps === updatedSteps.length
+          ? 'Revisar oportunidades recorrentes e manter relacionamento ativo'
+          : project.nextAction
+      };
+    }));
+  };
+
   const updateTaskStatus = (projectId: string, taskId: string, newStatus: ProjectTask['status']) => {
+    if (!ensureProjectEdit()) return;
     setProjects(prev => prev.map(p => {
       if (p.id === projectId) {
         return {
           ...p,
-          tasks: p.tasks.map(t => t.id === taskId ? { ...t, status: newStatus } : t)
+          tasks: (p.tasks || []).map(t => t.id === taskId ? { ...t, status: newStatus } : t)
         };
       }
       return p;
@@ -1632,11 +3004,12 @@ export default function AdminDashboard() {
   };
 
   const updateTaskDates = (projectId: string, taskId: string, field: 'startDate' | 'endDate', value: string) => {
+    if (!ensureProjectEdit()) return;
     setProjects(prev => prev.map(p => {
       if (p.id === projectId) {
         return {
           ...p,
-          tasks: p.tasks.map(t => t.id === taskId ? { ...t, [field]: value } : t)
+          tasks: (p.tasks || []).map(t => t.id === taskId ? { ...t, [field]: value } : t)
         };
       }
       return p;
@@ -1649,6 +3022,7 @@ export default function AdminDashboard() {
   }, 0);
 
   const toggleModule = (id: string) => {
+    if (!ensureProjectEdit()) return;
     setSelectedModules(prev => 
       prev.includes(id) ? prev.filter(m => m !== id) : [...prev, id]
     );
@@ -1701,81 +3075,103 @@ export default function AdminDashboard() {
             <p className="px-3 text-[10px] font-bold text-muted-foreground uppercase mb-3 tracking-widest">Acesso Rápido</p>
             
             <div className="space-y-1">
-              <button 
-                onClick={() => {
-                  setActiveTab('dashboard');
-                  setIsSidebarOpen(false);
-                }} 
-                className={`w-full flex items-center justify-between px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-all text-[11px] sm:text-sm ${activeTab === 'dashboard' ? 'bg-primary/10 text-primary border border-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
-              >
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <Activity size={16} className="sm:size-[18px]" /> 
-                  <span>Dashboards</span>
-                </div>
-                <ChevronRight size={14} className={`transition-transform duration-300 ${activeTab === 'dashboard' ? 'rotate-90' : ''}`} />
-              </button>
-
-              <AnimatePresence>
-                {activeTab === 'dashboard' && (
-                  <motion.div 
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    className="overflow-hidden pl-9 space-y-1"
+              {availableTabs.dashboard && (
+                <>
+                  <button 
+                    onClick={() => {
+                      setActiveTab('dashboard');
+                      setIsSidebarOpen(false);
+                    }} 
+                    className={`w-full flex items-center justify-between px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-all text-[11px] sm:text-sm ${activeTab === 'dashboard' ? 'bg-primary/10 text-primary border border-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
                   >
-                    {[
-                      { id: 'insights', label: 'Insights de Negócio', icon: Activity },
-                      { id: 'finance', label: 'Financeiro (ERP)', icon: PieChart },
-                      { id: 'server', label: 'Status do Servidor', icon: Server },
-                    ].map((sub) => (
-                      <button
-                        key={sub.id}
-                        onClick={() => {
-                          setDashboardSubTab(sub.id as any);
-                          setIsSidebarOpen(false);
-                        }}
-                        className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-md text-[11px] font-medium transition-all ${dashboardSubTab === sub.id ? 'text-white bg-white/5' : 'text-muted-foreground hover:text-white hover:bg-white/5'}`}
-                      >
-                        <sub.icon size={12} />
-                        {sub.label}
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <Activity size={16} className="sm:size-[18px]" /> 
+                      <span>Dashboards</span>
+                    </div>
+                    <ChevronRight size={14} className={`transition-transform duration-300 ${activeTab === 'dashboard' ? 'rotate-90' : ''}`} />
+                  </button>
 
-            <button 
-              onClick={() => {
-                setActiveTab('proposals');
-                setIsSidebarOpen(false);
-              }} 
-              className={`w-full flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-all text-[11px] sm:text-sm mt-1 ${activeTab === 'proposals' ? 'bg-primary/10 text-primary border border-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
-            >
-              <FileSignature size={16} className="sm:size-[18px]" /> Propostas & Vendas
-            </button>
-            <button 
-              onClick={() => {
-                setActiveTab('crm');
-                setIsSidebarOpen(false);
-              }} 
-              className={`w-full flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-all text-[11px] sm:text-sm ${activeTab === 'crm' ? 'bg-primary/10 text-primary border border-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
-            >
-              <Users size={16} className="sm:size-[18px]" /> CRM & Clientes
-            </button>
-            <button 
-              onClick={() => {
-                setActiveTab('company');
-                setIsSidebarOpen(false);
-              }} 
-              className={`w-full flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-all text-[11px] sm:text-sm ${activeTab === 'company' ? 'bg-primary/10 text-primary border border-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
-            >
-              <Building size={16} className="sm:size-[18px]" /> Perfil da Empresa
-            </button>
+                  <AnimatePresence>
+                    {activeTab === 'dashboard' && (
+                      <motion.div 
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden pl-9 space-y-1"
+                      >
+                        {[
+                          { id: 'insights', label: 'Insights de Negócio', icon: Activity, allowed: availableDashboardSubTabs.insights },
+                          { id: 'finance', label: 'Financeiro (ERP)', icon: PieChart, allowed: availableDashboardSubTabs.finance },
+                          { id: 'server', label: 'Status do Servidor', icon: Server, allowed: availableDashboardSubTabs.server },
+                        ].filter((sub) => sub.allowed).map((sub) => (
+                          <button
+                            key={sub.id}
+                            onClick={() => {
+                              setDashboardSubTab(sub.id as DashboardSubTab);
+                              setIsSidebarOpen(false);
+                            }}
+                            className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-md text-[11px] font-medium transition-all ${dashboardSubTab === sub.id ? 'text-white bg-white/5' : 'text-muted-foreground hover:text-white hover:bg-white/5'}`}
+                          >
+                            <sub.icon size={12} />
+                            {sub.label}
+                          </button>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </>
+              )}
+
+              {availableTabs.proposals && (
+                <button 
+                  onClick={() => {
+                    setActiveTab('proposals');
+                    setIsSidebarOpen(false);
+                  }} 
+                  className={`w-full flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-all text-[11px] sm:text-sm mt-1 ${activeTab === 'proposals' ? 'bg-primary/10 text-primary border border-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
+                >
+                  <FileSignature size={16} className="sm:size-[18px]" /> Propostas & Vendas
+                </button>
+              )}
+              {availableTabs.crm && (
+                <button 
+                  onClick={() => {
+                    setActiveTab('crm');
+                    setIsSidebarOpen(false);
+                  }} 
+                  className={`w-full flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-all text-[11px] sm:text-sm ${activeTab === 'crm' ? 'bg-primary/10 text-primary border border-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
+                >
+                  <Users size={16} className="sm:size-[18px]" /> CRM & Clientes
+                </button>
+              )}
+              {availableTabs.company && (
+                <button 
+                  onClick={() => {
+                    setActiveTab('company');
+                    setIsSidebarOpen(false);
+                  }} 
+                  className={`w-full flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-all text-[11px] sm:text-sm ${activeTab === 'company' ? 'bg-primary/10 text-primary border border-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
+                >
+                  <Building size={16} className="sm:size-[18px]" /> Perfil da Empresa
+                </button>
+              )}
+              {availableTabs.team && (
+                <button
+                  onClick={() => {
+                    setActiveTab('team');
+                    setIsSidebarOpen(false);
+                  }}
+                  className={`w-full flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-all text-[11px] sm:text-sm ${activeTab === 'team' ? 'bg-primary/10 text-primary border border-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
+                >
+                  <Shield size={16} className="sm:size-[18px]" /> Equipe & Permissões
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Workspaces */}
-          <div className="space-y-6">
+          {canViewWorkspaces && (
+            <div className="space-y-6">
             <p className="px-3 text-[10px] font-bold text-muted-foreground uppercase mb-3 tracking-widest">Workspaces</p>
             {workspaces.map(ws => (
               <div key={ws.id} className="space-y-1">
@@ -1785,13 +3181,15 @@ export default function AdminDashboard() {
                     return <Icon size={14} className="text-muted-foreground" />;
                   })()}
                   <span className="text-xs font-bold text-muted-foreground flex-1">{ws.name}</span>
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); deleteWorkspace(ws.id); }}
-                    className="opacity-0 group-hover/ws:opacity-100 p-1 hover:text-red-500 transition-all"
-                    title="Remover Workspace"
-                  >
-                    <Trash2 size={12} />
-                  </button>
+                  {canEditWorkspaces && (
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); deleteWorkspace(ws.id); }}
+                      className="opacity-0 group-hover/ws:opacity-100 p-1 hover:text-red-500 transition-all"
+                      title="Remover Workspace"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  )}
                 </div>
                 {ws.boards.map(board => (
                   <div key={board.id} className="group/board relative">
@@ -1807,18 +3205,21 @@ export default function AdminDashboard() {
                       <Layout size={16} className={activeBoardId === board.id && activeTab === 'board' ? 'text-primary' : ''} />
                       <span className="truncate flex-1 text-left">{board.name}</span>
                     </button>
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); deleteBoard(ws.id, board.id); }}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover/board:opacity-100 p-1 hover:text-red-500 transition-all z-10"
-                      title="Remover Quadro"
-                    >
-                      <Trash2 size={12} />
-                    </button>
+                    {canEditWorkspaces && (
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); deleteBoard(ws.id, board.id); }}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover/board:opacity-100 p-1 hover:text-red-500 transition-all z-10"
+                        title="Remover Quadro"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
             ))}
-          </div>
+            </div>
+          )}
         </div>
 
         <div className="p-4 border-t border-white/5 bg-white/[0.02]">
@@ -1829,7 +3230,7 @@ export default function AdminDashboard() {
               </div>
               <div className="overflow-hidden">
                 <p className="text-xs font-bold truncate">{user?.username || company.name}</p>
-                <p className="text-[10px] text-muted-foreground truncate">Administrador</p>
+                <p className="text-[10px] text-muted-foreground truncate">{isOwner ? 'Owner do ambiente' : 'Colaborador aprovado'}</p>
               </div>
             </div>
             <button 
@@ -1876,12 +3277,17 @@ export default function AdminDashboard() {
                  activeTab === 'crm' ? 'Gestão de Relacionamento (CRM)' :
                  activeTab === 'erp' ? 'Dashboard Financeiro (ERP)' :
                  activeTab === 'company' ? 'Perfil da Empresa' :
+                 activeTab === 'team' ? 'Equipe & Permissões' :
                  'Configurações da Empresa'}
               </h2>
             )}
           </div>
 
           <div className="flex items-center gap-4">
+            <div className="hidden lg:flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+              <Shield size={12} className="text-primary" />
+              {isOwner ? 'Owner' : access?.role || 'Colaborador'}
+            </div>
             {isSyncing && (
               <div className="hidden sm:flex items-center gap-2 text-[10px] text-muted-foreground animate-pulse">
                 <Database size={12} />
@@ -1917,6 +3323,44 @@ export default function AdminDashboard() {
               <p className="text-sm font-bold text-primary animate-pulse">Carregando dados do MongoDB...</p>
             </div>
           )}
+          {!isLoading && !canAccessAdmin && (
+            <div className="max-w-3xl mx-auto">
+              <div className="glass rounded-3xl border border-primary/20 p-6 sm:p-10 space-y-6">
+                <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                  <Shield size={28} className="text-primary" />
+                </div>
+                <div className="space-y-3">
+                  <h2 className="text-2xl sm:text-4xl font-bold font-heading">Acesso colaborativo pendente</h2>
+                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                    Sua conta já está autenticada, mas ainda não possui acesso administrativo liberado para este ambiente.
+                  </p>
+                </div>
+                {(isAcceptingInvite || inviteStatus) && (
+                  <div className={`rounded-2xl border px-4 py-3 text-sm ${
+                    isAcceptingInvite
+                      ? 'border-primary/20 bg-primary/10 text-primary'
+                      : inviteStatus?.type === 'success'
+                        ? 'border-cyber-emerald/20 bg-cyber-emerald/10 text-cyber-emerald'
+                        : 'border-red-500/20 bg-red-500/10 text-red-400'
+                  }`}>
+                    {isAcceptingInvite ? 'Validando convite aprovado...' : inviteStatus?.message}
+                  </div>
+                )}
+                <div className="grid gap-4 sm:grid-cols-3">
+                  {[
+                    'Login e cadastro já aceitam links de convite aprovados.',
+                    'O owner controla módulos visíveis e permissões de edição por colaborador.',
+                    'Quando o acesso for liberado, o botão Admin abre o ambiente adequado ao perfil.'
+                  ].map((item) => (
+                    <div key={item} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm text-white/80">
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+          {canAccessAdmin && (
           <AnimatePresence mode="wait">
             
             {/* NOVO MODELO: DASHBOARD UNIFICADO COM SUB-ABAS */}
@@ -1930,24 +3374,30 @@ export default function AdminDashboard() {
               >
                 {/* Dashboard Tabs */}
                 <div className="flex items-center gap-1 p-1 bg-white/5 rounded-xl border border-white/10 w-full sm:w-fit overflow-x-auto scrollbar-hide no-scrollbar">
-                  <button 
-                    onClick={() => setDashboardSubTab('insights')}
-                    className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[9px] sm:text-xs font-bold transition-all flex items-center gap-1.5 sm:gap-2 shrink-0 ${dashboardSubTab === 'insights' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
-                  >
-                    <Activity size={12} className="sm:size-[14px]" /> <span className="hidden xs:inline">Insights de Negócio</span><span className="xs:hidden">Insights</span>
-                  </button>
-                  <button 
-                    onClick={() => setDashboardSubTab('finance')}
-                    className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[9px] sm:text-xs font-bold transition-all flex items-center gap-1.5 sm:gap-2 shrink-0 ${dashboardSubTab === 'finance' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
-                  >
-                    <PieChart size={12} className="sm:size-[14px]" /> Financeiro
-                  </button>
-                  <button 
-                    onClick={() => setDashboardSubTab('server')}
-                    className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[9px] sm:text-xs font-bold transition-all flex items-center gap-1.5 sm:gap-2 shrink-0 ${dashboardSubTab === 'server' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
-                  >
-                    <Server size={12} className="sm:size-[14px]" /> <span className="hidden xs:inline">Status do Servidor</span><span className="xs:hidden">Servidor</span>
-                  </button>
+                  {availableDashboardSubTabs.insights && (
+                    <button 
+                      onClick={() => setDashboardSubTab('insights')}
+                      className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[9px] sm:text-xs font-bold transition-all flex items-center gap-1.5 sm:gap-2 shrink-0 ${dashboardSubTab === 'insights' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
+                    >
+                      <Activity size={12} className="sm:size-[14px]" /> <span className="hidden xs:inline">Insights de Negócio</span><span className="xs:hidden">Insights</span>
+                    </button>
+                  )}
+                  {availableDashboardSubTabs.finance && (
+                    <button 
+                      onClick={() => setDashboardSubTab('finance')}
+                      className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[9px] sm:text-xs font-bold transition-all flex items-center gap-1.5 sm:gap-2 shrink-0 ${dashboardSubTab === 'finance' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
+                    >
+                      <PieChart size={12} className="sm:size-[14px]" /> Financeiro
+                    </button>
+                  )}
+                  {availableDashboardSubTabs.server && (
+                    <button 
+                      onClick={() => setDashboardSubTab('server')}
+                      className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[9px] sm:text-xs font-bold transition-all flex items-center gap-1.5 sm:gap-2 shrink-0 ${dashboardSubTab === 'server' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted-foreground hover:bg-white/5'}`}
+                    >
+                      <Server size={12} className="sm:size-[14px]" /> <span className="hidden xs:inline">Status do Servidor</span><span className="xs:hidden">Servidor</span>
+                    </button>
+                  )}
                 </div>
 
                 {dashboardSubTab === 'insights' && (
@@ -1955,6 +3405,7 @@ export default function AdminDashboard() {
                     projects={projects} 
                     workspaces={workspaces} 
                     onNewWorkspace={() => {
+                      if (!ensureWorkspaceEdit()) return;
                       const name = prompt('Nome do novo cliente/workspace:');
                       if (name) {
                         const newWs: Workspace = {
@@ -1976,9 +3427,22 @@ export default function AdminDashboard() {
                       }
                     }}
                     onNewLead={() => {
+                      if (!ensureProjectEdit()) return;
                       setActiveTab('proposals');
                       toast.info('Preencha o briefing para gerar o lead.');
                     }}
+                    onOpenProject={(projectId) => {
+                      if (!canViewProjects) {
+                        toast.error('Seu perfil não possui acesso detalhado aos projetos.');
+                        return;
+                      }
+                      const project = projects.find(item => item.id === projectId);
+                      if (!project) return;
+                      setSelectedProject(project);
+                      setActiveTab('ops');
+                    }}
+                    onSnoozeFollowUp={snoozeFollowUp}
+                    onCompleteFollowUp={completeFollowUp}
                   />
                 )}
 
@@ -2047,7 +3511,7 @@ export default function AdminDashboard() {
                 )}
 
                 {dashboardSubTab === 'server' && (
-                  <ServerStatsView API_BASE={API_BASE} getHeaders={getHeaders} />
+                  <ServerStatsView />
                 )}
               </motion.div>
             )}
@@ -2278,27 +3742,31 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {projects.map(project => (
                   <div key={project.id} onClick={() => { setSelectedProject(project); setActiveTab('ops'); }} className="glass rounded-2xl p-4 sm:p-6 border-white/5 hover:border-primary/20 transition-all group cursor-pointer relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-3 sm:p-4 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity flex gap-1.5 sm:gap-2">
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setClientData({
-                            name: project.clientName,
-                            cnpj: '',
-                            email: '',
-                            projectTitle: project.projectName,
-                            brief: project.meetingNotes[0]?.content || '',
-                            profile: 'technical'
-                          });
-                          setActiveTab('proposals');
-                          toast.info("Dados carregados para edição na aba Propostas.");
-                        }}
-                        className="p-1.5 sm:p-2 glass rounded-lg hover:bg-primary/20 transition-all text-primary"
-                        title="Editar Projeto"
-                      >
-                        <Settings size={14} className="sm:size-[18px]" />
-                      </button>
-                      <button 
+                    <div className="flex justify-between items-start gap-3 mb-4">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary/20 transition-colors">
+                        <Building size={20} className="sm:size-[24px] text-primary" />
+                      </div>
+                      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setClientData({
+                              name: project.clientName,
+                              cnpj: '',
+                              email: '',
+                              projectTitle: project.projectName,
+                              brief: project.meetingNotes?.[0]?.content || '',
+                              profile: 'technical'
+                            });
+                            setActiveTab('proposals');
+                            toast.info("Dados carregados para edição na aba Propostas.");
+                          }}
+                          className="p-1.5 sm:p-2 glass rounded-lg hover:bg-primary/20 transition-all text-primary"
+                          title="Editar Projeto"
+                        >
+                          <Settings size={14} className="sm:size-[18px]" />
+                        </button>
+                        <button 
                           onClick={(e) => {
                             e.stopPropagation();
                             deleteProject(project.id);
@@ -2318,12 +3786,15 @@ export default function AdminDashboard() {
                         >
                           <ExternalLink size={14} className="sm:size-[18px]" />
                         </button>
-                    </div>
-                    <div className="flex justify-between items-start mb-4 sm:mb-6">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary/20 transition-colors">
-                        <Building size={20} className="sm:size-[24px] text-primary" />
                       </div>
-                      <div className="flex flex-col items-end gap-1.5 sm:gap-2">
+                    </div>
+
+                    <div className="flex justify-between items-start gap-4 mb-4 sm:mb-6">
+                      <div className="min-w-0">
+                        <h3 className="text-lg sm:text-xl font-bold mb-0.5 sm:mb-1 truncate">{project.clientName}</h3>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground line-clamp-1">{project.projectName}</p>
+                      </div>
+                      <div className="flex flex-col items-end gap-1.5 sm:gap-2 shrink-0">
                         <select 
                           id={`project-status-${project.id}`}
                           name={`project-status-${project.id}`}
@@ -2341,13 +3812,10 @@ export default function AdminDashboard() {
                           <option value="finished" className="bg-cyber-black">Finalizado</option>
                         </select>
                         <div className="flex items-center gap-1 text-[8px] sm:text-[9px] text-muted-foreground font-bold">
-                          <Clock size={10} /> {new Date(project.deadline).toLocaleDateString('pt-BR')}
+                          <Clock size={10} /> {formatProjectDate(project.deadline)}
                         </div>
                       </div>
                     </div>
-                    
-                    <h3 className="text-lg sm:text-xl font-bold mb-0.5 sm:mb-1 truncate">{project.clientName}</h3>
-                    <p className="text-[10px] sm:text-xs text-muted-foreground mb-4 sm:mb-6 line-clamp-1">{project.projectName}</p>
 
                     <div className="space-y-4 sm:space-y-6">
                       <div className="space-y-2 sm:space-y-3">
@@ -2355,15 +3823,15 @@ export default function AdminDashboard() {
                           <Network size={12} className="sm:size-[14px]" /> Stakeholders Principais
                         </h4>
                         <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                          {project.stakeholders.slice(0, 3).map((sh, i) => (
+                          {(project.stakeholders || []).slice(0, 3).map((sh, i) => (
                             <div key={i} className="glass px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border-white/5 flex items-center gap-1.5 sm:gap-2 group/sh">
                               <div className={`w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full ${sh.influence === 'high' ? 'bg-red-500' : 'bg-cyber-gold'}`} />
                               <span className="text-[9px] sm:text-[10px] font-medium truncate max-w-[60px] sm:max-w-none">{sh.name}</span>
                             </div>
                           ))}
-                          {project.stakeholders.length > 3 && (
+                          {(project.stakeholders || []).length > 3 && (
                             <div className="glass px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border-white/5 text-[9px] sm:text-[10px] font-bold text-muted-foreground">
-                              +{project.stakeholders.length - 3}
+                              +{(project.stakeholders || []).length - 3}
                             </div>
                           )}
                         </div>
@@ -2508,6 +3976,153 @@ export default function AdminDashboard() {
                         </p>
                       </div>
 
+                      <div className="glass rounded-2xl p-4 sm:p-8 border-white/5 space-y-5 sm:space-y-6">
+                        <div className="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-4">
+                          <div>
+                            <h3 className="text-sm sm:text-base font-bold flex items-center gap-2"><MessageSquareQuote size={18} className="sm:size-[20px] text-cyber-gold" /> Centro de Reuniões</h3>
+                            <p className="text-[10px] sm:text-xs text-muted-foreground mt-2">Registre contexto, decisões e próximos passos para nunca perder o fio da conversa.</p>
+                          </div>
+                          <div className="grid grid-cols-3 gap-2 sm:gap-3 w-full xl:w-auto xl:min-w-[360px]">
+                            <div className="rounded-2xl border border-white/5 bg-white/[0.03] px-3 py-3">
+                              <p className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Registros</p>
+                              <p className="text-base sm:text-lg font-bold mt-1">{selectedProject.meetingNotes.length}</p>
+                            </div>
+                            <div className="rounded-2xl border border-white/5 bg-white/[0.03] px-3 py-3">
+                              <p className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Último contato</p>
+                              <p className="text-[10px] sm:text-xs font-bold mt-1">{selectedProject.meetingNotes[0]?.date ? formatProjectDate(selectedProject.meetingNotes[0].date) : 'Sem registro'}</p>
+                            </div>
+                            <div className="rounded-2xl border border-white/5 bg-white/[0.03] px-3 py-3">
+                              <p className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Próximo follow-up</p>
+                              <p className="text-[10px] sm:text-xs font-bold mt-1">{formatProjectDate(meetingForm.followUpDate || selectedProject.followUpDate)}</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 xl:grid-cols-[0.95fr_1.05fr] gap-4 sm:gap-6">
+                          <div className="rounded-2xl border border-white/5 bg-black/20 p-4 sm:p-5 space-y-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              <div className="space-y-1.5">
+                                <label className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Data</label>
+                                <input
+                                  type="date"
+                                  value={meetingForm.date}
+                                  onChange={(e) => setMeetingForm(prev => ({ ...prev, date: e.target.value }))}
+                                  className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-[11px] sm:text-sm outline-none focus:border-primary/40 transition-all"
+                                />
+                              </div>
+                              <div className="space-y-1.5">
+                                <label className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Tipo</label>
+                                <select
+                                  value={meetingForm.kind}
+                                  onChange={(e) => setMeetingForm(prev => ({ ...prev, kind: e.target.value as MeetingType }))}
+                                  className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-[11px] sm:text-sm outline-none focus:border-primary/40 transition-all"
+                                >
+                                  {MEETING_TYPE_OPTIONS.map(option => (
+                                    <option key={option.value} value={option.value} className="bg-cyber-black">{option.label}</option>
+                                  ))}
+                                </select>
+                              </div>
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <label className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Título</label>
+                              <input
+                                type="text"
+                                value={meetingForm.title}
+                                onChange={(e) => setMeetingForm(prev => ({ ...prev, title: e.target.value }))}
+                                placeholder="Ex.: Alinhamento da entrega parcial"
+                                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-[11px] sm:text-sm outline-none focus:border-primary/40 transition-all"
+                              />
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <label className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Resumo</label>
+                              <textarea
+                                value={meetingForm.content}
+                                onChange={(e) => setMeetingForm(prev => ({ ...prev, content: e.target.value }))}
+                                placeholder="Principais dores, objeções, aprovações e contexto relevante."
+                                rows={4}
+                                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-[11px] sm:text-sm outline-none focus:border-primary/40 transition-all resize-none"
+                              />
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <label className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Decisão / resultado</label>
+                              <textarea
+                                value={meetingForm.outcome}
+                                onChange={(e) => setMeetingForm(prev => ({ ...prev, outcome: e.target.value }))}
+                                placeholder="O que foi aprovado, travado ou redefinido."
+                                rows={2}
+                                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-[11px] sm:text-sm outline-none focus:border-primary/40 transition-all resize-none"
+                              />
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-[1fr_180px] gap-3">
+                              <div className="space-y-1.5">
+                                <label className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Próximo passo</label>
+                                <input
+                                  type="text"
+                                  value={meetingForm.nextStep}
+                                  onChange={(e) => setMeetingForm(prev => ({ ...prev, nextStep: e.target.value }))}
+                                  placeholder="Ex.: enviar benchmark, proposta revisada, checklist..."
+                                  className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-[11px] sm:text-sm outline-none focus:border-primary/40 transition-all"
+                                />
+                              </div>
+                              <div className="space-y-1.5">
+                                <label className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Novo follow-up</label>
+                                <input
+                                  type="date"
+                                  value={meetingForm.followUpDate}
+                                  onChange={(e) => setMeetingForm(prev => ({ ...prev, followUpDate: e.target.value }))}
+                                  className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-[11px] sm:text-sm outline-none focus:border-primary/40 transition-all"
+                                />
+                              </div>
+                            </div>
+
+                            <button
+                              onClick={() => registerMeetingNote(selectedProject.id)}
+                              className="w-full rounded-xl bg-cyber-gold/20 text-cyber-gold border border-cyber-gold/30 px-4 py-3 text-[10px] sm:text-xs font-bold hover:bg-cyber-gold/30 transition-all"
+                            >
+                              Salvar reunião e atualizar contexto
+                            </button>
+                          </div>
+
+                          <div className="space-y-3">
+                            {selectedProject.meetingNotes.length > 0 ? selectedProject.meetingNotes.slice(0, 5).map((note, index) => (
+                              <div key={`${note.date}-${index}`} className="rounded-2xl border border-white/5 bg-white/[0.03] p-4 sm:p-5 space-y-3">
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                  <div>
+                                    <p className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">{formatProjectDate(note.date)}</p>
+                                    <p className="text-[11px] sm:text-sm font-bold mt-1">{note.title || 'Registro de reunião'}</p>
+                                  </div>
+                                  <span className={`px-2.5 py-1 rounded-full border text-[8px] sm:text-[9px] font-bold uppercase w-fit ${getMeetingTypeStyle(note.kind)}`}>
+                                    {MEETING_TYPE_OPTIONS.find(option => option.value === note.kind)?.label || 'Contato'}
+                                  </span>
+                                </div>
+                                <p className="text-[10px] sm:text-xs text-white/80 leading-relaxed">{note.content}</p>
+                                {note.outcome && (
+                                  <div className="rounded-xl border border-cyber-emerald/10 bg-cyber-emerald/5 px-3 py-2.5">
+                                    <p className="text-[8px] sm:text-[9px] uppercase font-bold text-cyber-emerald mb-1">Resultado</p>
+                                    <p className="text-[10px] sm:text-xs text-white/85">{note.outcome}</p>
+                                  </div>
+                                )}
+                                {note.nextStep && (
+                                  <div className="rounded-xl border border-primary/10 bg-primary/5 px-3 py-2.5">
+                                    <p className="text-[8px] sm:text-[9px] uppercase font-bold text-primary mb-1">Próximo passo</p>
+                                    <p className="text-[10px] sm:text-xs text-white/85">{note.nextStep}</p>
+                                  </div>
+                                )}
+                              </div>
+                            )) : (
+                              <div className="rounded-2xl border-2 border-dashed border-white/10 px-4 py-8 text-center">
+                                <MessageSquareQuote size={20} className="mx-auto text-muted-foreground opacity-30 mb-2" />
+                                <p className="text-[10px] sm:text-xs text-muted-foreground">Sem histórico estruturado ainda. Registre a primeira reunião para construir o contexto do projeto.</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
                       {/* Stakeholders */}
                       <div className="glass rounded-2xl p-4 sm:p-8 border-white/5">
                         <div className="flex justify-between items-center mb-4 sm:mb-6">
@@ -2566,7 +4181,7 @@ export default function AdminDashboard() {
                           <button className="text-[10px] sm:text-xs font-bold text-primary hover:underline">+ Nova Tarefa</button>
                         </div>
                         <div className="space-y-3 sm:space-y-4">
-                          {selectedProject.tasks.map(task => (
+                          {selectedProject.tasks.length > 0 ? selectedProject.tasks.map(task => (
                             <div key={task.id} className="p-3 sm:p-4 rounded-xl bg-white/5 border border-white/5 group hover:border-white/10 transition-all space-y-2 sm:space-y-3">
                               <div className="flex items-center gap-3 sm:gap-4">
                                 <button 
@@ -2624,7 +4239,12 @@ export default function AdminDashboard() {
                                   </div>
                                 </div>
                             </div>
-                          ))}
+                          )) : (
+                            <div className="py-6 sm:py-8 text-center border-2 border-dashed border-white/5 rounded-2xl">
+                              <Kanban size={20} className="sm:size-[24px] mx-auto text-muted-foreground mb-2 opacity-20" />
+                              <p className="text-[10px] sm:text-xs text-muted-foreground">Nenhuma tarefa cadastrada ainda.</p>
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -2635,7 +4255,7 @@ export default function AdminDashboard() {
                           <button className="text-[10px] sm:text-xs font-bold text-cyber-gold hover:underline">+ Novo Acesso</button>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                          {selectedProject.accesses.map((access, i) => (
+                          {selectedProject.accesses.length > 0 ? selectedProject.accesses.map((access, i) => (
                             <div key={i} className="p-3 sm:p-4 rounded-xl bg-white/5 border border-white/5 space-y-1.5 sm:space-y-2 group relative">
                               <div className="flex justify-between text-[9px] sm:text-[10px] font-bold uppercase text-muted-foreground">
                                 <span>{access.type}</span>
@@ -2646,7 +4266,12 @@ export default function AdminDashboard() {
                                 {access.credentials}
                               </code>
                             </div>
-                          ))}
+                          )) : (
+                            <div className="sm:col-span-2 py-6 sm:py-8 text-center border-2 border-dashed border-white/5 rounded-2xl">
+                              <Key size={20} className="sm:size-[24px] mx-auto text-muted-foreground mb-2 opacity-20" />
+                              <p className="text-[10px] sm:text-xs text-muted-foreground">Nenhum acesso técnico cadastrado.</p>
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -2715,14 +4340,14 @@ export default function AdminDashboard() {
                             <Calendar size={16} className="sm:size-[18px] text-muted-foreground shrink-0" />
                             <div className="min-w-0">
                               <p className="text-[9px] sm:text-[10px] font-bold text-muted-foreground uppercase">Deadline</p>
-                              <p className="text-[11px] sm:text-sm font-bold truncate">{new Date(selectedProject.deadline).toLocaleDateString('pt-BR')}</p>
+                              <p className="text-[11px] sm:text-sm font-bold truncate">{formatProjectDate(selectedProject.deadline)}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-2 sm:gap-3">
                             <DollarSign size={16} className="sm:size-[18px] text-muted-foreground shrink-0" />
                             <div className="min-w-0">
                               <p className="text-[9px] sm:text-[10px] font-bold text-muted-foreground uppercase">Valor do Contrato</p>
-                              <p className="text-[11px] sm:text-sm font-bold text-cyber-emerald truncate">R$ {selectedProject.value.toLocaleString('pt-BR')}</p>
+                              <p className="text-[11px] sm:text-sm font-bold text-cyber-emerald truncate">R$ {selectedProject.financials.proposalValue.toLocaleString('pt-BR')}</p>
                             </div>
                           </div>
                         </div>
@@ -2735,18 +4360,371 @@ export default function AdminDashboard() {
                         </button>
                       </div>
 
+                      <div className="glass rounded-2xl p-4 sm:p-6 border-white/5 bg-primary/5 space-y-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <h4 className="text-[9px] sm:text-[10px] font-bold uppercase text-primary flex items-center gap-2">
+                              <Target size={12} className="sm:size-[14px]" /> Operação Solo 360
+                            </h4>
+                            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Controle da jornada do cliente da reunião até a divulgação.</p>
+                          </div>
+                          <div className="px-2 py-1 rounded-full bg-primary/10 text-primary text-[8px] font-bold uppercase border border-primary/20">
+                            {selectedProject.workflowSteps.filter(step => step.done).length}/{selectedProject.workflowSteps.length}
+                          </div>
+                        </div>
+
+                        <div className="space-y-3">
+                          <div className="space-y-1.5">
+                            <label htmlFor="project-stage" className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Fase atual</label>
+                            <select
+                              id="project-stage"
+                              value={selectedProject.stage}
+                              onChange={(e) => updateProjectPlanning(selectedProject.id, { stage: e.target.value as ProjectStage })}
+                              className="w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2.5 text-[11px] sm:text-xs font-bold outline-none focus:border-primary"
+                            >
+                              {PROJECT_STAGE_OPTIONS.map(option => (
+                                <option key={option.value} value={option.value} className="bg-cyber-black">
+                                  {option.label}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <label htmlFor="project-next-action" className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Próxima ação</label>
+                            <input
+                              id="project-next-action"
+                              type="text"
+                              value={selectedProject.nextAction}
+                              onChange={(e) => updateProjectPlanning(selectedProject.id, { nextAction: e.target.value })}
+                              placeholder="Ex: confirmar kickoff com o cliente"
+                              className="w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2.5 text-[11px] sm:text-xs outline-none focus:border-primary"
+                            />
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <label htmlFor="project-follow-up" className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Data de follow-up</label>
+                            <input
+                              id="project-follow-up"
+                              type="date"
+                              value={selectedProject.followUpDate}
+                              onChange={(e) => updateProjectPlanning(selectedProject.id, { followUpDate: e.target.value })}
+                              className="w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2.5 text-[11px] sm:text-xs outline-none focus:border-primary"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          {selectedProject.workflowSteps.map(step => (
+                            <button
+                              key={step.id}
+                              onClick={() => toggleWorkflowStep(selectedProject.id, step.id)}
+                              className={`w-full flex items-center justify-between gap-3 rounded-xl border px-3 py-2.5 text-left transition-all ${
+                                step.done
+                                  ? 'border-cyber-emerald/20 bg-cyber-emerald/10'
+                                  : 'border-white/10 bg-black/20 hover:border-primary/30'
+                              }`}
+                            >
+                              <div className="flex items-center gap-3 min-w-0">
+                                <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${step.done ? 'border-cyber-emerald bg-cyber-emerald text-white' : 'border-white/20 text-transparent'}`}>
+                                  <CheckCircle2 size={12} />
+                                </div>
+                                <div className="min-w-0">
+                                  <p className={`text-[10px] sm:text-[11px] font-bold truncate ${step.done ? 'text-white' : 'text-white/90'}`}>{step.title}</p>
+                                  <p className="text-[8px] sm:text-[9px] uppercase text-muted-foreground">{step.area}</p>
+                                </div>
+                              </div>
+                              <span className={`text-[8px] sm:text-[9px] font-bold uppercase shrink-0 ${step.done ? 'text-cyber-emerald' : 'text-muted-foreground'}`}>
+                                {step.done ? 'feito' : 'pendente'}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="glass rounded-2xl p-4 sm:p-6 border-white/5 bg-sky-500/5 space-y-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <h4 className="text-[9px] sm:text-[10px] font-bold uppercase text-sky-300 flex items-center gap-2">
+                              <ClipboardList size={12} className="sm:size-[14px]" /> SOP / Playbook
+                            </h4>
+                            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Template operacional reaproveitável para conduzir este tipo de projeto com consistência.</p>
+                          </div>
+                          <div className="px-2 py-1 rounded-full bg-sky-500/10 text-sky-300 text-[8px] font-bold uppercase border border-sky-500/20">
+                            {selectedProject.playbook.steps.filter(step => step.done).length}/{selectedProject.playbook.steps.length}
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Template ativo</label>
+                          <select
+                            value={selectedProject.playbook.templateId}
+                            onChange={(e) => updateProjectPlaybookTemplate(selectedProject.id, e.target.value as PlaybookTemplateId)}
+                            className="w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2.5 text-[11px] sm:text-xs font-bold outline-none focus:border-sky-400"
+                          >
+                            {(Object.keys(PLAYBOOK_TEMPLATES) as PlaybookTemplateId[]).map(templateId => (
+                              <option key={templateId} value={templateId} className="bg-cyber-black">
+                                {getPlaybookTemplateMeta(templateId).label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3">
+                          <p className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Diretriz do template</p>
+                          <p className="text-[10px] sm:text-xs text-white mt-1">
+                            {getPlaybookTemplateMeta(selectedProject.playbook.templateId).description}
+                          </p>
+                        </div>
+
+                        <div className="space-y-2">
+                          {selectedProject.playbook.steps.map(step => (
+                            <button
+                              key={step.id}
+                              onClick={() => toggleProjectPlaybookStep(selectedProject.id, step.id)}
+                              className={`w-full flex items-start justify-between gap-3 rounded-xl border px-3 py-3 text-left transition-all ${
+                                step.done
+                                  ? 'border-sky-400/20 bg-sky-500/10'
+                                  : 'border-white/10 bg-black/20 hover:border-sky-400/30'
+                              }`}
+                            >
+                              <div className="flex items-start gap-3 min-w-0">
+                                <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 mt-0.5 ${step.done ? 'border-sky-300 bg-sky-300 text-cyber-black' : 'border-white/20 text-transparent'}`}>
+                                  <CheckCircle2 size={12} />
+                                </div>
+                                <div className="min-w-0">
+                                  <p className={`text-[10px] sm:text-[11px] font-bold ${step.done ? 'text-white' : 'text-white/90'}`}>{step.title}</p>
+                                  <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-1">{step.description}</p>
+                                </div>
+                              </div>
+                              <span className={`text-[8px] sm:text-[9px] font-bold uppercase shrink-0 ${step.done ? 'text-sky-300' : 'text-muted-foreground'}`}>
+                                {step.done ? 'feito' : 'pendente'}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="glass rounded-2xl p-4 sm:p-6 border-white/5 bg-cyber-emerald/5 space-y-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <h4 className="text-[9px] sm:text-[10px] font-bold uppercase text-cyber-emerald flex items-center gap-2">
+                              <CreditCard size={12} className="sm:size-[14px]" /> Financeiro do Projeto
+                            </h4>
+                            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Controle proposta, recebimentos, parcelas e margem real.</p>
+                          </div>
+                          <span className={`px-2 py-1 rounded-full border text-[8px] font-bold uppercase ${getPaymentStatusStyle(getProjectPaymentStatus(selectedProject))}`}>
+                            {getProjectPaymentStatus(selectedProject)}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-2">
+                          <div className="rounded-xl border border-white/5 bg-white/[0.03] px-3 py-3">
+                            <p className="text-[8px] uppercase font-bold text-muted-foreground">Recebido</p>
+                            <p className="text-[10px] sm:text-xs font-bold text-cyber-emerald mt-1">R$ {getProjectReceivedTotal(selectedProject).toLocaleString('pt-BR')}</p>
+                          </div>
+                          <div className="rounded-xl border border-white/5 bg-white/[0.03] px-3 py-3">
+                            <p className="text-[8px] uppercase font-bold text-muted-foreground">Em aberto</p>
+                            <p className="text-[10px] sm:text-xs font-bold text-cyber-gold mt-1">R$ {getProjectOutstandingTotal(selectedProject).toLocaleString('pt-BR')}</p>
+                          </div>
+                          <div className="rounded-xl border border-white/5 bg-white/[0.03] px-3 py-3">
+                            <p className="text-[8px] uppercase font-bold text-muted-foreground">Margem</p>
+                            <p className={`text-[10px] sm:text-xs font-bold mt-1 ${getProjectMarginPercentage(selectedProject) >= 50 ? 'text-cyber-emerald' : 'text-cyber-gold'}`}>
+                              {getProjectMarginPercentage(selectedProject)}%
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-3">
+                          <div className="space-y-1.5">
+                            <label className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Valor proposto</label>
+                            <input
+                              type="number"
+                              min="0"
+                              value={selectedProject.financials.proposalValue}
+                              onChange={(e) => updateProjectFinancials(selectedProject.id, { proposalValue: Number(e.target.value) || 0 })}
+                              className="w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2.5 text-[11px] sm:text-xs outline-none focus:border-cyber-emerald"
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="space-y-1.5">
+                              <label className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Forma de pagamento</label>
+                              <input
+                                type="text"
+                                value={financeForm.paymentMethod}
+                                onChange={(e) => {
+                                  const paymentMethod = e.target.value;
+                                  setFinanceForm(prev => ({ ...prev, paymentMethod }));
+                                  updateProjectFinancials(selectedProject.id, { paymentMethod });
+                                }}
+                                className="w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2.5 text-[11px] sm:text-xs outline-none focus:border-cyber-emerald"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Nota / cobrança</label>
+                              <select
+                                value={financeForm.invoiceStatus}
+                                onChange={(e) => {
+                                  const invoiceStatus = e.target.value as ProjectFinancials['invoiceStatus'];
+                                  setFinanceForm(prev => ({ ...prev, invoiceStatus }));
+                                  updateProjectFinancials(selectedProject.id, { invoiceStatus });
+                                }}
+                                className="w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2.5 text-[11px] sm:text-xs outline-none focus:border-cyber-emerald"
+                              >
+                                <option value="pending" className="bg-cyber-black">Pendente</option>
+                                <option value="issued" className="bg-cyber-black">Emitida</option>
+                                <option value="paid" className="bg-cyber-black">Quitada</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="rounded-2xl border border-white/5 bg-black/20 p-3 sm:p-4 space-y-3">
+                          <p className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Nova parcela</p>
+                          <div className="space-y-2">
+                            <input
+                              type="text"
+                              value={financeForm.installmentLabel}
+                              onChange={(e) => setFinanceForm(prev => ({ ...prev, installmentLabel: e.target.value }))}
+                              placeholder="Ex.: sinal, 2ª parcela, entrega final"
+                              className="w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2.5 text-[11px] sm:text-xs outline-none focus:border-cyber-emerald"
+                            />
+                            <div className="grid grid-cols-[1fr_120px] gap-2">
+                              <input
+                                type="number"
+                                min="0"
+                                value={financeForm.installmentAmount}
+                                onChange={(e) => setFinanceForm(prev => ({ ...prev, installmentAmount: e.target.value }))}
+                                placeholder="Valor"
+                                className="w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2.5 text-[11px] sm:text-xs outline-none focus:border-cyber-emerald"
+                              />
+                              <input
+                                type="date"
+                                value={financeForm.installmentDueDate}
+                                onChange={(e) => setFinanceForm(prev => ({ ...prev, installmentDueDate: e.target.value }))}
+                                className="w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2.5 text-[11px] sm:text-xs outline-none focus:border-cyber-emerald"
+                              />
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => addProjectInstallment(selectedProject.id)}
+                            className="w-full rounded-xl border border-cyber-emerald/20 bg-cyber-emerald/10 px-3 py-2.5 text-[10px] sm:text-xs font-bold text-cyber-emerald hover:bg-cyber-emerald/15 transition-all"
+                          >
+                            Adicionar parcela
+                          </button>
+                        </div>
+
+                        <div className="space-y-2">
+                          {selectedProject.financials.installments.length > 0 ? selectedProject.financials.installments.map(installment => {
+                            const effectiveStatus = getEffectiveInstallmentStatus(installment);
+
+                            return (
+                              <div key={installment.id} className="rounded-xl border border-white/5 bg-white/[0.03] px-3 py-3 space-y-2">
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="min-w-0">
+                                    <p className="text-[10px] sm:text-xs font-bold truncate">{installment.label}</p>
+                                    <p className="text-[8px] sm:text-[9px] text-muted-foreground">Vence em {formatProjectDate(installment.dueDate)}</p>
+                                  </div>
+                                  <span className={`px-2 py-1 rounded-full border text-[8px] font-bold uppercase shrink-0 ${getInstallmentStatusStyle(effectiveStatus)}`}>
+                                    {effectiveStatus}
+                                  </span>
+                                </div>
+                                <div className="flex items-center justify-between gap-3">
+                                  <p className="text-[10px] sm:text-xs font-mono text-white">R$ {installment.amount.toLocaleString('pt-BR')}</p>
+                                  <div className="flex gap-2">
+                                    <button
+                                      onClick={() => updateInstallmentStatus(selectedProject.id, installment.id, 'pending')}
+                                      className="px-2.5 py-1 rounded-lg border border-white/10 text-[8px] sm:text-[9px] font-bold text-muted-foreground hover:bg-white/5 transition-all"
+                                    >
+                                      Pendente
+                                    </button>
+                                    <button
+                                      onClick={() => updateInstallmentStatus(selectedProject.id, installment.id, 'paid')}
+                                      className="px-2.5 py-1 rounded-lg border border-cyber-emerald/20 text-[8px] sm:text-[9px] font-bold text-cyber-emerald hover:bg-cyber-emerald/10 transition-all"
+                                    >
+                                      Recebida
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          }) : (
+                            <div className="rounded-xl border border-dashed border-white/10 px-3 py-4 text-center text-[10px] sm:text-xs text-muted-foreground">
+                              Nenhuma parcela cadastrada ainda.
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="glass rounded-2xl p-4 sm:p-6 border-white/5 bg-fuchsia-500/5 space-y-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <h4 className="text-[9px] sm:text-[10px] font-bold uppercase text-fuchsia-300 flex items-center gap-2">
+                              <ArrowUpRight size={12} className="sm:size-[14px]" /> Pós-entrega & Divulgação
+                            </h4>
+                            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Garanta prova social, portfólio e novas oportunidades após a entrega.</p>
+                          </div>
+                          <div className="px-2 py-1 rounded-full bg-fuchsia-500/10 text-fuchsia-300 text-[8px] font-bold uppercase border border-fuchsia-500/20">
+                            {selectedProject.postDeliverySteps.filter(step => step.done).length}/{selectedProject.postDeliverySteps.length}
+                          </div>
+                        </div>
+
+                        <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3">
+                          <p className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Próxima alavanca</p>
+                          <p className="text-[10px] sm:text-xs text-white mt-1">
+                            {selectedProject.postDeliverySteps.find(step => !step.done)?.title || 'Checklist completo. Hora de nutrir relacionamento e abrir nova oferta.'}
+                          </p>
+                        </div>
+
+                        <div className="space-y-2">
+                          {selectedProject.postDeliverySteps.map(step => (
+                            <button
+                              key={step.id}
+                              onClick={() => togglePostDeliveryStep(selectedProject.id, step.id)}
+                              className={`w-full flex items-center justify-between gap-3 rounded-xl border px-3 py-2.5 text-left transition-all ${
+                                step.done
+                                  ? 'border-fuchsia-500/20 bg-fuchsia-500/10'
+                                  : 'border-white/10 bg-black/20 hover:border-fuchsia-500/30'
+                              }`}
+                            >
+                              <div className="flex items-center gap-3 min-w-0">
+                                <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${step.done ? 'border-fuchsia-300 bg-fuchsia-300 text-cyber-black' : 'border-white/20 text-transparent'}`}>
+                                  <CheckCircle2 size={12} />
+                                </div>
+                                <div className="min-w-0">
+                                  <p className={`text-[10px] sm:text-[11px] font-bold truncate ${step.done ? 'text-white' : 'text-white/90'}`}>{step.title}</p>
+                                  <p className="text-[8px] sm:text-[9px] uppercase text-muted-foreground">{getPostDeliveryAreaLabel(step.area)}</p>
+                                </div>
+                              </div>
+                              <span className={`text-[8px] sm:text-[9px] font-bold uppercase shrink-0 ${step.done ? 'text-fuchsia-300' : 'text-muted-foreground'}`}>
+                                {step.done ? 'feito' : 'pendente'}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
                       {/* Custos Operacionais */}
                       <div className="glass rounded-2xl p-4 sm:p-6 border-white/5 bg-red-500/5 space-y-3 sm:space-y-4">
                         <h4 className="text-[9px] sm:text-[10px] font-bold uppercase text-red-400 flex items-center gap-2">
                           <PieChart size={12} className="sm:size-[14px]" /> Custos do Projeto
                         </h4>
                         <div className="space-y-1.5 sm:space-y-2">
-                          {selectedProject.costs.map((cost, i) => (
+                          {selectedProject.costs.length > 0 ? selectedProject.costs.map((cost, i) => (
                             <div key={i} className="flex justify-between text-[10px] sm:text-[11px]">
                               <span className="text-muted-foreground truncate mr-2">{cost.label}</span>
                               <span className="font-mono text-red-400 shrink-0">R$ {cost.value}</span>
                             </div>
-                          ))}
+                          )) : (
+                            <p className="text-[10px] sm:text-xs text-muted-foreground italic">Nenhum custo operacional registrado.</p>
+                          )}
+                        </div>
+                        <div className="pt-2 border-t border-white/5 flex justify-between text-[10px] sm:text-[11px] font-bold">
+                          <span className="text-muted-foreground">Margem estimada</span>
+                          <span className={getProjectMarginPercentage(selectedProject) >= 50 ? 'text-cyber-emerald' : 'text-cyber-gold'}>
+                            R$ {getProjectMarginTotal(selectedProject).toLocaleString('pt-BR')} ({getProjectMarginPercentage(selectedProject)}%)
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -2768,12 +4746,17 @@ export default function AdminDashboard() {
                   <div className="glass px-4 sm:px-6 py-3 sm:py-4 rounded-2xl border-white/5 flex items-center gap-3 sm:gap-4 w-full sm:w-auto justify-between sm:justify-start">
                     <div>
                       <p className="text-[8px] sm:text-[10px] font-bold text-muted-foreground uppercase">Receita Total</p>
-                      <p className="text-sm sm:text-xl font-bold text-cyber-emerald">R$ {projects.reduce((acc, p) => acc + p.value, 0).toLocaleString('pt-BR')}</p>
+                      <p className="text-sm sm:text-xl font-bold text-cyber-emerald">R$ {projects.reduce((acc, p) => acc + p.financials.proposalValue, 0).toLocaleString('pt-BR')}</p>
+                    </div>
+                    <div className="w-px h-6 sm:h-8 bg-white/10" />
+                    <div>
+                      <p className="text-[8px] sm:text-[10px] font-bold text-muted-foreground uppercase">Recebido</p>
+                      <p className="text-sm sm:text-xl font-bold text-primary">R$ {projects.reduce((acc, p) => acc + getProjectReceivedTotal(p), 0).toLocaleString('pt-BR')}</p>
                     </div>
                     <div className="w-px h-6 sm:h-8 bg-white/10" />
                     <div>
                       <p className="text-[8px] sm:text-[10px] font-bold text-muted-foreground uppercase">Custos Atuais</p>
-                      <p className="text-sm sm:text-xl font-bold text-red-400">R$ {projects.reduce((acc, p) => acc + (p.costs?.reduce((cAcc, c) => cAcc + c.value, 0) || 0), 0).toLocaleString('pt-BR')}</p>
+                      <p className="text-sm sm:text-xl font-bold text-red-400">R$ {projects.reduce((acc, p) => acc + getProjectCostsTotal(p), 0).toLocaleString('pt-BR')}</p>
                     </div>
                   </div>
                 </div>
@@ -2805,21 +4788,28 @@ export default function AdminDashboard() {
                         <thead>
                           <tr className="border-b border-white/5">
                             <th className="py-3 sm:py-4 text-[8px] sm:text-[10px] font-bold text-muted-foreground uppercase">Projeto</th>
-                            <th className="py-3 sm:py-4 text-[8px] sm:text-[10px] font-bold text-muted-foreground uppercase">Valor</th>
+                            <th className="py-3 sm:py-4 text-[8px] sm:text-[10px] font-bold text-muted-foreground uppercase">Proposta</th>
+                            <th className="py-3 sm:py-4 text-[8px] sm:text-[10px] font-bold text-muted-foreground uppercase">Recebido</th>
+                            <th className="py-3 sm:py-4 text-[8px] sm:text-[10px] font-bold text-muted-foreground uppercase">Em aberto</th>
                             <th className="py-3 sm:py-4 text-[8px] sm:text-[10px] font-bold text-muted-foreground uppercase">Custos</th>
                             <th className="py-3 sm:py-4 text-[8px] sm:text-[10px] font-bold text-muted-foreground uppercase">Margem</th>
-                            <th className="py-3 sm:py-4 text-[8px] sm:text-[10px] font-bold text-muted-foreground uppercase text-right">Status</th>
+                            <th className="py-3 sm:py-4 text-[8px] sm:text-[10px] font-bold text-muted-foreground uppercase text-right">Pagamento</th>
                           </tr>
                         </thead>
                         <tbody className="text-[11px] sm:text-sm">
                           {projects.map(p => {
-                            const costs = p.costs?.reduce((acc, c) => acc + c.value, 0) || 0;
-                            const margin = p.value - costs;
-                            const marginPerc = Math.round((margin / p.value) * 100);
+                            const costs = getProjectCostsTotal(p);
+                            const received = getProjectReceivedTotal(p);
+                            const outstanding = getProjectOutstandingTotal(p);
+                            const margin = getProjectMarginTotal(p);
+                            const marginPerc = getProjectMarginPercentage(p);
+                            const paymentStatus = getProjectPaymentStatus(p);
                             return (
                               <tr key={p.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
                                 <td className="py-3 sm:py-4 font-bold truncate max-w-[100px] sm:max-w-none">{p.projectName}</td>
-                                <td className="py-3 sm:py-4 font-mono">R$ {p.value.toLocaleString('pt-BR')}</td>
+                                <td className="py-3 sm:py-4 font-mono">R$ {p.financials.proposalValue.toLocaleString('pt-BR')}</td>
+                                <td className="py-3 sm:py-4 font-mono text-primary">R$ {received.toLocaleString('pt-BR')}</td>
+                                <td className="py-3 sm:py-4 font-mono text-cyber-gold">R$ {outstanding.toLocaleString('pt-BR')}</td>
                                 <td className="py-3 sm:py-4 font-mono text-red-400">R$ {costs.toLocaleString('pt-BR')}</td>
                                 <td className="py-3 sm:py-4">
                                   <span className={`font-mono ${marginPerc > 50 ? 'text-cyber-emerald' : 'text-cyber-gold'}`}>
@@ -2827,12 +4817,8 @@ export default function AdminDashboard() {
                                   </span>
                                 </td>
                                 <td className="py-3 sm:py-4 text-right">
-                                  <span className={`text-[8px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 sm:py-1 rounded uppercase font-bold ${
-                                    p.status === 'active' ? 'bg-primary/20 text-primary' : 
-                                    p.status === 'finished' ? 'bg-cyber-emerald/20 text-cyber-emerald' : 
-                                    'bg-white/10 text-muted-foreground'
-                                  }`}>
-                                    {p.status}
+                                  <span className={`text-[8px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 sm:py-1 rounded uppercase font-bold border ${getPaymentStatusStyle(paymentStatus)}`}>
+                                    {paymentStatus}
                                   </span>
                                 </td>
                               </tr>
@@ -2952,8 +4938,12 @@ export default function AdminDashboard() {
                         id="company-name"
                         name="company-name"
                         value={company.name} 
-                        onChange={e => setCompany({...company, name: e.target.value})} 
+                        onChange={e => {
+                          if (!ensureCompanyEdit()) return;
+                          setCompany({...company, name: e.target.value});
+                        }} 
                         className="w-full bg-white/5 border border-white/10 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 outline-none focus:border-primary/50 transition-all text-[11px] sm:text-sm" 
+                        readOnly={!canEditCompany}
                       />
                     </div>
                     <div className="space-y-1 sm:space-y-1.5">
@@ -2962,9 +4952,13 @@ export default function AdminDashboard() {
                         id="company-cnpj"
                         name="company-cnpj"
                         value={company.cnpj} 
-                        onChange={e => setCompany({...company, cnpj: maskCNPJ(e.target.value)})} 
+                        onChange={e => {
+                          if (!ensureCompanyEdit()) return;
+                          setCompany({...company, cnpj: maskCNPJ(e.target.value)});
+                        }} 
                         className="w-full bg-white/5 border border-white/10 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 outline-none focus:border-primary/50 transition-all text-[11px] sm:text-sm" 
                         placeholder="00.000.000/0000-00"
+                        readOnly={!canEditCompany}
                       />
                     </div>
                     <div className="space-y-1 sm:space-y-1.5">
@@ -2973,8 +4967,12 @@ export default function AdminDashboard() {
                         id="company-email"
                         name="company-email"
                         value={company.email} 
-                        onChange={e => setCompany({...company, email: e.target.value})} 
+                        onChange={e => {
+                          if (!ensureCompanyEdit()) return;
+                          setCompany({...company, email: e.target.value});
+                        }} 
                         className="w-full bg-white/5 border border-white/10 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 outline-none focus:border-primary/50 transition-all text-[11px] sm:text-sm" 
+                        readOnly={!canEditCompany}
                       />
                     </div>
                   </div>
@@ -2989,11 +4987,22 @@ export default function AdminDashboard() {
                         id="company-bank-info"
                         name="company-bank-info"
                         value={company.bankInfo} 
-                        onChange={e => setCompany({...company, bankInfo: e.target.value})} 
+                        onChange={e => {
+                          if (!ensureCompanyEdit()) return;
+                          setCompany({...company, bankInfo: e.target.value});
+                        }} 
                         className="w-full bg-white/5 border border-white/10 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 outline-none focus:border-primary/50 transition-all text-[11px] sm:text-sm h-24 sm:h-32 resize-none" 
+                        readOnly={!canEditCompany}
                       />
                     </div>
-                    <button className="w-full bg-primary py-3 sm:py-4 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+                    <button
+                      onClick={ensureCompanyEdit}
+                      className={`w-full py-3 sm:py-4 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-lg ${
+                        canEditCompany
+                          ? 'bg-primary hover:bg-primary/90 shadow-primary/20'
+                          : 'bg-white/5 text-muted-foreground shadow-transparent'
+                      }`}
+                    >
                       <Save size={16} className="sm:size-[18px]" /> Salvar Configurações
                     </button>
                   </div>
@@ -3002,7 +5011,217 @@ export default function AdminDashboard() {
             </motion.div>
           )}
 
+          {activeTab === 'team' && (
+            <motion.div key="team" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-7xl mx-auto space-y-6">
+              <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+                <div className="space-y-2">
+                  <h2 className="text-2xl sm:text-4xl font-bold font-heading">Equipe <span className="text-gradient">Colaborativa</span></h2>
+                  <p className="text-sm text-muted-foreground max-w-3xl">
+                    Aqui ficam os atores adicionais já mapeados no produto: operação comercial, CRM, projetos, workspaces, empresa, financeiro, conteúdo e servidor.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <span className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary">
+                    {collaborators.length} colaborador(es)
+                  </span>
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                    Owner: {user?.email}
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid gap-6 xl:grid-cols-[1.1fr,0.9fr]">
+                <div className="space-y-6">
+                  <div className="glass rounded-3xl border-white/5 p-5 sm:p-6 space-y-5">
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <h3 className="text-sm sm:text-base font-bold">Convite aprovado</h3>
+                        <p className="text-[11px] sm:text-xs text-muted-foreground">O link já nasce pronto para cadastro/login e só aceita o e-mail aprovado.</p>
+                      </div>
+                      <div className="rounded-2xl border border-primary/20 bg-primary/10 p-3 text-primary">
+                        <Shield size={20} />
+                      </div>
+                    </div>
+
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] uppercase font-bold text-muted-foreground">E-mail</label>
+                        <input
+                          value={inviteForm.email}
+                          onChange={(e) => setInviteForm(prev => ({ ...prev, email: e.target.value }))}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-all text-sm"
+                          placeholder="colaborador@empresa.com"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] uppercase font-bold text-muted-foreground">Papel inicial</label>
+                        <select
+                          value={inviteForm.role}
+                          onChange={(e) => setInviteForm(prev => ({ ...prev, role: e.target.value as CollaborationMember['role'] }))}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-all text-sm"
+                        >
+                          {ROLE_OPTIONS.map((role) => (
+                            <option key={role.value} value={role.value} className="bg-cyber-black">
+                              {role.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] uppercase font-bold text-muted-foreground">Contexto do acesso</label>
+                      <textarea
+                        value={inviteForm.note}
+                        onChange={(e) => setInviteForm(prev => ({ ...prev, note: e.target.value }))}
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-all text-sm h-28 resize-none"
+                        placeholder="Ex.: vai assumir CRM, follow-up comercial e leitura financeira."
+                      />
+                    </div>
+
+                    <button
+                      onClick={handleInviteCollaborator}
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+                    >
+                      <Plus size={16} /> Aprovar e gerar link
+                    </button>
+                  </div>
+
+                  <div className="glass rounded-3xl border-white/5 p-5 sm:p-6 space-y-5">
+                    <div>
+                      <h3 className="text-sm sm:text-base font-bold">Colaboradores ativos</h3>
+                      <p className="text-[11px] sm:text-xs text-muted-foreground">Cada perfil combina visibilidade de módulo com capacidade de edição.</p>
+                    </div>
+
+                    <div className="space-y-4">
+                      {isLoadingCollaborators && (
+                        <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-5 text-sm text-muted-foreground">
+                          Carregando equipe colaborativa...
+                        </div>
+                      )}
+
+                      {!isLoadingCollaborators && collaborators.length === 0 && (
+                        <div className="rounded-2xl border border-dashed border-white/10 px-4 py-8 text-center text-sm text-muted-foreground">
+                          Nenhum colaborador aprovado ainda.
+                        </div>
+                      )}
+
+                      {collaborators.map((collaborator) => (
+                        <div key={collaborator.id} className="rounded-3xl border border-white/10 bg-white/[0.03] p-4 sm:p-5 space-y-4">
+                          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                            <div className="space-y-1">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <h4 className="text-base font-bold">{collaborator.user?.username || collaborator.email}</h4>
+                                <span className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-primary">
+                                  {collaborator.status}
+                                </span>
+                                <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                                  {collaborator.role}
+                                </span>
+                              </div>
+                              <p className="text-sm text-muted-foreground">{collaborator.email}</p>
+                              {collaborator.note && <p className="text-sm text-white/80">{collaborator.note}</p>}
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+                              <select
+                                value={collaborator.role}
+                                onChange={(e) => updateCollaborator(collaborator.id, { role: e.target.value as CollaborationMember['role'] })}
+                                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm outline-none focus:border-primary/50"
+                              >
+                                {ROLE_OPTIONS.map((role) => (
+                                  <option key={role.value} value={role.value} className="bg-cyber-black">
+                                    {role.label}
+                                  </option>
+                                ))}
+                              </select>
+                              <button
+                                onClick={() => revokeCollaborator(collaborator.id)}
+                                className="inline-flex items-center justify-center gap-2 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2 text-sm font-bold text-red-400 hover:bg-red-500/20 transition-all"
+                              >
+                                <Trash2 size={14} /> Revogar
+                              </button>
+                            </div>
+                          </div>
+
+                          {collaborator.inviteLink && (
+                            <div className="rounded-2xl border border-white/10 bg-cyber-black/40 p-3 text-xs text-muted-foreground break-all">
+                              {collaborator.inviteLink}
+                            </div>
+                          )}
+
+                          <div className="grid gap-3 md:grid-cols-2">
+                            {PERMISSION_CATALOG.map((permission) => (
+                              <button
+                                key={`${collaborator.id}-${permission.key}`}
+                                onClick={() => updateCollaborator(collaborator.id, {
+                                  permissions: {
+                                    ...collaborator.permissions,
+                                    [permission.key]: !collaborator.permissions[permission.key]
+                                  }
+                                })}
+                                className={`rounded-2xl border p-4 text-left transition-all ${
+                                  collaborator.permissions[permission.key]
+                                    ? 'border-primary/20 bg-primary/10'
+                                    : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.05]'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between gap-3">
+                                  <span className="text-sm font-bold">{permission.label}</span>
+                                  <span className={`text-[10px] font-bold uppercase tracking-widest ${collaborator.permissions[permission.key] ? 'text-primary' : 'text-muted-foreground'}`}>
+                                    {collaborator.permissions[permission.key] ? 'Ativo' : 'Bloqueado'}
+                                  </span>
+                                </div>
+                                <p className="mt-2 text-xs text-white/80">{permission.summary}</p>
+                                <p className="mt-1 text-[11px] text-muted-foreground">{permission.impact}</p>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="glass rounded-3xl border-white/5 p-5 sm:p-6 space-y-4">
+                    <h3 className="text-sm sm:text-base font-bold">Papéis sugeridos</h3>
+                    <div className="space-y-3">
+                      {ROLE_OPTIONS.map((role) => (
+                        <div key={role.value} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-sm font-bold">{role.label}</span>
+                            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{role.value}</span>
+                          </div>
+                          <p className="mt-2 text-xs text-muted-foreground">{role.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="glass rounded-3xl border-white/5 p-5 sm:p-6 space-y-4">
+                    <h3 className="text-sm sm:text-base font-bold">Oportunidades multiator já preparadas</h3>
+                    <div className="space-y-3">
+                      {[
+                        { title: 'Comercial/Closer', detail: 'Propostas, CRM, follow-up e acesso parcial ao financeiro.' },
+                        { title: 'Delivery/PM', detail: 'Projetos, workspaces, playbooks, stakeholders e pós-entrega.' },
+                        { title: 'Financeiro', detail: 'ERP, company billing e leitura de propostas para conferência.' },
+                        { title: 'Conteúdo/Marketing', detail: 'Blog e ativos da marca sem acesso aos dados sensíveis.' }
+                      ].map((item) => (
+                        <div key={item.title} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                          <p className="text-sm font-bold">{item.title}</p>
+                          <p className="mt-1 text-xs text-muted-foreground">{item.detail}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
           </AnimatePresence>
+          )}
         </div>
       </main>
 

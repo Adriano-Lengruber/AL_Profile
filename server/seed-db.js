@@ -35,6 +35,19 @@ mongoose.connect(MONGODB_URI)
       costs: [mongoose.Schema.Types.Mixed],
       stakeholders: [mongoose.Schema.Types.Mixed],
       meetingNotes: [mongoose.Schema.Types.Mixed],
+      stage: { type: String, default: 'proposal' },
+      nextAction: { type: String, default: '' },
+      followUpDate: { type: String, default: '' },
+      workflowSteps: { type: [mongoose.Schema.Types.Mixed], default: [] },
+      postDeliverySteps: { type: [mongoose.Schema.Types.Mixed], default: [] },
+      playbook: {
+        type: mongoose.Schema.Types.Mixed,
+        default: { templateId: 'consulting', steps: [] }
+      },
+      financials: {
+        type: mongoose.Schema.Types.Mixed,
+        default: { proposalValue: 0, paymentMethod: 'A definir', invoiceStatus: 'pending', installments: [] }
+      },
       userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
     });
     const Project = mongoose.model('Project', projectSchema);
@@ -101,7 +114,40 @@ mongoose.connect(MONGODB_URI)
         ],
         costs: [{ label: "Hospedagem DigitalOcean", value: 60 }, { label: "API OpenAI", value: 150 }],
         stakeholders: [{ name: "Ricardo Santos", role: "CTO", influence: "high", preference: "clean code" }],
-        meetingNotes: [{ date: "2026-03-10", content: "Discussão sobre cache com Redis." }],
+        meetingNotes: [{
+          date: "2026-03-10",
+          title: "Validação técnica da integração",
+          kind: "followup",
+          content: "Discussão sobre cache com Redis.",
+          outcome: "Aprovado teste de performance antes da próxima entrega.",
+          nextStep: "Apresentar benchmark da API e fluxo com cache."
+        }],
+        financials: {
+          proposalValue: 8500,
+          paymentMethod: "Pix + transferência",
+          invoiceStatus: "issued",
+          installments: [
+            { id: "inst-1", label: "Sinal", amount: 3500, dueDate: "2026-03-08", status: "paid" },
+            { id: "inst-2", label: "Entrega parcial", amount: 2500, dueDate: "2026-03-28", status: "pending" },
+            { id: "inst-3", label: "Entrega final", amount: 2500, dueDate: "2026-04-15", status: "pending" }
+          ]
+        },
+        postDeliverySteps: [
+          { id: "testimonial", title: "Solicitar depoimento do cliente", area: "testimonial", done: false },
+          { id: "case", title: "Transformar o projeto em case", area: "case", done: false },
+          { id: "portfolio", title: "Atualizar portfólio e landing pessoal", area: "portfolio", done: false },
+          { id: "referral", title: "Pedir indicação ou ponte comercial", area: "referral", done: false },
+          { id: "upsell", title: "Abrir próxima oferta ou retenção", area: "upsell", done: false }
+        ],
+        playbook: {
+          templateId: "automation",
+          steps: [
+            { id: "playbook-briefing", title: "Consolidar briefing técnico e fontes de dados", description: "Transformar dores do cliente em fluxo operacional validado.", done: true },
+            { id: "playbook-stack", title: "Definir stack, ambiente e segurança do fluxo", description: "Fechar n8n, banco, credenciais, observabilidade e backups.", done: true },
+            { id: "playbook-mvp", title: "Entregar MVP automatizado com validação", description: "Subir primeira versão do fluxo e validar com dados reais.", done: false },
+            { id: "playbook-handover", title: "Preparar handoff, treinamento e SOP final", description: "Registrar operação, uso e manutenção para o cliente.", done: false }
+          ]
+        },
         userId
       },
       {
@@ -112,6 +158,20 @@ mongoose.connect(MONGODB_URI)
         status: "active",
         value: 12500,
         deadline: "2026-05-20",
+        financials: {
+          proposalValue: 12500,
+          paymentMethod: "Boleto",
+          invoiceStatus: "pending",
+          installments: [
+            { id: "inst-4", label: "Entrada", amount: 5000, dueDate: "2026-03-30", status: "pending" },
+            { id: "inst-5", label: "Entrega final", amount: 7500, dueDate: "2026-05-20", status: "pending" }
+          ]
+        },
+        postDeliverySteps: [],
+        playbook: {
+          templateId: "analytics",
+          steps: []
+        },
         userId
       },
       {
@@ -122,6 +182,17 @@ mongoose.connect(MONGODB_URI)
         status: "prospect",
         value: 15000,
         deadline: "A definir",
+        financials: {
+          proposalValue: 15000,
+          paymentMethod: "A definir",
+          invoiceStatus: "pending",
+          installments: []
+        },
+        postDeliverySteps: [],
+        playbook: {
+          templateId: "consulting",
+          steps: []
+        },
         userId
       },
       {
@@ -132,6 +203,31 @@ mongoose.connect(MONGODB_URI)
         status: "finished",
         value: 9200,
         deadline: "2026-03-01",
+        financials: {
+          proposalValue: 9200,
+          paymentMethod: "Pix",
+          invoiceStatus: "paid",
+          installments: [
+            { id: "inst-6", label: "Sinal", amount: 4600, dueDate: "2026-01-15", status: "paid" },
+            { id: "inst-7", label: "Entrega final", amount: 4600, dueDate: "2026-03-01", status: "paid" }
+          ]
+        },
+        postDeliverySteps: [
+          { id: "testimonial", title: "Solicitar depoimento do cliente", area: "testimonial", done: true },
+          { id: "case", title: "Transformar o projeto em case", area: "case", done: false },
+          { id: "portfolio", title: "Atualizar portfólio e landing pessoal", area: "portfolio", done: false },
+          { id: "referral", title: "Pedir indicação ou ponte comercial", area: "referral", done: false },
+          { id: "upsell", title: "Abrir próxima oferta ou retenção", area: "upsell", done: false }
+        ],
+        playbook: {
+          templateId: "retainer",
+          steps: [
+            { id: "playbook-scope", title: "Definir escopo mensal e SLAs", description: "Alinhar entregas recorrentes, limites e prioridades.", done: true },
+            { id: "playbook-backlog", title: "Organizar backlog e agenda mensal", description: "Separar melhorias, correções e oportunidades do período.", done: true },
+            { id: "playbook-review", title: "Executar review e reportar valor", description: "Mostrar resultado, horas, impacto e próximos passos.", done: true },
+            { id: "playbook-renewal", title: "Abrir renovação, upsell e expansão", description: "Transformar operação recorrente em conta crescente.", done: false }
+          ]
+        },
         userId
       },
       {
@@ -142,6 +238,17 @@ mongoose.connect(MONGODB_URI)
         status: "prospect",
         value: 5000,
         deadline: "A definir",
+        financials: {
+          proposalValue: 5000,
+          paymentMethod: "A definir",
+          invoiceStatus: "pending",
+          installments: []
+        },
+        postDeliverySteps: [],
+        playbook: {
+          templateId: "consulting",
+          steps: []
+        },
         userId
       }
     ];

@@ -21,7 +21,6 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }
 
   if (!isAuthenticated) {
-    // Redireciona para o login, mas salva a localização atual para onde o usuário queria ir
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

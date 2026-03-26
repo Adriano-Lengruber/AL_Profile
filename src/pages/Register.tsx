@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { UserPlus, Mail, Lock, User, ArrowLeft, Loader2 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
@@ -14,7 +14,9 @@ export default function Register() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { register } = useAuth();
+  const inviteToken = new URLSearchParams(location.search).get('invite');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +30,7 @@ export default function Register() {
     setLoading(true);
     try {
       await register(formData.username, formData.email, formData.password);
-      navigate('/admin');
+      navigate(inviteToken ? `/admin?invite=${inviteToken}` : '/admin');
     } catch (err: any) {
       setError(err.message || 'Erro ao criar conta');
     } finally {
@@ -63,8 +65,16 @@ export default function Register() {
               <UserPlus className="text-primary" size={32} />
             </div>
             <h1 className="text-2xl font-bold font-heading">Criar Conta</h1>
-            <p className="text-muted-foreground mt-2">Junte-se ao ambiente administrativo</p>
+            <p className="text-muted-foreground mt-2">
+              {inviteToken ? 'Crie sua conta com o e-mail aprovado para entrar como colaborador.' : 'Junte-se ao ambiente administrativo'}
+            </p>
           </div>
+
+          {inviteToken && (
+            <div className="mb-6 rounded-xl border border-primary/20 bg-primary/10 p-4 text-sm text-primary">
+              O acesso será liberado apenas para o e-mail que recebeu o link de colaboração.
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
@@ -155,7 +165,7 @@ export default function Register() {
 
           <div className="mt-8 text-center text-sm">
             <span className="text-muted-foreground">Já tem uma conta? </span>
-            <Link to="/login" className="text-primary hover:underline font-medium">
+            <Link to={inviteToken ? `/login?invite=${inviteToken}` : '/login'} className="text-primary hover:underline font-medium">
               Fazer Login
             </Link>
           </div>

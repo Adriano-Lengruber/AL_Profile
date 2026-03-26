@@ -14,8 +14,13 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
-
-  const from = (location.state as any)?.from?.pathname || '/admin';
+  const inviteToken = new URLSearchParams(location.search).get('invite');
+  const fromLocation = (location.state as { from?: { pathname?: string; search?: string } } | null)?.from;
+  const from = fromLocation
+    ? `${fromLocation.pathname || '/admin'}${fromLocation.search || ''}`
+    : inviteToken
+      ? `/admin?invite=${inviteToken}`
+      : '/admin';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,8 +64,16 @@ export default function Login() {
               <LogIn className="text-primary" size={32} />
             </div>
             <h1 className="text-2xl font-bold font-heading">Bem-vindo de volta</h1>
-            <p className="text-muted-foreground mt-2">Acesse o seu ambiente administrativo</p>
+            <p className="text-muted-foreground mt-2">
+              {inviteToken ? 'Entre para validar o convite colaborativo que foi aprovado para você.' : 'Acesse o seu ambiente administrativo'}
+            </p>
           </div>
+
+          {inviteToken && (
+            <div className="mb-6 rounded-xl border border-primary/20 bg-primary/10 p-4 text-sm text-primary">
+              Seu acesso ao Admin depende da aprovação do convite enviado para este e-mail.
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
@@ -124,7 +137,7 @@ export default function Login() {
 
           <div className="mt-8 text-center text-sm">
             <span className="text-muted-foreground">Ainda não tem acesso? </span>
-            <Link to="/register" className="text-primary hover:underline font-medium">
+            <Link to={inviteToken ? `/register?invite=${inviteToken}` : '/register'} className="text-primary hover:underline font-medium">
               Criar Conta
             </Link>
           </div>

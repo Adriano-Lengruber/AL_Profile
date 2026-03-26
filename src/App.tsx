@@ -19,8 +19,9 @@ import AdminDashboard from './pages/AdminDashboard';
 import ClientPortal from './pages/ClientPortal';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import { AuthProvider } from './hooks/useAuth';
+import { AuthProvider } from './hooks/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { useAuth } from './hooks/useAuth';
 
 interface Experience {
   id: number; title: string; company: string; period: string;
@@ -36,6 +37,8 @@ interface BlogPost {
 }
 
 export { };
+const HERO_ROLES = ['Consultoria de Soluções Inteligentes', 'AI Agents & Automation Specialist', 'Data Scientist & Full Stack Dev', 'Business Intelligence Expert'];
+
 interface Skill {
   name: string; level: number; category: 'language' | 'tool' | 'cloud' | 'other';
   icon: React.ReactNode;
@@ -125,6 +128,7 @@ const certifications = [
 function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -140,6 +144,7 @@ function Navigation() {
     { name: 'Currículo', href: '#resume' },
     { name: 'Projetos', href: '#projects' },
     { name: 'Blog', href: '/blog' },
+    { name: 'Admin', href: '/admin' },
     { name: 'Contato', href: '#contact' },
   ];
 
@@ -158,9 +163,19 @@ function Navigation() {
             </a>
           ))}
         </div>
-        <div className="hidden md:flex">
+        <div className="hidden md:flex items-center gap-3">
           <Link to="/blog" className="inline-flex items-center gap-2 px-5 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors duration-200">
             Blog
+          </Link>
+          <Link
+            to="/admin"
+            className={`inline-flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-colors duration-200 border ${
+              user?.adminAccess?.canAccessAdmin
+                ? 'border-primary/30 bg-primary/10 text-primary hover:bg-primary/20'
+                : 'border-white/10 bg-white/5 text-foreground hover:bg-white/10'
+            }`}
+          >
+            Admin
           </Link>
         </div>
         <button onClick={() => setIsOpen(!isOpen)} className="md:hidden text-foreground">
@@ -192,16 +207,15 @@ function Navigation() {
 // ──────────────────────────────────────────────────────────────
 function Hero() {
   const [typedText, setTypedText] = useState('');
-  const roles = ['Consultoria de Soluções Inteligentes', 'AI Agents & Automation Specialist', 'Data Scientist & Full Stack Dev', 'Business Intelligence Expert'];
   const [roleIndex, setRoleIndex] = useState(0);
 
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
-    const currentRole = roles[roleIndex];
+    const currentRole = HERO_ROLES[roleIndex];
     if (typedText.length < currentRole.length) {
       timeout = setTimeout(() => setTypedText(currentRole.slice(0, typedText.length + 1)), 100);
     } else {
-      timeout = setTimeout(() => { setRoleIndex((prev) => (prev + 1) % roles.length); setTypedText(''); }, 2500);
+      timeout = setTimeout(() => { setRoleIndex((prev) => (prev + 1) % HERO_ROLES.length); setTypedText(''); }, 2500);
     }
     return () => clearTimeout(timeout);
   }, [typedText, roleIndex]);
