@@ -46,28 +46,34 @@ interface Skill {
 
 const experiences: Experience[] = [
   {
-    id: 1, title: 'Cientista de Dados & Desenvolvedor', company: 'Freelancer',
-    period: '2024 - Atual', location: 'Itaperuna, RJ', current: true,
-    description: 'Atuação independente: desenvolvimento de softwares sob medida, manutenção de computadores, marketing digital, automação de processos e inteligência artificial. Prospecção e agendamento de novos clientes.',
-    skills: ['Python', 'SQL', 'Power BI', 'RPA', 'AI Agents', 'Automação'],
+    id: 1, title: 'Consultor em Soluções Inteligentes & IA', company: 'adriano-lengruber.com',
+    period: 'Mar 2026 - Atual', location: 'Remoto / Brasil', current: true,
+    description: 'Atuação dedicada à criação de soluções proprietárias para empresas e empreendedores, unindo automação, inteligência artificial, dados e desenvolvimento sob medida. Conduzo o projeto do diagnóstico à entrega final, com foco em eficiência operacional, escalabilidade e melhor relação entre investimento e resultado.',
+    skills: ['IA Aplicada', 'Automação', 'Arquitetura de Soluções', 'Full-Stack', 'Consultoria'],
   },
   {
-    id: 2, title: 'Engenheiro de Software Sênior', company: 'Global RJ Serviços',
-    period: 'Mar 2025 - Set 2025', location: 'Itaperuna, RJ',
-    description: 'Python e SQL para tratamento/limpeza, análise e criação de Views/Querys. Processo ETL completo, Modelagem, Relacionamentos, Colunas Calculadas, Medidas DAX. Criação de Painéis no PowerBi. Scripts para automações e Web Scraping. Desenvolvimento Full-Stack.',
+    id: 2, title: 'Fundador & Consultor de Tecnologia', company: 'SuperTech - Soluções em TI',
+    period: 'Jan 2010 - Mar 2026', location: 'Natividade, RJ',
+    description: 'Liderei uma operação própria de tecnologia com atendimento personalizado, desenvolvimento de softwares sob medida, manutenção de computadores e eletrônicos, marketing digital e relacionamento comercial. A experiência consolidou uma visão prática de ponta a ponta, da prospecção à entrega de soluções alinhadas às necessidades reais de cada cliente.',
+    skills: ['Empreendedorismo', 'Suporte Técnico', 'Software Sob Medida', 'Marketing Digital', 'Relacionamento com Clientes'],
+  },
+  {
+    id: 3, title: 'Engenheiro de Software Sênior', company: 'Global RJ Serviços',
+    period: 'Mar 2025 - Set 2025', location: 'Natividade, RJ',
+    description: 'Atuei na construção de soluções orientadas a dados com Python, SQL e Power BI, cobrindo extração, tratamento, modelagem e disponibilização de informações para análise executiva. Também desenvolvi automações, rotinas de web scraping, dashboards de alta performance e entregas full stack com versionamento e deploy estruturados.',
     skills: ['Python', 'SQL', 'Power BI', 'DAX', 'ETL', 'Git', 'Full-Stack'],
   },
   {
-    id: 3, title: 'Analista de Dados / Planejamento', company: 'Infotec Brasil',
+    id: 4, title: 'Analista de Dados / Planejamento', company: 'Infotec Brasil',
     period: 'Jul 2023 - Fev 2025', location: 'Macaé, RJ',
-    description: 'Contrato MC38 atendendo clientes da região de Imbetiba - Macaé/RJ. Extrações de dados do sistema SAP BW - SAP 4/HANA Petrobrás. Processo ETL completo, testes, validação. Criação de relatórios e dashboards no PowerBi. Microsoft Power Platform: PowerApps e Power Automate.',
-    skills: ['SAP BW', 'Power BI', 'DAX', 'PowerApps', 'Power Automate', 'ETL'],
+    description: 'Atuei no contrato MC38, atendendo demandas da região de Imbetiba com extração de dados em SAP BW / SAP S/4HANA, processos completos de ETL, validação de consistência e construção de relatórios no Power BI. Também desenvolvi aplicações corporativas com Power Apps e automações com Power Automate para digitalizar rotinas e integrar informações em uma única solução de negócio.',
+    skills: ['SAP BW', 'Power BI', 'DAX', 'Power Apps', 'Power Automate', 'ETL'],
   },
   {
-    id: 4, title: 'Gerente Operacional', company: 'BIF BEEF - BCG IND. E COM.',
+    id: 5, title: 'Gerente Operacional', company: 'BIF BEEF - BCG IND. E COM.',
     period: 'Abr 2014 - Set 2016', location: 'Itaperuna, RJ',
-    description: 'Retorno financeiro e baixa nas duplicatas. Importação de pedidos para sistema ERP. Logística de entrega e faturamento (NFe). Gestão de rede interna e equipamentos.',
-    skills: ['Gestão', 'ERP', 'Logística', 'Financeiro', 'Gestão de Equipes'],
+    description: 'Fui responsável pela operação administrativa e logística, incluindo faturamento, controle financeiro, importação de pedidos, emissão de notas fiscais, roteirização de entregas e gestão de cadastros no ERP. Também atuei na negociação com fornecedores, supervisão comercial e administração da infraestrutura interna e dos equipamentos da empresa.',
+    skills: ['Gestão Operacional', 'ERP', 'Logística', 'Financeiro', 'Gestão de Equipes'],
   },
 ];
 
@@ -144,7 +150,6 @@ function Navigation() {
     { name: 'Currículo', href: '#resume' },
     { name: 'Projetos', href: '#projects' },
     { name: 'Blog', href: '/blog' },
-    { name: 'Admin', href: '/admin' },
     { name: 'Contato', href: '#contact' },
   ];
 
@@ -250,9 +255,9 @@ function Hero() {
 
           <motion.p
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
+            className="text-lg text-muted-foreground max-w-4xl mx-auto mb-10 leading-relaxed"
           >
-            Transformando dados em soluções inteligentes. Especialista em automação e IA, criando soluções que impulsionam a evolução das empresas.
+            Transformando dados em soluções inteligentes. Especialista em automação e IA, crio soluções com tecnologias de ponta que impulsionam a evolução de empresas e empreendedores de todos os portes.
           </motion.p>
 
           <motion.div
@@ -550,7 +555,7 @@ function Services() {
           <p className="text-muted-foreground max-w-2xl mx-auto">Soluções sob medida para transformar seus dados e processos em vantagem competitiva</p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
           {services.map((svc, i) => (
             <motion.div key={svc.title}
               initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
@@ -581,6 +586,184 @@ function Services() {
               )}
             </motion.div>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SpecializedConsulting() {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'start' });
+
+  const consultingServices = [
+    {
+      title: 'Workstations Pro para IA & Dados',
+      audience: 'IA • Ciência de Dados • Criadores',
+      description: 'Projeto estações de trabalho sob medida para quem precisa de desempenho real em IA, ciência de dados, criação de conteúdo e workloads intensivos. O foco é equilibrar performance, possibilidade de upgrade, confiabilidade e investimento inteligente.',
+      idealFor: 'Profissionais que precisam montar ou evoluir uma máquina realmente compatível com o seu perfil de uso.',
+      deliverable: 'Definição da configuração ideal, orientação de compra, checklist técnico e plano de evolução.',
+      badges: ['Alta Performance', 'GPU Ready', 'Setup Sob Medida'],
+      features: [
+        'Dimensionamento de CPU, GPU, RAM e armazenamento por perfil de uso',
+        'Planejamento térmico, consumo, upgrade e longevidade do equipamento',
+        'Configuração pensada para produtividade, estabilidade e custo-benefício',
+      ],
+      icon: <HardDrive size={24} />,
+      iconColor: 'text-cyber-gold',
+      iconBg: 'bg-cyber-gold/15',
+      border: 'hover:border-cyber-gold/30 hover:shadow-cyber-gold/10',
+      cover: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80',
+    },
+    {
+      title: 'VPS Pessoal ou Profissional',
+      audience: 'Cloud • Self-Hosted • Deploy',
+      description: 'Estruturo VPS sob medida para aplicações, automações, bots, sites, APIs ou ambientes privados, com configuração orientada ao objetivo do cliente. A entrega inclui transparência total, documentação operacional no próprio ambiente e transferência integral dos acessos.',
+      idealFor: 'Empresas e profissionais que querem infraestrutura enxuta, segura e pronta para uso sem depender de pacotes genéricos.',
+      deliverable: 'Servidor provisionado, stack configurada, segurança inicial aplicada e acessos totalmente em posse do cliente.',
+      badges: ['Linux', 'Docker', 'Acessos do Cliente'],
+      features: [
+        'Configuração precisa das aplicações escolhidas para o cenário de uso',
+        'Organização de usuários, domínios, SSL, backups e boas práticas de segurança',
+        'Entrega final com transparência sobre contas, logins e estrutura implantada',
+      ],
+      icon: <Server size={24} />,
+      iconColor: 'text-cyan-400',
+      iconBg: 'bg-cyan-400/15',
+      border: 'hover:border-cyan-400/30 hover:shadow-cyan-400/10',
+      cover: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80',
+    },
+    {
+      title: 'Personal Developer',
+      audience: 'Produto Sob Medida • Full Stack',
+      description: 'Consultoria e desenvolvimento do início ao fim para projetos personalizados, pensados especificamente para a realidade de uma pessoa, empresa ou gestor. A prioridade é construir a solução certa com a stack mais atual, sem perder de vista viabilidade, manutenção e retorno sobre o investimento.',
+      idealFor: 'Quem precisa tirar uma ideia do papel ou evoluir um processo com tecnologia feita sob medida.',
+      deliverable: 'Descoberta, arquitetura, implementação, validação e evolução contínua do projeto.',
+      badges: ['Sob Medida', 'IA Aplicada', 'Custo-Benefício'],
+      features: [
+        'Levantamento da necessidade real antes da escolha técnica',
+        'Desenvolvimento orientado a resultado, usabilidade e escalabilidade',
+        'Tecnologia atual com foco em sustentabilidade financeira do projeto',
+      ],
+      icon: <Brackets size={24} />,
+      iconColor: 'text-cyber-emerald',
+      iconBg: 'bg-cyber-emerald/15',
+      border: 'hover:border-cyber-emerald/30 hover:shadow-cyber-emerald/10',
+      cover: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80',
+    },
+    {
+      title: 'BI Express para PMEs',
+      audience: 'Gestão • Comercial • Operação',
+      description: 'Uma frente pensada para gerar resultado rápido em empresas locais e regionais por meio de dashboards executivos, automações operacionais e organização dos indicadores essenciais. É uma porta de entrada de alto valor para negócios que precisam enxergar melhor suas operações e decidir com mais segurança.',
+      idealFor: 'Comércios, indústrias, distribuidores, clínicas e gestores que querem clareza nos números e ganho operacional.',
+      deliverable: 'Mapa de indicadores, painel executivo, rotina de atualização e recomendações práticas de melhoria.',
+      badges: ['Dashboard', 'KPIs', 'Quick Wins'],
+      features: [
+        'Estruturação de indicadores críticos para operação, comercial e financeiro',
+        'Painéis objetivos para acompanhamento e tomada de decisão',
+        'Automação de etapas repetitivas para reduzir retrabalho e ruído operacional',
+      ],
+      icon: <Gauge size={24} />,
+      iconColor: 'text-[#E07390]',
+      iconBg: 'bg-[#E07390]/15',
+      border: 'hover:border-[#E07390]/30 hover:shadow-[#E07390]/10',
+      cover: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
+    },
+  ];
+
+  return (
+    <section className="py-24 relative bg-cyber-black/30">
+      <div className="max-w-7xl mx-auto px-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-medium tracking-[0.2em] uppercase mb-5">
+            <Sparkles size={14} />
+            Nova frente
+          </div>
+          <h2 className="font-heading text-4xl font-bold mb-4">Consultorias <span className="text-gradient">Especializadas</span></h2>
+          <p className="text-muted-foreground max-w-3xl mx-auto">Serviços com alta percepção de valor para atrair projetos rápidos, estratégicos e personalizados, do hardware à infraestrutura e ao software sob medida.</p>
+        </motion.div>
+
+        <div className="relative">
+          <button
+            onClick={() => emblaApi?.scrollPrev()}
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-12 h-12 rounded-full glass items-center justify-center hover:bg-primary/15 hover:border-primary/25 transition-all hidden md:flex"
+          >
+            <ChevronLeft size={20} />
+          </button>
+
+          <div className="overflow-hidden" ref={emblaRef}>
+            <div className="flex gap-6">
+              {consultingServices.map((service, index) => (
+                <motion.div
+                  key={service.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.08 }}
+                  className="min-w-0 flex-[0_0_100%] md:flex-[0_0_calc(50%-12px)]"
+                >
+                  <div className={`glass rounded-2xl overflow-hidden border border-white/10 transition-all duration-300 ${service.border} hover:-translate-y-1 h-full`}>
+                    <div className="relative h-60">
+                      <div
+                        className="absolute inset-0 bg-cover bg-center scale-105 transition-transform duration-500"
+                        style={{ backgroundImage: `linear-gradient(135deg, rgba(5,8,12,0.2), rgba(5,8,12,0.75)), url(${service.cover})` }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-cyber-black via-cyber-black/30 to-transparent" />
+                      <div className="relative z-10 h-full p-6 flex flex-col justify-between">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex flex-wrap gap-2 max-w-[80%]">
+                            {service.badges.map((badge) => (
+                              <span key={badge} className="px-2.5 py-1 rounded-full bg-black/35 backdrop-blur-sm border border-white/15 text-[11px] font-medium text-white/90">
+                                {badge}
+                              </span>
+                            ))}
+                          </div>
+                          <div className={`w-12 h-12 rounded-xl ${service.iconBg} backdrop-blur-sm flex items-center justify-center ${service.iconColor}`}>
+                            {service.icon}
+                          </div>
+                        </div>
+
+                        <div>
+                          <p className="text-[11px] uppercase tracking-[0.25em] text-white/70 mb-2">{service.audience}</p>
+                          <h3 className="font-heading text-2xl font-semibold text-white">{service.title}</h3>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-6">
+                      <p className="text-muted-foreground leading-relaxed mb-5">{service.description}</p>
+
+                      <div className="grid sm:grid-cols-2 gap-4 mb-5">
+                        <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                          <p className="text-[11px] uppercase tracking-[0.2em] text-primary mb-2">Ideal para</p>
+                          <p className="text-sm text-foreground/85 leading-relaxed">{service.idealFor}</p>
+                        </div>
+                        <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                          <p className="text-[11px] uppercase tracking-[0.2em] text-primary mb-2">Entregáveis</p>
+                          <p className="text-sm text-foreground/85 leading-relaxed">{service.deliverable}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        {service.features.map((feature) => (
+                          <div key={feature} className="flex items-start gap-2 text-sm text-muted-foreground">
+                            <CheckCircle2 size={16} className={service.iconColor} />
+                            <span>{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          <button
+            onClick={() => emblaApi?.scrollNext()}
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-12 h-12 rounded-full glass items-center justify-center hover:bg-primary/15 hover:border-primary/25 transition-all hidden md:flex"
+          >
+            <ChevronRight size={20} />
+          </button>
         </div>
       </div>
     </section>
@@ -622,7 +805,7 @@ function Process() {
     <section id="process" className="py-24 relative bg-cyber-black/30">
       <div className="max-w-7xl mx-auto px-6">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
-          <h2 className="font-heading text-4xl font-bold mb-4">Como <span className="text-gradient">Atuamos</span></h2>
+          <h2 className="font-heading text-4xl font-bold mb-4">Como <span className="text-gradient">Atuo?</span></h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">Um processo consultivo focado em resultados tangíveis e transparência total.</p>
         </motion.div>
 
@@ -1249,6 +1432,7 @@ export default function App() {
             <About />
             <TechStack />
             <Services />
+            <SpecializedConsulting />
             <Process />
             <Resume />
             <Education />
