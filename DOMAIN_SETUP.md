@@ -164,6 +164,17 @@ Checklist rápido:
 4. `docker exec nginx-proxy-app-1 getent hosts al-profile-frontend` precisa resolver o host.
 5. Só depois valide novamente o domínio público.
 
+Se o `docker-compose` falhar com `No such image` ou tentar recriar containers com nomes estranhos como `<hash>_al-profile-frontend` ou `<hash>_al-profile-backend`, remova o container órfão antes de subir novamente:
+
+```bash
+docker ps -a --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}" | grep al-profile
+docker-compose -f docker-compose.blog.yml rm -sf frontend backend || true
+docker rm -f <container_orfao> 2>/dev/null || true
+docker-compose -f docker-compose.blog.yml up -d frontend backend
+```
+
+Esse erro acontece quando o Docker tenta recriar um container antigo preso a uma imagem que já foi removida localmente.
+
 ### ⏪ Rollback imediato
 
 Se a nova versão derrubar o site, volte imediatamente ao último commit estável:
