@@ -220,6 +220,22 @@ interface ProjectFinancials {
   installments: ProjectInstallment[];
 }
 
+type ProjectContractStatus = 'draft' | 'sent' | 'signed';
+type ProjectApprovalStatus = 'pending' | 'approved';
+type ProjectSignatureProvider = 'manual' | 'govbr' | 'platform';
+
+interface ProjectApproval {
+  contractStatus: ProjectContractStatus;
+  approvalStatus: ProjectApprovalStatus;
+  signatureProvider: ProjectSignatureProvider;
+  contractUrl: string;
+  signatureUrl: string;
+  scopeSummary: string;
+  approvalDeadline: string;
+  signedAt: string;
+  approvedAt: string;
+}
+
 interface ProjectPostDeliveryStep {
   id: string;
   title: string;
@@ -269,8 +285,25 @@ interface Project {
   followUpDate: string;
   workflowSteps: ProjectWorkflowStep[];
   financials: ProjectFinancials;
+  approval: ProjectApproval;
   postDeliverySteps: ProjectPostDeliveryStep[];
   playbook: ProjectPlaybook;
+}
+
+interface ProjectAttentionItem {
+  id: string;
+  title: string;
+  detail: string;
+  tone: string;
+}
+
+interface ProjectTimelineItem {
+  id: string;
+  date: string;
+  title: string;
+  detail: string;
+  category: string;
+  tone: string;
 }
 
 interface CompanyProfile {
@@ -413,6 +446,17 @@ const INITIAL_PROJECTS: Project[] = [
         { id: 'inst-3', label: 'Entrega final', amount: 2500, dueDate: '2026-04-15', status: 'pending' }
       ]
     },
+    approval: {
+      contractStatus: 'signed',
+      approvalStatus: 'pending',
+      signatureProvider: 'govbr',
+      contractUrl: 'https://adriano-lengruber.com/docs/contrato-global-rj.pdf',
+      signatureUrl: 'https://www.gov.br/governodigital/pt-br/assinatura-eletronica',
+      scopeSummary: 'Automação de ETL, validação do pipeline, dashboard analítico e handoff operacional com checkpoints formais.',
+      approvalDeadline: '2026-03-28',
+      signedAt: '2026-03-05',
+      approvedAt: ''
+    },
     postDeliverySteps: [
       { id: 'testimonial', title: 'Solicitar depoimento do cliente', area: 'testimonial', done: false },
       { id: 'case', title: 'Transformar o projeto em case', area: 'case', done: false },
@@ -550,6 +594,37 @@ const getDefaultFollowUpDate = (deadline?: string) => {
   const nextWeek = new Date();
   nextWeek.setDate(nextWeek.getDate() + 7);
   return nextWeek.toISOString().split('T')[0];
+};
+
+const createProjectApproval = (project?: Partial<Project>): ProjectApproval => {
+  const status = project?.status;
+  const approval = project?.approval;
+
+  return {
+    contractStatus: approval?.contractStatus === 'sent' || approval?.contractStatus === 'signed'
+      ? approval.contractStatus
+      : status === 'finished' || status === 'active'
+        ? 'signed'
+        : 'draft',
+    approvalStatus: approval?.approvalStatus === 'approved'
+      ? 'approved'
+      : status === 'finished'
+        ? 'approved'
+        : 'pending',
+    signatureProvider: approval?.signatureProvider === 'govbr' || approval?.signatureProvider === 'platform'
+      ? approval.signatureProvider
+      : 'manual',
+    contractUrl: typeof approval?.contractUrl === 'string' ? approval.contractUrl : '',
+    signatureUrl: typeof approval?.signatureUrl === 'string' ? approval.signatureUrl : '',
+    scopeSummary: typeof approval?.scopeSummary === 'string' && approval.scopeSummary.trim()
+      ? approval.scopeSummary
+      : (typeof project?.brief === 'string' ? project.brief : ''),
+    approvalDeadline: typeof approval?.approvalDeadline === 'string' && approval.approvalDeadline.trim()
+      ? approval.approvalDeadline
+      : getDefaultFollowUpDate(project?.deadline),
+    signedAt: typeof approval?.signedAt === 'string' ? approval.signedAt : '',
+    approvedAt: typeof approval?.approvedAt === 'string' ? approval.approvedAt : ''
+  };
 };
 
 const createWorkflowSteps = (status?: Project['status'], workflowSteps?: Partial<ProjectWorkflowStep>[]) => {
@@ -774,6 +849,179 @@ const getPaymentStatusStyle = (status: ProjectPaymentStatus) => {
   return 'bg-cyber-gold/10 text-cyber-gold border-cyber-gold/20';
 };
 
+const getContractStatusStyle = (status: ProjectContractStatus) => {
+  if (status === 'signed') return 'bg-cyber-emerald/10 text-cyber-emerald border-cyber-emerald/20';
+  if (status === 'sent') return 'bg-primary/10 text-primary border-primary/20';
+  return 'bg-white/10 text-muted-foreground border-white/10';
+};
+
+const getApprovalStatusStyle = (status: ProjectApprovalStatus) => {
+  if (status === 'approved') return 'bg-cyber-emerald/10 text-cyber-emerald border-cyber-emerald/20';
+  return 'bg-cyber-gold/10 text-cyber-gold border-cyber-gold/20';
+};
+
+const getSignatureProviderLabel = (provider: ProjectSignatureProvider) => {
+  if (provider === 'govbr') return 'gov.br';
+  if (provider === 'platform') return 'Plataforma externa';
+  return 'Manual / envio direto';
+};
+
+const getProjectAttentionItems = (project: Project): ProjectAttentionItem[] => {
+  const items: ProjectAttentionItem[] = [];
+  const followUpMeta = getFollowUpMeta(project.followUpDate);
+  const incompleteTasks = project.tasks.filter(task => task.status !== 'done').length;
+  const deadlineTimestamp = getDateTimestamp(project.deadline);
+  const todayTimestamp = new Date().setHours(0, 0, 0, 0);
+  const deadlineDiffDays = deadlineTimestamp ? Math.round((deadlineTimestamp - todayTimestamp) / 86400000) : null;
+  const overdueInstallments = project.financials.installments.filter(installment => getEffectiveInstallmentStatus(installment) === 'overdue');
+  const approvalDeadlineTimestamp = getDateTimestamp(project.approval.approvalDeadline);
+  const approvalPending = project.approval.approvalStatus !== 'approved';
+
+  if (followUpMeta.rank === 0) {
+    items.push({
+      id: 'followup-overdue',
+      title: 'Follow-up atrasado',
+      detail: `O próximo contato estava previsto para ${formatProjectDate(project.followUpDate)} e precisa de ação imediata.`,
+      tone: 'border-red-500/20 bg-red-500/5 text-red-400'
+    });
+  } else if (followUpMeta.rank === 1) {
+    items.push({
+      id: 'followup-today',
+      title: 'Follow-up vence hoje',
+      detail: 'Há um contato programado para hoje. Boa oportunidade para confirmar decisão, entrega ou retenção.',
+      tone: 'border-cyber-gold/20 bg-cyber-gold/5 text-cyber-gold'
+    });
+  }
+
+  if (overdueInstallments.length > 0) {
+    items.push({
+      id: 'financial-overdue',
+      title: 'Financeiro em atraso',
+      detail: `${overdueInstallments.length} parcela(s) vencida(s) precisam de cobrança ou renegociação para proteger o caixa.`,
+      tone: 'border-red-500/20 bg-red-500/5 text-red-400'
+    });
+  }
+
+  if (approvalPending && approvalDeadlineTimestamp && approvalDeadlineTimestamp < todayTimestamp) {
+    items.push({
+      id: 'approval-overdue',
+      title: 'Aceite fora do prazo',
+      detail: `O aceite formal venceu em ${formatProjectDate(project.approval.approvalDeadline)} e segue pendente.`,
+      tone: 'border-red-500/20 bg-red-500/5 text-red-400'
+    });
+  } else if (approvalPending && project.approval.contractStatus !== 'signed') {
+    items.push({
+      id: 'contract-open',
+      title: 'Contrato ainda aberto',
+      detail: 'Contrato e aceite ainda não foram totalmente formalizados. Ideal para evitar retrabalho de escopo.',
+      tone: 'border-primary/20 bg-primary/5 text-primary'
+    });
+  }
+
+  if (!project.nextAction.trim()) {
+    items.push({
+      id: 'next-action-missing',
+      title: 'Próxima ação indefinida',
+      detail: 'Defina o próximo movimento para não deixar a operação sem dono nem contexto.',
+      tone: 'border-cyber-gold/20 bg-cyber-gold/5 text-cyber-gold'
+    });
+  }
+
+  if (deadlineDiffDays !== null && deadlineDiffDays <= 5 && incompleteTasks > 0) {
+    items.push({
+      id: 'deadline-pressure',
+      title: 'Prazo pressionado',
+      detail: `${incompleteTasks} tarefa(s) seguem abertas com deadline em ${formatProjectDate(project.deadline)}.`,
+      tone: 'border-primary/20 bg-primary/5 text-primary'
+    });
+  }
+
+  if (items.length === 0) {
+    items.push({
+      id: 'healthy',
+      title: 'Operação sob controle',
+      detail: 'Sem alertas críticos no momento. O projeto segue com contexto, agenda e checkpoints publicados.',
+      tone: 'border-cyber-emerald/20 bg-cyber-emerald/5 text-cyber-emerald'
+    });
+  }
+
+  return items.slice(0, 4);
+};
+
+const getProjectTimeline = (project: Project): ProjectTimelineItem[] => {
+  const items: ProjectTimelineItem[] = [
+    ...project.meetingNotes.map((note, index) => ({
+      id: `meeting-${index}-${note.date}`,
+      date: note.date,
+      title: note.title || 'Registro de reunião',
+      detail: note.outcome || note.nextStep || note.content,
+      category: 'Reunião',
+      tone: 'border-cyber-gold/20 bg-cyber-gold/5 text-cyber-gold'
+    })),
+    ...project.documents.map((document) => ({
+      id: `document-${document.id}`,
+      date: document.date,
+      title: document.name,
+      detail: `${document.type.toUpperCase()}${document.size ? ` • ${document.size}` : ''}`,
+      category: 'Documento',
+      tone: 'border-primary/20 bg-primary/5 text-primary'
+    })),
+    ...project.financials.installments.map((installment) => ({
+      id: `installment-${installment.id}`,
+      date: installment.dueDate,
+      title: installment.label,
+      detail: `${getEffectiveInstallmentStatus(installment) === 'paid' ? 'Parcela liquidada' : 'Parcela prevista'} • R$ ${installment.amount.toLocaleString('pt-BR')}`,
+      category: 'Financeiro',
+      tone: getEffectiveInstallmentStatus(installment) === 'paid'
+        ? 'border-cyber-emerald/20 bg-cyber-emerald/5 text-cyber-emerald'
+        : 'border-white/10 bg-white/[0.03] text-white/80'
+    })),
+    ...(project.approval.signedAt ? [{
+      id: 'approval-signed',
+      date: project.approval.signedAt,
+      title: 'Contrato assinado',
+      detail: `Canal: ${getSignatureProviderLabel(project.approval.signatureProvider)}`,
+      category: 'Assinatura',
+      tone: 'border-cyber-emerald/20 bg-cyber-emerald/5 text-cyber-emerald'
+    }] : []),
+    ...(project.approval.approvedAt ? [{
+      id: 'approval-approved',
+      date: project.approval.approvedAt,
+      title: 'Aceite aprovado',
+      detail: 'Validação formal registrada no Work OS.',
+      category: 'Aceite',
+      tone: 'border-cyber-emerald/20 bg-cyber-emerald/5 text-cyber-emerald'
+    }] : []),
+    ...(project.followUpDate ? [{
+      id: 'followup-next',
+      date: project.followUpDate,
+      title: 'Próximo follow-up',
+      detail: project.nextAction || 'Contato planejado para o próximo checkpoint.',
+      category: 'Agenda',
+      tone: 'border-cyber-gold/20 bg-cyber-gold/5 text-cyber-gold'
+    }] : []),
+    ...(project.deadline && project.deadline !== 'A definir' ? [{
+      id: 'deadline',
+      date: project.deadline,
+      title: 'Deadline do projeto',
+      detail: incompleteTasksLabel(project.tasks),
+      category: 'Prazo',
+      tone: 'border-white/10 bg-white/[0.03] text-white/80'
+    }] : [])
+  ];
+
+  return items
+    .filter(item => Boolean(item.date))
+    .sort((a, b) => (getDateTimestamp(b.date) || 0) - (getDateTimestamp(a.date) || 0))
+    .slice(0, 10);
+};
+
+const incompleteTasksLabel = (tasks: ProjectTask[]) => {
+  const openTasks = tasks.filter(task => task.status !== 'done').length;
+  if (openTasks === 0) return 'Todos os marcos operacionais foram concluídos.';
+  return `${openTasks} tarefa(s) ainda dependem de execução ou validação.`;
+};
+
 const getPostDeliveryAreaLabel = (area: ProjectPostDeliveryStep['area']) => {
   if (area === 'testimonial') return 'Depoimento';
   if (area === 'case') return 'Case';
@@ -827,6 +1075,7 @@ const normalizeProject = (project: Partial<Project>): Project => ({
         }))
       : []
   },
+  approval: createProjectApproval(project),
   postDeliverySteps: createPostDeliverySteps(project.status, project.postDeliverySteps),
   playbook: createProjectPlaybook(project)
 });
@@ -1500,8 +1749,8 @@ const ServerStatsView = () => {
   );
 };
 
-const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead, onOpenProject, onSnoozeFollowUp, onCompleteFollowUp }: { 
-  projects: Project[], 
+const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead, onOpenProject, onSnoozeFollowUp, onCompleteFollowUp }: {
+  projects: Project[],
   workspaces: Workspace[],
   onNewWorkspace: () => void,
   onNewLead: () => void,
@@ -1509,6 +1758,7 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead, onOpen
   onSnoozeFollowUp: (projectId: string, days: number) => void,
   onCompleteFollowUp: (projectId: string) => void
 }) => {
+  const [focusPanel, setFocusPanel] = useState<'overview' | 'followups' | 'attention'>('overview');
   const activeWorkspacesCount = workspaces.length;
   const totalLeads = projects.filter(p => p.status === 'prospect').length;
   const activeProjectsCount = projects.filter(p => p.status === 'active').length;
@@ -1517,13 +1767,14 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead, onOpen
   const mrrEstimated = projects
     .filter(p => p.status === 'active' || p.status === 'finished')
     .reduce((acc, p) => acc + (p.value || 0), 0) / 6;
+  const projectsWithoutTasks = projects.filter(project => project.tasks.length === 0).length;
+  const projectsWithoutNextAction = projects.filter(project => !project.nextAction.trim()).length;
 
-  // Gerar dados do gráfico a partir dos projetos finalizados e ativos
   const getMonthlyRevenue = () => {
     const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
     const currentMonth = new Date().getMonth();
     const last6Months = [];
-    
+
     for (let i = 5; i >= 0; i--) {
       const monthIdx = (currentMonth - i + 12) % 12;
       last6Months.push({
@@ -1533,24 +1784,16 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead, onOpen
       });
     }
 
-    projects.forEach(p => {
-      if (p.status === 'active' || p.status === 'finished') {
-        // Usa a data de criação ou fallback para hoje se não houver deadline
-        const date = p.deadline && p.deadline !== 'A definir' ? new Date(p.deadline) : new Date();
+    projects.forEach(project => {
+      if (project.status === 'active' || project.status === 'finished') {
+        const date = project.deadline && project.deadline !== 'A definir' ? new Date(project.deadline) : new Date();
         const monthIdx = date.getMonth();
-        const chartMonth = last6Months.find(m => m.monthIdx === monthIdx);
+        const chartMonth = last6Months.find(month => month.monthIdx === monthIdx);
         if (chartMonth) {
-          chartMonth.value += (p.value || 0);
+          chartMonth.value += (project.value || 0);
         }
       }
     });
-
-    // Se todos os valores forem zero, adiciona um fallback visual para não quebrar o gráfico
-    const hasData = last6Months.some(m => m.value > 0);
-    if (!hasData) {
-      // Opcional: injetar dados fake apenas se realmente não houver nada para o gráfico não ficar vazio
-      // Ou apenas retornar os zeros e deixar o gráfico plano (que é o comportamento correto para "sem dados")
-    }
 
     return last6Months;
   };
@@ -1604,13 +1847,28 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead, onOpen
       }).slice(0, 6)
     }
   ];
+  const attentionInsights = [
+    overdueFollowUps > 0 ? `${overdueFollowUps} follow-up(s) atrasado(s) podem esfriar lead, projeto ou upsell.` : 'Nenhum follow-up atrasado no momento.',
+    projectsWithoutTasks > 0
+      ? `${projectsWithoutTasks} projeto(s) sem tarefas detalhadas ainda.`
+      : 'Todos os projetos têm ao menos uma tarefa registrada.',
+    projectsWithoutNextAction > 0
+      ? `${projectsWithoutNextAction} projeto(s) sem próxima ação definida.`
+      : 'Todos os projetos têm próxima ação definida.'
+  ];
+  const attentionCount = [overdueFollowUps > 0, projectsWithoutTasks > 0, projectsWithoutNextAction > 0].filter(Boolean).length;
+  const focusPanels = [
+    { id: 'overview' as const, label: 'Visão executiva', description: 'KPIs, receita e ações rápidas', count: `${activeProjectsCount} projetos` },
+    { id: 'followups' as const, label: 'Fila de follow-ups', description: 'Agenda priorizada sem rolagem excessiva', count: `${weekFollowUps} em foco` },
+    { id: 'attention' as const, label: 'Pontos de atenção', description: 'Riscos operacionais e contexto crítico', count: `${attentionCount} alertas` }
+  ];
 
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
           <h2 className="text-2xl sm:text-4xl font-bold font-heading">Business <span className="text-gradient">Insights</span></h2>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-2">Visão consolidada da sua operação de consultoria.</p>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-2">Visão consolidada da sua operação com foco no que precisa de ação agora.</p>
         </div>
         <div className="flex items-center gap-2 px-3 py-1.5 glass rounded-full border-cyber-emerald/20 text-cyber-emerald text-[10px] font-bold uppercase tracking-widest">
           <div className="w-2 h-2 rounded-full bg-cyber-emerald animate-pulse" />
@@ -1618,17 +1876,40 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead, onOpen
         </div>
       </div>
 
-      {/* KPI Grid */}
+      <div className="grid gap-3 lg:grid-cols-3">
+        {focusPanels.map((panel) => (
+          <button
+            key={panel.id}
+            onClick={() => setFocusPanel(panel.id)}
+            className={`text-left rounded-3xl border p-4 sm:p-5 transition-all ${
+              focusPanel === panel.id
+                ? 'border-primary/30 bg-primary/10 shadow-lg shadow-primary/10'
+                : 'border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.05]'
+            }`}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-bold">{panel.label}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{panel.description}</p>
+              </div>
+              <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase border ${focusPanel === panel.id ? 'border-primary/20 bg-primary/10 text-primary' : 'border-white/10 bg-white/5 text-muted-foreground'}`}>
+                {panel.count}
+              </span>
+            </div>
+          </button>
+        ))}
+      </div>
+
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-2 sm:gap-4">
         {[
-          { label: 'Workspaces', value: activeWorkspacesCount, sub: 'Clientes ativos', icon: Layout, color: 'text-primary' },
-          { label: 'Projetos', value: activeProjectsCount, sub: 'Em execução', icon: Kanban, color: 'text-cyber-emerald' },
-          { label: 'Total Leads', value: totalLeads, sub: 'Novas ops', icon: Users, color: 'text-cyber-gold' },
-          { label: 'Pipeline', value: `R$ ${(totalPipelineValue / 1000).toFixed(1)}k`, sub: 'Valor total', icon: DollarSign, color: 'text-blue-500' },
-          { label: 'MRR Est.', value: `R$ ${(mrrEstimated / 1000).toFixed(1)}k`, sub: 'Recorrência', icon: TrendingUp, color: 'text-purple-500' },
-          { label: 'Win Rate', value: `${winRate}%`, sub: 'Conversão', icon: Activity, color: 'text-cyber-emerald' },
-        ].map((kpi, i) => (
-          <div key={i} className="glass p-2.5 sm:p-4 rounded-xl sm:rounded-2xl border-white/5 relative overflow-hidden group hover:border-white/10 transition-all hover:scale-[1.02] duration-300 shadow-lg hover:shadow-primary/5">
+          { label: 'Workspaces', value: activeWorkspacesCount, sub: 'Clientes ativos', icon: Layout },
+          { label: 'Projetos', value: activeProjectsCount, sub: 'Em execução', icon: Kanban },
+          { label: 'Leads', value: totalLeads, sub: 'Novas oportunidades', icon: Users },
+          { label: 'Pipeline', value: `R$ ${(totalPipelineValue / 1000).toFixed(1)}k`, sub: 'Valor total', icon: DollarSign },
+          { label: 'MRR Est.', value: `R$ ${(mrrEstimated / 1000).toFixed(1)}k`, sub: 'Recorrência', icon: TrendingUp },
+          { label: 'Win Rate', value: `${winRate}%`, sub: 'Conversão', icon: Activity },
+        ].map((kpi) => (
+          <div key={kpi.label} className="glass p-2.5 sm:p-4 rounded-xl sm:rounded-2xl border-white/5 relative overflow-hidden group hover:border-white/10 transition-all hover:scale-[1.02] duration-300 shadow-lg hover:shadow-primary/5">
             <div className="absolute -right-2 -top-2 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
               <kpi.icon size={28} className="sm:size-[50px]" />
             </div>
@@ -1643,91 +1924,88 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead, onOpen
         ))}
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        {/* Chart Area */}
-        <div className="xl:col-span-2 glass p-4 sm:p-8 rounded-3xl border-white/5 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] -z-10" />
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
-            <div className="min-w-0 w-full">
-              <h3 className="text-[10px] sm:text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2 truncate">
-                <TrendingUp size={16} className="text-primary shrink-0" /> <span className="truncate">Velocidade de Receita</span>
-              </h3>
-              <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate">Volume de projetos ativos e finalizados por mês</p>
+      {focusPanel === 'overview' && (
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <div className="xl:col-span-2 glass p-4 sm:p-8 rounded-3xl border-white/5 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] -z-10" />
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
+              <div className="min-w-0 w-full">
+                <h3 className="text-[10px] sm:text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2 truncate">
+                  <TrendingUp size={16} className="text-primary shrink-0" /> <span className="truncate">Velocidade de Receita</span>
+                </h3>
+                <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate">Volume de projetos ativos e finalizados por mês</p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <div className="px-2 py-1 bg-cyber-emerald/10 text-cyber-emerald text-[9px] font-bold rounded uppercase border border-cyber-emerald/20">Operação viva</div>
+                <div className="px-2 py-1 bg-primary/10 text-primary text-[9px] font-bold rounded uppercase border border-primary/20">2026</div>
+              </div>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <div className="px-2 py-1 bg-cyber-emerald/10 text-cyber-emerald text-[9px] font-bold rounded uppercase border border-cyber-emerald/20">Real-time</div>
-              <div className="px-2 py-1 bg-primary/10 text-primary text-[9px] font-bold rounded uppercase border border-primary/20">2026</div>
-            </div>
-          </div>
-          
-          <div className="h-[250px] sm:h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData}>
-                <defs>
-                  <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#0066FF" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#0066FF" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff05" />
-                {/* @ts-expect-error - Recharts types incompatibility with React 18 */}
-                <XAxis 
-                  dataKey="name" 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fontSize: 9, fill: '#888' }}
-                  dy={10}
-                  minTickGap={10}
-                />
-                {/* @ts-expect-error - Recharts types incompatibility with React 18 */}
-                <YAxis 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fontSize: 9, fill: '#888' }}
-                  width={35}
-                  tickFormatter={(val) => `R$ ${val >= 1000 ? (val/1000).toFixed(0) + 'k' : val}`}
-                />
-                {/* @ts-expect-error - Recharts types incompatibility with React 18 */}
-                <RechartsTooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'rgba(5, 5, 5, 0.9)', 
-                    border: '1px solid rgba(255, 255, 255, 0.1)', 
-                    borderRadius: '12px', 
-                    fontSize: '10px',
-                    backdropFilter: 'blur(4px)',
-                    padding: '8px'
-                  }}
-                  itemStyle={{ color: '#0066FF', padding: 0 }}
-                  formatter={(value: any) => [`R$ ${Number(value).toLocaleString('pt-BR')}`, 'Receita']}
-                />
-                {/* @ts-expect-error - Recharts types incompatibility with React 18 */}
-                <Area 
-                  type="monotone" 
-                  dataKey="value" 
-                  stroke="#0066FF" 
-                  strokeWidth={3}
-                  fillOpacity={1} 
-                  fill="url(#colorValue)" 
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
 
-        {/* Command Center */}
-        <div className="space-y-4 sm:space-y-6 h-full">
+            <div className="h-[250px] sm:h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData}>
+                  <defs>
+                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#0066FF" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#0066FF" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff05" />
+                  {/* @ts-expect-error - Recharts types incompatibility with React 18 */}
+                  <XAxis
+                    dataKey="name"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 9, fill: '#888' }}
+                    dy={10}
+                    minTickGap={10}
+                  />
+                  {/* @ts-expect-error - Recharts types incompatibility with React 18 */}
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 9, fill: '#888' }}
+                    width={35}
+                    tickFormatter={(val) => `R$ ${val >= 1000 ? `${(val / 1000).toFixed(0)}k` : val}`}
+                  />
+                  {/* @ts-expect-error - Recharts types incompatibility with React 18 */}
+                  <RechartsTooltip
+                    contentStyle={{
+                      backgroundColor: 'rgba(5, 5, 5, 0.9)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: '12px',
+                      fontSize: '10px',
+                      backdropFilter: 'blur(4px)',
+                      padding: '8px'
+                    }}
+                    itemStyle={{ color: '#0066FF', padding: 0 }}
+                    formatter={(value: any) => [`R$ ${Number(value).toLocaleString('pt-BR')}`, 'Receita']}
+                  />
+                  {/* @ts-expect-error - Recharts types incompatibility with React 18 */}
+                  <Area
+                    type="monotone"
+                    dataKey="value"
+                    stroke="#0066FF"
+                    strokeWidth={3}
+                    fillOpacity={1}
+                    fill="url(#colorValue)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
           <div className="glass p-4 sm:p-8 rounded-[2rem] border-white/5 h-full relative overflow-hidden group">
-            {/* Background Glow */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[60px] -z-10 group-hover:bg-primary/20 transition-all duration-700" />
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-cyber-gold/5 blur-[40px] -z-10" />
-            
+
             <h3 className="text-[10px] sm:text-xs font-black uppercase tracking-[0.3em] text-white/50 mb-4 sm:mb-6 flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-cyber-gold animate-pulse" />
               Command Center
             </h3>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-3 sm:gap-4">
-              <motion.button 
+              <motion.button
                 whileHover={{ scale: 1.02, translateY: -2 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => onNewWorkspace()}
@@ -1741,8 +2019,8 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead, onOpen
                   <p className="text-[8px] sm:text-[10px] text-muted-foreground truncate font-medium">Setup rápido de cliente</p>
                 </div>
               </motion.button>
-              
-              <motion.button 
+
+              <motion.button
                 whileHover={{ scale: 1.02, translateY: -2 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => onNewLead()}
@@ -1803,22 +2081,22 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead, onOpen
                 <div className="flex justify-between items-center mb-4">
                   <div className="flex flex-col">
                     <h4 className="text-[8px] sm:text-[10px] font-black uppercase text-white/50 tracking-[0.2em]">Sistemas Ativos</h4>
-                    <p className="text-[6px] sm:text-[8px] text-muted-foreground font-medium uppercase mt-0.5">Auto-scaling enabled</p>
+                    <p className="text-[6px] sm:text-[8px] text-muted-foreground font-medium uppercase mt-0.5">Camadas principais da operação</p>
                   </div>
                   <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-cyber-emerald/10 border border-cyber-emerald/20">
                     <div className="w-1 h-1 rounded-full bg-cyber-emerald animate-pulse" />
                     <span className="text-cyber-emerald text-[7px] sm:text-[8px] font-black uppercase tracking-tighter">Live Ops</span>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-2 sm:gap-3">
                   {[
-                    { name: 'Sales Engine', icon: Target, active: true },
-                    { name: 'CRM Core', icon: Users, active: true },
-                    { name: 'BI Layer', icon: Activity, active: true },
-                    { name: 'Automation', icon: Zap, active: true }
-                  ].map((mod, i) => (
-                    <div key={i} className="px-2 sm:px-3 py-2 sm:py-3 rounded-xl bg-white/[0.03] border border-white/5 text-[8px] sm:text-[10px] font-bold flex flex-col gap-2 hover:bg-white/[0.08] hover:border-white/10 transition-all cursor-default group/mod">
+                    { name: 'Sales Engine', icon: Target },
+                    { name: 'CRM Core', icon: Users },
+                    { name: 'BI Layer', icon: Activity },
+                    { name: 'Automation', icon: Zap }
+                  ].map((mod) => (
+                    <div key={mod.name} className="px-2 sm:px-3 py-2 sm:py-3 rounded-xl bg-white/[0.03] border border-white/5 text-[8px] sm:text-[10px] font-bold flex flex-col gap-2 hover:bg-white/[0.08] hover:border-white/10 transition-all cursor-default group/mod">
                       <div className="flex justify-between items-center w-full">
                         <mod.icon size={12} className="text-muted-foreground group-hover/mod:text-primary transition-colors" />
                         <div className="w-1 h-1 rounded-full bg-cyber-emerald shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
@@ -1831,124 +2109,444 @@ const DashboardView = ({ projects, workspaces, onNewWorkspace, onNewLead, onOpen
             </div>
           </div>
         </div>
-      </div>
+      )}
 
-      <div className="grid grid-cols-1 xl:grid-cols-[1.4fr_0.9fr] gap-4 sm:gap-6">
-        <div className="glass rounded-3xl border-white/5 p-4 sm:p-6 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h3 className="text-[10px] sm:text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
-                <Calendar size={16} className="text-primary" /> Agenda de Follow-ups
-              </h3>
-              <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-1">Contatos prioritários para manter pipeline, entrega e pós-venda sob controle.</p>
+      {focusPanel === 'followups' && (
+        <div className="grid grid-cols-1 xl:grid-cols-[1.35fr_0.85fr] gap-6">
+          <div className="glass rounded-3xl border-white/5 p-4 sm:p-6 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h3 className="text-[10px] sm:text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
+                  <Calendar size={16} className="text-primary" /> Agenda de Follow-ups
+                </h3>
+                <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-1">Contatos priorizados sem precisar atravessar o dashboard inteiro.</p>
+              </div>
+              <div className="flex flex-wrap gap-2 text-[8px] sm:text-[9px] font-bold uppercase">
+                <span className="px-2.5 py-1 rounded-full border border-red-500/20 bg-red-500/10 text-red-400">{overdueFollowUps} atrasados</span>
+                <span className="px-2.5 py-1 rounded-full border border-cyber-gold/20 bg-cyber-gold/10 text-cyber-gold">{todayFollowUps} hoje</span>
+                <span className="px-2.5 py-1 rounded-full border border-primary/20 bg-primary/10 text-primary">{weekFollowUps} foco da semana</span>
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2 text-[8px] sm:text-[9px] font-bold uppercase">
-              <span className="px-2.5 py-1 rounded-full border border-red-500/20 bg-red-500/10 text-red-400">{overdueFollowUps} atrasados</span>
-              <span className="px-2.5 py-1 rounded-full border border-cyber-gold/20 bg-cyber-gold/10 text-cyber-gold">{todayFollowUps} hoje</span>
-              <span className="px-2.5 py-1 rounded-full border border-primary/20 bg-primary/10 text-primary">{weekFollowUps} foco da semana</span>
+
+            <div className="space-y-4">
+              {followUpProjects.length > 0 ? followUpAgendaGroups.map(group => (
+                <div key={group.id} className="rounded-2xl border border-white/5 bg-black/20 p-3 sm:p-4 space-y-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <h4 className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-white/80">{group.label}</h4>
+                      <p className="text-[8px] sm:text-[9px] text-muted-foreground mt-1">{group.description}</p>
+                    </div>
+                    <div className={`px-2.5 py-1 rounded-full border text-[8px] font-bold uppercase ${group.style}`}>
+                      {group.projects.length}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    {group.projects.length > 0 ? group.projects.map(project => {
+                      const meta = getFollowUpMeta(project.followUpDate);
+                      const lastContact = project.meetingNotes[0]?.date;
+
+                      return (
+                        <div key={project.id} className="rounded-2xl border border-white/5 bg-white/[0.03] p-3 sm:p-4 space-y-3 hover:border-white/10 transition-all">
+                          <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <p className="text-[11px] sm:text-sm font-bold truncate">{project.projectName}</p>
+                                <span className={`px-2 py-1 rounded-full border text-[8px] font-bold uppercase ${meta.badge} ${meta.tone}`}>{meta.label}</span>
+                              </div>
+                              <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate">{project.clientName}</p>
+                              <p className="mt-2 text-[10px] sm:text-[11px] text-white/80">{project.nextAction || 'Definir próximo contato com o cliente'}</p>
+                            </div>
+
+                            <div className="text-[8px] sm:text-[9px] text-muted-foreground space-y-1 shrink-0">
+                              <p>Follow-up: {formatProjectDate(project.followUpDate)}</p>
+                              <p>Último contato: {lastContact ? formatProjectDate(lastContact) : 'Sem registro'}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div className="text-[8px] sm:text-[9px] text-muted-foreground">
+                              Fase atual: {PROJECT_STAGE_OPTIONS.find(option => option.value === project.stage)?.label || 'Pipeline'}
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              <button
+                                onClick={() => onOpenProject(project.id)}
+                                className="px-3 py-1.5 rounded-xl border border-white/10 text-[9px] sm:text-[10px] font-bold hover:bg-white/5 transition-all"
+                              >
+                                Abrir projeto
+                              </button>
+                              <button
+                                onClick={() => onSnoozeFollowUp(project.id, 2)}
+                                className="px-3 py-1.5 rounded-xl border border-primary/20 bg-primary/10 text-primary text-[9px] sm:text-[10px] font-bold hover:bg-primary/15 transition-all"
+                              >
+                                +2 dias
+                              </button>
+                              <button
+                                onClick={() => onCompleteFollowUp(project.id)}
+                                className="px-3 py-1.5 rounded-xl border border-cyber-emerald/20 bg-cyber-emerald/10 text-cyber-emerald text-[9px] sm:text-[10px] font-bold hover:bg-cyber-emerald/15 transition-all"
+                              >
+                                Follow-up feito
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }) : (
+                      <div className="rounded-2xl border border-dashed border-white/10 p-4 text-center text-[10px] sm:text-xs text-muted-foreground">
+                        {group.empty}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )) : (
+                <div className="rounded-2xl border border-dashed border-white/10 p-5 text-center text-[10px] sm:text-xs text-muted-foreground">
+                  Cadastre datas de follow-up nos projetos para montar sua fila de contatos.
+                </div>
+              )}
             </div>
           </div>
 
           <div className="space-y-4">
-            {followUpProjects.length > 0 ? followUpAgendaGroups.map(group => (
-              <div key={group.id} className="rounded-2xl border border-white/5 bg-black/20 p-3 sm:p-4 space-y-3">
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <h4 className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-white/80">{group.label}</h4>
-                    <p className="text-[8px] sm:text-[9px] text-muted-foreground mt-1">{group.description}</p>
-                  </div>
-                  <div className={`px-2.5 py-1 rounded-full border text-[8px] font-bold uppercase ${group.style}`}>
-                    {group.projects.length}
-                  </div>
-                </div>
+            <div className="glass rounded-3xl border-white/5 p-4 sm:p-6 space-y-4">
+              <div>
+                <h3 className="text-[10px] sm:text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
+                  <Target size={16} className="text-cyber-gold" /> Radar da Semana
+                </h3>
+                <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-1">Seleção compacta dos contextos que merecem sua atenção primeiro.</p>
+              </div>
 
-                <div className="space-y-3">
-                  {group.projects.length > 0 ? group.projects.map(project => {
-                    const meta = getFollowUpMeta(project.followUpDate);
-                    const lastContact = project.meetingNotes[0]?.date;
-
-                    return (
-                      <div key={project.id} className="rounded-2xl border border-white/5 bg-white/[0.03] p-3 sm:p-4 space-y-3 hover:border-white/10 transition-all">
-                        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-3">
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <p className="text-[11px] sm:text-sm font-bold truncate">{project.projectName}</p>
-                              <span className={`px-2 py-1 rounded-full border text-[8px] font-bold uppercase ${meta.badge} ${meta.tone}`}>{meta.label}</span>
-                            </div>
-                            <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate">{project.clientName}</p>
-                            <p className="mt-2 text-[10px] sm:text-[11px] text-white/80">{project.nextAction || 'Definir próximo contato com o cliente'}</p>
-                          </div>
-
-                          <div className="text-[8px] sm:text-[9px] text-muted-foreground space-y-1 shrink-0">
-                            <p>Follow-up: {formatProjectDate(project.followUpDate)}</p>
-                            <p>Último contato: {lastContact ? formatProjectDate(lastContact) : 'Sem registro'}</p>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                          <div className="text-[8px] sm:text-[9px] text-muted-foreground">
-                            Fase atual: {PROJECT_STAGE_OPTIONS.find(option => option.value === project.stage)?.label || 'Pipeline'}
-                          </div>
-                          <div className="flex flex-wrap gap-2">
-                            <button
-                              onClick={() => onOpenProject(project.id)}
-                              className="px-3 py-1.5 rounded-xl border border-white/10 text-[9px] sm:text-[10px] font-bold hover:bg-white/5 transition-all"
-                            >
-                              Abrir projeto
-                            </button>
-                            <button
-                              onClick={() => onSnoozeFollowUp(project.id, 2)}
-                              className="px-3 py-1.5 rounded-xl border border-primary/20 bg-primary/10 text-primary text-[9px] sm:text-[10px] font-bold hover:bg-primary/15 transition-all"
-                            >
-                              +2 dias
-                            </button>
-                            <button
-                              onClick={() => onCompleteFollowUp(project.id)}
-                              className="px-3 py-1.5 rounded-xl border border-cyber-emerald/20 bg-cyber-emerald/10 text-cyber-emerald text-[9px] sm:text-[10px] font-bold hover:bg-cyber-emerald/15 transition-all"
-                            >
-                              Follow-up feito
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  }) : (
-                    <div className="rounded-2xl border border-dashed border-white/10 p-4 text-center text-[10px] sm:text-xs text-muted-foreground">
-                      {group.empty}
+              <div className="space-y-3">
+                {soloRadarProjects.length > 0 ? soloRadarProjects.map(project => (
+                  <button
+                    key={project.id}
+                    onClick={() => onOpenProject(project.id)}
+                    className="w-full text-left rounded-2xl border border-white/10 bg-white/[0.03] p-4 hover:border-primary/30 hover:bg-primary/5 transition-all"
+                  >
+                    <p className="text-sm font-bold">{project.projectName}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{project.clientName}</p>
+                    <p className="text-xs text-white/80 mt-3 line-clamp-2">{project.nextAction || 'Definir próxima ação do projeto'}</p>
+                    <div className="mt-3 flex items-center justify-between text-[10px] text-muted-foreground">
+                      <span>{formatProjectDate(project.followUpDate)}</span>
+                      <span>{PROJECT_STAGE_OPTIONS.find(option => option.value === project.stage)?.label || 'Pipeline'}</span>
                     </div>
-                  )}
+                  </button>
+                )) : (
+                  <div className="rounded-2xl border border-dashed border-white/10 p-4 text-center text-xs text-muted-foreground">
+                    Nenhuma prioridade definida no radar ainda.
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="glass rounded-3xl border-white/5 p-4 sm:p-6 space-y-3">
+              <h3 className="text-[10px] sm:text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
+                <Zap size={16} className="text-primary" /> Atalhos rápidos
+              </h3>
+              <button onClick={onNewLead} className="w-full rounded-2xl border border-cyber-gold/20 bg-cyber-gold/10 px-4 py-3 text-left text-sm font-bold text-cyber-gold hover:bg-cyber-gold/15 transition-all">
+                Registrar nova oportunidade
+              </button>
+              <button onClick={onNewWorkspace} className="w-full rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-left text-sm font-bold text-primary hover:bg-primary/15 transition-all">
+                Abrir novo workspace de cliente
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {focusPanel === 'attention' && (
+        <div className="grid grid-cols-1 xl:grid-cols-[1.1fr_0.9fr] gap-6">
+          <div className="glass rounded-3xl border-white/5 p-4 sm:p-6 space-y-4">
+            <div>
+              <h3 className="text-[10px] sm:text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
+                <AlertCircle size={16} className="text-cyber-gold" /> Brechas Detectadas
+              </h3>
+              <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-1">Pontos que mais geram perda de contexto e aumento de esforço operacional.</p>
+            </div>
+
+            <div className="space-y-3">
+              {attentionInsights.map((insight) => (
+                <div key={insight} className="rounded-2xl border border-white/5 bg-white/[0.03] px-4 py-4 text-[11px] sm:text-sm text-white/85">
+                  {insight}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="glass rounded-3xl border-white/5 p-4 sm:p-6 space-y-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-[10px] sm:text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
+                    <ClipboardList size={16} className="text-primary" /> Contexto crítico
+                  </h3>
+                  <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-1">Projetos que você deveria abrir primeiro.</p>
+                </div>
+                <span className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-[10px] font-bold uppercase text-primary">
+                  {soloRadarProjects.length} itens
+                </span>
+              </div>
+
+              <div className="space-y-3">
+                {soloRadarProjects.length > 0 ? soloRadarProjects.map(project => (
+                  <button
+                    key={project.id}
+                    onClick={() => onOpenProject(project.id)}
+                    className="w-full rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left hover:border-primary/30 hover:bg-primary/5 transition-all"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold truncate">{project.projectName}</p>
+                        <p className="text-xs text-muted-foreground mt-1 truncate">{project.clientName}</p>
+                      </div>
+                      <span className="text-[10px] font-bold uppercase text-cyber-gold">{PROJECT_STAGE_OPTIONS.find(option => option.value === project.stage)?.label || 'Pipeline'}</span>
+                    </div>
+                    <p className="mt-3 text-xs text-white/80 line-clamp-2">{project.nextAction || 'Definir próxima ação do projeto'}</p>
+                  </button>
+                )) : (
+                  <div className="rounded-2xl border border-dashed border-white/10 p-4 text-center text-xs text-muted-foreground">
+                    Nada crítico mapeado no radar neste momento.
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="glass rounded-3xl border-white/5 p-4 sm:p-6">
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex flex-col">
+                  <h4 className="text-[10px] sm:text-sm font-bold uppercase text-white/80 tracking-[0.2em]">Camadas ativas</h4>
+                  <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-1">Visão rápida dos módulos com maior relevância operacional.</p>
+                </div>
+                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-cyber-emerald/10 border border-cyber-emerald/20">
+                  <div className="w-1 h-1 rounded-full bg-cyber-emerald animate-pulse" />
+                  <span className="text-cyber-emerald text-[8px] font-black uppercase">Live</span>
                 </div>
               </div>
-            )) : (
-              <div className="rounded-2xl border border-dashed border-white/10 p-5 text-center text-[10px] sm:text-xs text-muted-foreground">
-                Cadastre datas de follow-up nos projetos para montar sua fila de contatos.
+
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { name: 'Sales Engine', icon: Target },
+                  { name: 'CRM Core', icon: Users },
+                  { name: 'BI Layer', icon: Activity },
+                  { name: 'Automation', icon: Zap }
+                ].map((mod) => (
+                  <div key={mod.name} className="rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-4 text-xs font-bold">
+                    <div className="flex items-center justify-between mb-3">
+                      <mod.icon size={14} className="text-primary" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-cyber-emerald" />
+                    </div>
+                    <span className="text-muted-foreground uppercase">{mod.name}</span>
+                  </div>
+                ))}
               </div>
-            )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const OperationalFinanceView = ({ projects, onOpenProject }: {
+  projects: Project[],
+  onOpenProject: (projectId: string) => void
+}) => {
+  const formatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+  const today = new Date();
+  const month = today.getMonth();
+  const year = today.getFullYear();
+  const financeProjects = projects.filter(project => project.financials.proposalValue > 0);
+  const installments = financeProjects.flatMap(project => (
+    project.financials.installments.map(installment => ({
+      ...installment,
+      project
+    }))
+  ));
+  const totalProjected = financeProjects.reduce((acc, project) => acc + project.financials.proposalValue, 0);
+  const totalReceived = financeProjects.reduce((acc, project) => acc + getProjectReceivedTotal(project), 0);
+  const totalOutstanding = financeProjects.reduce((acc, project) => acc + getProjectOutstandingTotal(project), 0);
+  const totalCosts = financeProjects.reduce((acc, project) => acc + getProjectCostsTotal(project), 0);
+  const totalMargin = financeProjects.reduce((acc, project) => acc + getProjectMarginTotal(project), 0);
+  const dueThisMonth = installments.filter(installment => {
+    const dueDate = new Date(installment.dueDate);
+    return dueDate.getMonth() === month && dueDate.getFullYear() === year;
+  }).reduce((acc, installment) => acc + installment.amount, 0);
+  const overdueInstallments = installments
+    .filter(installment => getEffectiveInstallmentStatus(installment) === 'overdue')
+    .sort((a, b) => (getDateTimestamp(a.dueDate) || Number.MAX_SAFE_INTEGER) - (getDateTimestamp(b.dueDate) || Number.MAX_SAFE_INTEGER));
+  const upcomingInstallments = installments
+    .filter(installment => {
+      const status = getEffectiveInstallmentStatus(installment);
+      const dueTimestamp = getDateTimestamp(installment.dueDate);
+      return status === 'pending' && dueTimestamp && dueTimestamp >= new Date().setHours(0, 0, 0, 0);
+    })
+    .sort((a, b) => (getDateTimestamp(a.dueDate) || Number.MAX_SAFE_INTEGER) - (getDateTimestamp(b.dueDate) || Number.MAX_SAFE_INTEGER))
+    .slice(0, 6);
+  const projectSummaries = financeProjects
+    .map(project => ({
+      project,
+      received: getProjectReceivedTotal(project),
+      outstanding: getProjectOutstandingTotal(project),
+      margin: getProjectMarginTotal(project),
+      marginPercentage: getProjectMarginPercentage(project),
+      paymentStatus: getProjectPaymentStatus(project)
+    }))
+    .sort((a, b) => b.outstanding - a.outstanding || b.project.financials.proposalValue - a.project.financials.proposalValue);
+
+  return (
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+        <div>
+          <h3 className="text-2xl sm:text-3xl font-bold font-heading">Financeiro <span className="text-gradient">Operacional</span></h3>
+          <p className="text-sm text-muted-foreground mt-2">Receita, recebimento, parcelas e margem organizados para tomada de decisão real.</p>
+        </div>
+        <div className="flex flex-wrap gap-2 text-[10px] font-bold uppercase">
+          <span className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-primary">{financeProjects.length} projeto(s) faturáveis</span>
+          <span className="rounded-full border border-red-500/20 bg-red-500/10 px-3 py-1 text-red-400">{overdueInstallments.length} parcela(s) vencida(s)</span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        {[
+          { label: 'Receita contratada', value: formatter.format(totalProjected), sub: 'Escopo aprovado', icon: DollarSign, tone: 'text-primary' },
+          { label: 'Recebido', value: formatter.format(totalReceived), sub: 'Entradas confirmadas', icon: CheckCircle2, tone: 'text-cyber-emerald' },
+          { label: 'A receber', value: formatter.format(totalOutstanding), sub: 'Saldo em aberto', icon: CreditCard, tone: 'text-cyber-gold' },
+          { label: 'Margem prevista', value: formatter.format(totalMargin), sub: `${totalProjected > 0 ? Math.round((totalMargin / totalProjected) * 100) : 0}% sobre a carteira`, icon: TrendingUp, tone: 'text-blue-500' }
+        ].map((card) => (
+          <div key={card.label} className="glass rounded-3xl border-white/5 p-5 space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className={`rounded-2xl p-3 bg-white/5 ${card.tone}`}>
+                <card.icon size={20} />
+              </div>
+              <span className="text-[10px] uppercase font-bold text-muted-foreground">{card.label}</span>
+            </div>
+            <div>
+              <p className="text-2xl font-bold">{card.value}</p>
+              <p className="text-xs text-muted-foreground mt-1">{card.sub}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-[1fr,1.2fr]">
+        <div className="glass rounded-3xl border-white/5 p-5 sm:p-6 space-y-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h4 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
+                <Calendar size={16} className="text-primary" /> Radar de parcelas
+              </h4>
+              <p className="text-xs text-muted-foreground mt-1">Competência do mês: {formatter.format(dueThisMonth)}</p>
+            </div>
+            <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase text-muted-foreground">
+              Custos: {formatter.format(totalCosts)}
+            </span>
+          </div>
+
+          <div className="space-y-4">
+            <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-4 space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <h5 className="text-xs font-bold uppercase tracking-widest text-red-300">Vencidas</h5>
+                <span className="text-[10px] font-bold uppercase text-red-300">{overdueInstallments.length}</span>
+              </div>
+              <div className="space-y-2">
+                {overdueInstallments.length > 0 ? overdueInstallments.slice(0, 5).map((installment) => (
+                  <div key={installment.id} className="rounded-2xl border border-red-500/10 bg-black/20 p-3 text-sm">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="font-bold truncate">{installment.project.projectName}</p>
+                        <p className="text-xs text-muted-foreground truncate">{installment.label} • {installment.project.clientName}</p>
+                      </div>
+                      <span className="text-xs font-bold text-red-300">{formatter.format(installment.amount)}</span>
+                    </div>
+                    <p className="mt-2 text-[11px] text-muted-foreground">Vencimento: {formatProjectDate(installment.dueDate)}</p>
+                  </div>
+                )) : (
+                  <div className="rounded-2xl border border-dashed border-red-500/20 p-3 text-xs text-red-100/80">
+                    Nenhuma parcela vencida no momento.
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <h5 className="text-xs font-bold uppercase tracking-widest text-primary">Próximos recebimentos</h5>
+                <span className="text-[10px] font-bold uppercase text-primary">{upcomingInstallments.length}</span>
+              </div>
+              <div className="space-y-2">
+                {upcomingInstallments.length > 0 ? upcomingInstallments.map((installment) => (
+                  <div key={installment.id} className="rounded-2xl border border-primary/10 bg-black/20 p-3 text-sm">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="font-bold truncate">{installment.project.projectName}</p>
+                        <p className="text-xs text-muted-foreground truncate">{installment.label} • {installment.project.clientName}</p>
+                      </div>
+                      <span className="text-xs font-bold text-primary">{formatter.format(installment.amount)}</span>
+                    </div>
+                    <p className="mt-2 text-[11px] text-muted-foreground">Vencimento: {formatProjectDate(installment.dueDate)}</p>
+                  </div>
+                )) : (
+                  <div className="rounded-2xl border border-dashed border-primary/20 p-3 text-xs text-white/70">
+                    Nenhuma parcela pendente próxima cadastrada.
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="glass rounded-3xl border-white/5 p-4 sm:p-6 space-y-4">
-          <div>
-            <h3 className="text-[10px] sm:text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
-              <AlertCircle size={16} className="text-cyber-gold" /> Brechas Detectadas
-            </h3>
-            <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-1">Pontos que mais costumam gerar perda de contexto quando você toca tudo sozinho.</p>
+        <div className="glass rounded-3xl border-white/5 p-5 sm:p-6 space-y-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h4 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
+                <PieChart size={16} className="text-primary" /> Economia por projeto
+              </h4>
+              <p className="text-xs text-muted-foreground mt-1">Abrangência financeira por cliente, saldo e margem.</p>
+            </div>
+            <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase text-muted-foreground">
+              Caixa e carteira
+            </span>
           </div>
 
           <div className="space-y-3">
-            {[
-              overdueFollowUps > 0 ? `${overdueFollowUps} follow-up(s) atrasado(s) podem esfriar lead, projeto ou upsell.` : 'Nenhum follow-up atrasado no momento.',
-              projects.filter(project => project.tasks.length === 0).length > 0
-                ? `${projects.filter(project => project.tasks.length === 0).length} projeto(s) sem tarefas detalhadas ainda.`
-                : 'Todos os projetos têm ao menos uma tarefa registrada.',
-              projects.filter(project => !project.nextAction.trim()).length > 0
-                ? `${projects.filter(project => !project.nextAction.trim()).length} projeto(s) sem próxima ação definida.`
-                : 'Todos os projetos têm próxima ação definida.'
-            ].map((insight, index) => (
-              <div key={index} className="rounded-2xl border border-white/5 bg-white/[0.03] px-3 py-3 text-[10px] sm:text-xs text-white/85">
-                {insight}
+            {projectSummaries.length > 0 ? projectSummaries.map(({ project, received, outstanding, margin, marginPercentage, paymentStatus }) => (
+              <button
+                key={project.id}
+                onClick={() => onOpenProject(project.id)}
+                className="w-full rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left hover:border-primary/30 hover:bg-primary/5 transition-all"
+              >
+                <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-sm font-bold truncate">{project.projectName}</p>
+                      <span className={`rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase ${getPaymentStatusStyle(paymentStatus)}`}>
+                        {paymentStatus}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1 truncate">{project.clientName}</p>
+                  </div>
+                  <span className="text-xs font-bold text-primary">{formatter.format(project.financials.proposalValue)}</span>
+                </div>
+
+                <div className="grid sm:grid-cols-3 gap-3 mt-4 text-xs">
+                  <div className="rounded-xl border border-white/10 bg-black/20 px-3 py-3">
+                    <p className="text-muted-foreground uppercase">Recebido</p>
+                    <p className="mt-1 font-bold text-cyber-emerald">{formatter.format(received)}</p>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-black/20 px-3 py-3">
+                    <p className="text-muted-foreground uppercase">Saldo</p>
+                    <p className="mt-1 font-bold text-cyber-gold">{formatter.format(outstanding)}</p>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-black/20 px-3 py-3">
+                    <p className="text-muted-foreground uppercase">Margem</p>
+                    <p className="mt-1 font-bold text-primary">{formatter.format(margin)} • {marginPercentage}%</p>
+                  </div>
+                </div>
+              </button>
+            )) : (
+              <div className="rounded-2xl border border-dashed border-white/10 p-4 text-center text-sm text-muted-foreground">
+                Cadastre valores e parcelas nos projetos para ativar o financeiro operacional.
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>
@@ -2718,6 +3316,12 @@ export default function AdminDashboard() {
           status: 'pending'
         }] : []
       },
+      approval: createProjectApproval({
+        status: 'prospect',
+        brief: clientData.brief,
+        deadline: getTodayDate(),
+        followUpDate: getTodayDate()
+      }),
       postDeliverySteps: createPostDeliverySteps('prospect'),
       playbook: createProjectPlaybook({
         status: 'prospect',
@@ -2915,6 +3519,21 @@ export default function AdminDashboard() {
     }));
   };
 
+  const updateProjectApproval = (projectId: string, fields: Partial<ProjectApproval>) => {
+    if (!ensureProjectEdit()) return;
+    setProjects(prev => prev.map(project => {
+      if (project.id !== projectId) return project;
+
+      return {
+        ...project,
+        approval: {
+          ...project.approval,
+          ...fields
+        }
+      };
+    }));
+  };
+
   const addProjectInstallment = (projectId: string) => {
     if (!ensureProjectEdit()) return;
     const amount = Number(financeForm.installmentAmount);
@@ -3106,7 +3725,7 @@ export default function AdminDashboard() {
                       >
                         {[
                           { id: 'insights', label: 'Insights de Negócio', icon: Activity, allowed: availableDashboardSubTabs.insights },
-                          { id: 'finance', label: 'Financeiro (ERP)', icon: PieChart, allowed: availableDashboardSubTabs.finance },
+                          { id: 'finance', label: 'Financeiro Operacional', icon: PieChart, allowed: availableDashboardSubTabs.finance },
                           { id: 'server', label: 'Status do Servidor', icon: Server, allowed: availableDashboardSubTabs.server },
                         ].filter((sub) => sub.allowed).map((sub) => (
                           <button
@@ -3452,67 +4071,19 @@ export default function AdminDashboard() {
                 )}
 
                 {dashboardSubTab === 'finance' && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="glass rounded-2xl p-4 sm:p-6 border-white/5 space-y-3 sm:space-y-4 relative overflow-hidden group hover:border-white/10 transition-all">
-                      <div className="absolute -right-2 -top-2 opacity-5 group-hover:opacity-10 transition-opacity">
-                        <TrendingUp size={40} className="sm:size-[60px]" />
-                      </div>
-                      <div className="flex justify-between items-start">
-                        <div className="p-2 sm:p-3 rounded-xl bg-green-500/10 text-green-500 shadow-inner group-hover:scale-110 transition-transform">
-                          <TrendingUp size={18} className="sm:size-[24px]" />
-                        </div>
-                        <span className="text-[7px] sm:text-[10px] font-bold text-green-500 bg-green-500/10 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">+12.5%</span>
-                      </div>
-                      <div>
-                        <p className="text-[8px] sm:text-xs text-muted-foreground font-bold uppercase tracking-widest truncate">Receita Projetada</p>
-                        <h4 className="text-xl sm:text-3xl font-bold mt-1">R$ 28.400</h4>
-                      </div>
-                      <div className="pt-3 sm:pt-4 border-t border-white/5 flex items-center justify-between text-[8px] sm:text-[10px] font-bold">
-                        <span className="text-muted-foreground uppercase truncate">4 projetos ativos</span>
-                        <button className="text-primary hover:underline shrink-0">DETALHES</button>
-                      </div>
-                    </div>
-
-                    <div className="glass rounded-2xl p-4 sm:p-6 border-white/5 space-y-3 sm:space-y-4 relative overflow-hidden group hover:border-white/10 transition-all">
-                      <div className="absolute -right-2 -top-2 opacity-5 group-hover:opacity-10 transition-opacity">
-                        <CreditCard size={40} className="sm:size-[60px]" />
-                      </div>
-                      <div className="flex justify-between items-start">
-                        <div className="p-2 sm:p-3 rounded-xl bg-blue-500/10 text-blue-500 shadow-inner group-hover:scale-110 transition-transform">
-                          <CreditCard size={18} className="sm:size-[24px]" />
-                        </div>
-                        <span className="text-[7px] sm:text-[10px] font-bold text-blue-500 bg-blue-500/10 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">Em dia</span>
-                      </div>
-                      <div>
-                        <p className="text-[8px] sm:text-xs text-muted-foreground font-bold uppercase tracking-widest truncate">Contas a Receber</p>
-                        <h4 className="text-xl sm:text-3xl font-bold mt-1">R$ 12.150</h4>
-                      </div>
-                      <div className="pt-3 sm:pt-4 border-t border-white/5 flex items-center justify-between text-[8px] sm:text-[10px] font-bold">
-                        <span className="text-muted-foreground uppercase truncate">Próximo: 25/03</span>
-                        <button className="text-primary hover:underline shrink-0">GERENCIAR</button>
-                      </div>
-                    </div>
-
-                    <div className="glass rounded-2xl p-4 sm:p-6 border-white/5 space-y-3 sm:space-y-4 relative overflow-hidden group hover:border-white/10 transition-all sm:col-span-2 lg:col-span-1">
-                      <div className="absolute -right-2 -top-2 opacity-5 group-hover:opacity-10 transition-opacity">
-                        <Zap size={40} className="sm:size-[60px]" />
-                      </div>
-                      <div className="flex justify-between items-start">
-                        <div className="p-2 sm:p-3 rounded-xl bg-orange-500/10 text-orange-500 shadow-inner group-hover:scale-110 transition-transform">
-                          <Zap size={18} className="sm:size-[24px]" />
-                        </div>
-                        <span className="text-[7px] sm:text-[10px] font-bold text-orange-500 bg-orange-500/10 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">-5.2%</span>
-                      </div>
-                      <div>
-                        <p className="text-[8px] sm:text-xs text-muted-foreground font-bold uppercase tracking-widest truncate">Custos Operacionais</p>
-                        <h4 className="text-xl sm:text-3xl font-bold mt-1">R$ 3.820</h4>
-                      </div>
-                      <div className="pt-3 sm:pt-4 border-t border-white/5 flex items-center justify-between text-[8px] sm:text-[10px] font-bold">
-                        <span className="text-muted-foreground uppercase truncate">Infra & APIs</span>
-                        <button className="text-primary hover:underline shrink-0">OTIMIZAR</button>
-                      </div>
-                    </div>
-                  </div>
+                  <OperationalFinanceView
+                    projects={projects}
+                    onOpenProject={(projectId) => {
+                      if (!canViewProjects) {
+                        toast.error('Seu perfil não possui acesso detalhado aos projetos.');
+                        return;
+                      }
+                      const project = projects.find(item => item.id === projectId);
+                      if (!project) return;
+                      setSelectedProject(project);
+                      setActiveTab('ops');
+                    }}
+                  />
                 )}
 
                 {dashboardSubTab === 'server' && (
@@ -4128,6 +4699,71 @@ export default function AdminDashboard() {
                         </div>
                       </div>
 
+                      <div className="glass rounded-2xl p-4 sm:p-8 border-white/5 space-y-5 sm:space-y-6">
+                        <div className="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-4">
+                          <div>
+                            <h3 className="text-sm sm:text-base font-bold flex items-center gap-2"><History size={18} className="sm:size-[20px] text-primary" /> Timeline & Alertas</h3>
+                            <p className="text-[10px] sm:text-xs text-muted-foreground mt-2">Misture reuniões, documentos, financeiro, aceite e prazos para enxergar risco e contexto em um único bloco.</p>
+                          </div>
+                          <div className="grid grid-cols-3 gap-2 sm:gap-3 w-full xl:w-auto xl:min-w-[360px]">
+                            <div className="rounded-2xl border border-white/5 bg-white/[0.03] px-3 py-3">
+                              <p className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Alertas</p>
+                              <p className="text-base sm:text-lg font-bold mt-1">{getProjectAttentionItems(selectedProject).length}</p>
+                            </div>
+                            <div className="rounded-2xl border border-white/5 bg-white/[0.03] px-3 py-3">
+                              <p className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Timeline</p>
+                              <p className="text-[10px] sm:text-xs font-bold mt-1">{getProjectTimeline(selectedProject).length} eventos</p>
+                            </div>
+                            <div className="rounded-2xl border border-white/5 bg-white/[0.03] px-3 py-3">
+                              <p className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Próximo marco</p>
+                              <p className="text-[10px] sm:text-xs font-bold mt-1">{formatProjectDate(selectedProject.followUpDate || selectedProject.approval.approvalDeadline || selectedProject.deadline)}</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 xl:grid-cols-[0.88fr_1.12fr] gap-4 sm:gap-6">
+                          <div className="space-y-3">
+                            {getProjectAttentionItems(selectedProject).map((item) => (
+                              <div key={item.id} className={`rounded-2xl border px-4 py-4 ${item.tone}`}>
+                                <div className="flex items-start gap-3">
+                                  <AlertCircle size={16} className="mt-0.5 shrink-0" />
+                                  <div>
+                                    <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em]">Radar</p>
+                                    <p className="text-[11px] sm:text-sm font-bold mt-1 text-white">{item.title}</p>
+                                    <p className="text-[10px] sm:text-xs mt-2 text-white/80 leading-relaxed">{item.detail}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+
+                          <div className="space-y-3">
+                            {getProjectTimeline(selectedProject).length > 0 ? getProjectTimeline(selectedProject).map((item) => (
+                              <div key={item.id} className="rounded-2xl border border-white/5 bg-white/[0.03] px-4 py-4">
+                                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                                  <div className="min-w-0">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                      <span className={`px-2.5 py-1 rounded-full border text-[8px] sm:text-[9px] font-bold uppercase ${item.tone}`}>
+                                        {item.category}
+                                      </span>
+                                      <span className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">{formatProjectDate(item.date)}</span>
+                                    </div>
+                                    <p className="text-[11px] sm:text-sm font-bold mt-2">{item.title}</p>
+                                    <p className="text-[10px] sm:text-xs text-white/80 mt-1.5 leading-relaxed">{item.detail}</p>
+                                  </div>
+                                  <div className="w-2.5 h-2.5 rounded-full bg-primary shrink-0 mt-1 sm:mt-2" />
+                                </div>
+                              </div>
+                            )) : (
+                              <div className="rounded-2xl border-2 border-dashed border-white/10 px-4 py-8 text-center">
+                                <History size={20} className="mx-auto text-muted-foreground opacity-30 mb-2" />
+                                <p className="text-[10px] sm:text-xs text-muted-foreground">Assim que houver reuniões, documentos, parcelas e checkpoints, a timeline consolidada aparece aqui.</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
                       {/* Stakeholders */}
                       <div className="glass rounded-2xl p-4 sm:p-8 border-white/5">
                         <div className="flex justify-between items-center mb-4 sm:mb-6">
@@ -4507,6 +5143,149 @@ export default function AdminDashboard() {
                               </span>
                             </button>
                           ))}
+                        </div>
+                      </div>
+
+                      <div className="glass rounded-2xl p-4 sm:p-6 border-white/5 bg-cyber-emerald/5 space-y-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <h4 className="text-[9px] sm:text-[10px] font-bold uppercase text-cyber-gold flex items-center gap-2">
+                              <FileSignature size={12} className="sm:size-[14px]" /> Aceite & Assinatura
+                            </h4>
+                            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Centralize contrato, link de assinatura e prazo de aceite dentro do Work OS.</p>
+                          </div>
+                          <div className="flex flex-col gap-2 items-end">
+                            <span className={`px-2 py-1 rounded-full border text-[8px] font-bold uppercase ${getContractStatusStyle(selectedProject.approval.contractStatus)}`}>
+                              contrato {selectedProject.approval.contractStatus}
+                            </span>
+                            <span className={`px-2 py-1 rounded-full border text-[8px] font-bold uppercase ${getApprovalStatusStyle(selectedProject.approval.approvalStatus)}`}>
+                              aceite {selectedProject.approval.approvalStatus}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div className="space-y-1.5">
+                            <label className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Status do contrato</label>
+                            <select
+                              value={selectedProject.approval.contractStatus}
+                              onChange={(e) => {
+                                const contractStatus = e.target.value as ProjectContractStatus;
+                                updateProjectApproval(selectedProject.id, {
+                                  contractStatus,
+                                  signedAt: contractStatus === 'signed' ? (selectedProject.approval.signedAt || getTodayDate()) : ''
+                                });
+                              }}
+                              className="w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2.5 text-[11px] sm:text-xs font-bold outline-none focus:border-cyber-gold"
+                            >
+                              <option value="draft" className="bg-cyber-black">Rascunho</option>
+                              <option value="sent" className="bg-cyber-black">Enviado</option>
+                              <option value="signed" className="bg-cyber-black">Assinado</option>
+                            </select>
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Status do aceite</label>
+                            <select
+                              value={selectedProject.approval.approvalStatus}
+                              onChange={(e) => {
+                                const approvalStatus = e.target.value as ProjectApprovalStatus;
+                                updateProjectApproval(selectedProject.id, {
+                                  approvalStatus,
+                                  approvedAt: approvalStatus === 'approved' ? (selectedProject.approval.approvedAt || getTodayDate()) : ''
+                                });
+                              }}
+                              className="w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2.5 text-[11px] sm:text-xs font-bold outline-none focus:border-cyber-gold"
+                            >
+                              <option value="pending" className="bg-cyber-black">Pendente</option>
+                              <option value="approved" className="bg-cyber-black">Aprovado</option>
+                            </select>
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Canal de assinatura</label>
+                            <select
+                              value={selectedProject.approval.signatureProvider}
+                              onChange={(e) => updateProjectApproval(selectedProject.id, { signatureProvider: e.target.value as ProjectSignatureProvider })}
+                              className="w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2.5 text-[11px] sm:text-xs font-bold outline-none focus:border-cyber-gold"
+                            >
+                              <option value="manual" className="bg-cyber-black">Manual / envio direto</option>
+                              <option value="govbr" className="bg-cyber-black">gov.br</option>
+                              <option value="platform" className="bg-cyber-black">Plataforma externa</option>
+                            </select>
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Prazo de aceite</label>
+                            <input
+                              type="date"
+                              value={selectedProject.approval.approvalDeadline}
+                              onChange={(e) => updateProjectApproval(selectedProject.id, { approvalDeadline: e.target.value })}
+                              className="w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2.5 text-[11px] sm:text-xs outline-none focus:border-cyber-gold"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Resumo formal do escopo</label>
+                          <textarea
+                            value={selectedProject.approval.scopeSummary}
+                            onChange={(e) => updateProjectApproval(selectedProject.id, { scopeSummary: e.target.value })}
+                            rows={3}
+                            className="w-full rounded-xl bg-black/30 border border-white/10 px-3 py-3 text-[11px] sm:text-xs outline-none focus:border-cyber-gold resize-none"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="space-y-1.5">
+                            <label className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Link do contrato</label>
+                            <input
+                              type="url"
+                              value={selectedProject.approval.contractUrl}
+                              onChange={(e) => updateProjectApproval(selectedProject.id, { contractUrl: e.target.value })}
+                              placeholder="https://..."
+                              className="w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2.5 text-[11px] sm:text-xs outline-none focus:border-cyber-gold"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[8px] sm:text-[9px] uppercase font-bold text-muted-foreground">Link de assinatura / aceite</label>
+                            <input
+                              type="url"
+                              value={selectedProject.approval.signatureUrl}
+                              onChange={(e) => updateProjectApproval(selectedProject.id, { signatureUrl: e.target.value })}
+                              placeholder="https://..."
+                              className="w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2.5 text-[11px] sm:text-xs outline-none focus:border-cyber-gold"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                          <div className="rounded-xl border border-white/5 bg-white/[0.03] px-3 py-3">
+                            <p className="text-[8px] uppercase font-bold text-muted-foreground">Canal</p>
+                            <p className="text-[10px] sm:text-xs font-bold mt-1">{getSignatureProviderLabel(selectedProject.approval.signatureProvider)}</p>
+                          </div>
+                          <div className="rounded-xl border border-white/5 bg-white/[0.03] px-3 py-3">
+                            <p className="text-[8px] uppercase font-bold text-muted-foreground">Assinado em</p>
+                            <p className="text-[10px] sm:text-xs font-bold mt-1">{formatProjectDate(selectedProject.approval.signedAt)}</p>
+                          </div>
+                          <div className="rounded-xl border border-white/5 bg-white/[0.03] px-3 py-3">
+                            <p className="text-[8px] uppercase font-bold text-muted-foreground">Aprovado em</p>
+                            <p className="text-[10px] sm:text-xs font-bold mt-1">{formatProjectDate(selectedProject.approval.approvedAt)}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <button
+                            onClick={() => selectedProject.approval.contractUrl && window.open(selectedProject.approval.contractUrl, '_blank')}
+                            disabled={!selectedProject.approval.contractUrl}
+                            className="flex-1 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-[10px] sm:text-xs font-bold hover:bg-white/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                          >
+                            Abrir contrato
+                          </button>
+                          <button
+                            onClick={() => selectedProject.approval.signatureUrl && window.open(selectedProject.approval.signatureUrl, '_blank')}
+                            disabled={!selectedProject.approval.signatureUrl}
+                            className="flex-1 rounded-xl border border-cyber-gold/20 bg-cyber-gold/10 px-3 py-2.5 text-[10px] sm:text-xs font-bold text-cyber-gold hover:bg-cyber-gold/15 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                          >
+                            Abrir assinatura
+                          </button>
                         </div>
                       </div>
 

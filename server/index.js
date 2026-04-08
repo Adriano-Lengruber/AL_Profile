@@ -287,6 +287,44 @@ const projectSchema = new mongoose.Schema({
       default: []
     }
   },
+  approval: {
+    contractStatus: {
+      type: String,
+      default: 'draft'
+    },
+    approvalStatus: {
+      type: String,
+      default: 'pending'
+    },
+    signatureProvider: {
+      type: String,
+      default: 'manual'
+    },
+    contractUrl: {
+      type: String,
+      default: ''
+    },
+    signatureUrl: {
+      type: String,
+      default: ''
+    },
+    scopeSummary: {
+      type: String,
+      default: ''
+    },
+    approvalDeadline: {
+      type: String,
+      default: ''
+    },
+    signedAt: {
+      type: String,
+      default: ''
+    },
+    approvedAt: {
+      type: String,
+      default: ''
+    }
+  },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
 
@@ -1482,7 +1520,30 @@ app.get('/api/public/projects/:id', async (req, res) => {
       value: project.value,
       deadline: project.deadline,
       tasks: Array.isArray(project.tasks) ? project.tasks : [],
-      meetingNotes: Array.isArray(project.meetingNotes) ? project.meetingNotes : []
+      meetingNotes: Array.isArray(project.meetingNotes) ? project.meetingNotes : [],
+      documents: Array.isArray(project.documents) ? project.documents : [],
+      stage: project.stage || 'proposal',
+      nextAction: project.nextAction || '',
+      followUpDate: project.followUpDate || '',
+      workflowSteps: Array.isArray(project.workflowSteps) ? project.workflowSteps : [],
+      financials: project.financials || {
+        proposalValue: typeof project.value === 'number' ? project.value : 0,
+        paymentMethod: 'A definir',
+        invoiceStatus: 'pending',
+        installments: []
+      },
+      approval: project.approval || {
+        contractStatus: 'draft',
+        approvalStatus: 'pending',
+        signatureProvider: 'manual',
+        contractUrl: '',
+        signatureUrl: '',
+        scopeSummary: project.brief || '',
+        approvalDeadline: project.followUpDate || '',
+        signedAt: '',
+        approvedAt: ''
+      },
+      postDeliverySteps: Array.isArray(project.postDeliverySteps) ? project.postDeliverySteps : []
     });
   } catch (error) {
     res.status(500).json({ error: 'Erro ao buscar projeto do portal' });

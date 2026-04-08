@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import AdminDashboard from '../pages/AdminDashboard';
 
 // Mock dos ícones para evitar erros de renderização
@@ -18,7 +19,52 @@ window.confirm = vi.fn(() => true);
 // Mock do fetch global
 global.fetch = vi.fn();
 
+vi.mock('../hooks/useAuth', () => ({
+  useAuth: () => ({
+    user: {
+      id: 'owner-1',
+      username: 'admin',
+      email: 'admin@teste.com',
+      avatar: '',
+      bio: '',
+      adminAccess: {
+        canAccessAdmin: true,
+        isOwner: true,
+        ownerId: 'owner-1',
+        role: 'owner',
+        permissions: {
+          dashboardView: true,
+          crmView: true,
+          projectsView: true,
+          projectsEdit: true,
+          workspacesView: true,
+          workspacesEdit: true,
+          companyView: true,
+          companyEdit: true,
+          financeView: true,
+          postsEdit: true,
+          serverView: true,
+          teamManage: true
+        }
+      }
+    },
+    token: 'token-teste',
+    isAuthenticated: true,
+    loading: false,
+    login: vi.fn(),
+    register: vi.fn(),
+    logout: vi.fn(),
+    updateUser: vi.fn()
+  })
+}));
+
 describe('AdminDashboard - Funcionalidades de Exclusão', () => {
+  const renderDashboard = () => render(
+    <MemoryRouter>
+      <AdminDashboard />
+    </MemoryRouter>
+  );
+
   const mockWorkspaces = [
     {
       id: 'ws-1',
@@ -70,7 +116,7 @@ describe('AdminDashboard - Funcionalidades de Exclusão', () => {
   });
 
   it('deve chamar a API de exclusão ao remover um workspace', async () => {
-    render(<AdminDashboard />);
+    renderDashboard();
     
     // Espera os dados carregarem
     await waitFor(() => {
@@ -88,7 +134,7 @@ describe('AdminDashboard - Funcionalidades de Exclusão', () => {
   });
 
   it('deve chamar a API de exclusão ao remover um item do board', async () => {
-    render(<AdminDashboard />);
+    renderDashboard();
     
     // Espera os dados carregarem e seleciona o board
     await waitFor(() => {
@@ -114,7 +160,7 @@ describe('AdminDashboard - Funcionalidades de Exclusão', () => {
   });
 
   it('deve chamar a API de exclusão ao remover um grupo do board', async () => {
-    render(<AdminDashboard />);
+    renderDashboard();
     
     await waitFor(() => {
       expect(screen.getByText('Board Teste')).toBeInTheDocument();
@@ -137,7 +183,7 @@ describe('AdminDashboard - Funcionalidades de Exclusão', () => {
   });
 
   it('deve chamar a API de exclusão ao remover um projeto no CRM', async () => {
-    render(<AdminDashboard />);
+    renderDashboard();
     
     // Espera os dados carregarem
     await waitFor(() => {
@@ -151,7 +197,7 @@ describe('AdminDashboard - Funcionalidades de Exclusão', () => {
       expect(screen.getByText('Cliente Teste')).toBeInTheDocument();
     });
 
-    const deleteBtn = screen.getByTitle('Excluir Projeto');
+    const deleteBtn = await screen.findByTitle('Excluir Projeto');
     fireEvent.click(deleteBtn);
 
     expect(window.confirm).toHaveBeenCalledWith(expect.stringContaining('remover este projeto'));
@@ -162,7 +208,7 @@ describe('AdminDashboard - Funcionalidades de Exclusão', () => {
   });
 
   it('deve chamar a API de atualização ao alterar o valor de uma célula no board', async () => {
-    render(<AdminDashboard />);
+    renderDashboard();
     
     await waitFor(() => {
       expect(screen.getByText('Board Teste')).toBeInTheDocument();
@@ -200,7 +246,7 @@ describe('AdminDashboard - Funcionalidades de Exclusão', () => {
   });
 
   it('deve chamar a API de criação ao salvar uma proposta como projeto', async () => {
-    render(<AdminDashboard />);
+    renderDashboard();
     
     // Espera o carregamento inicial e clica na aba de propostas
     const tabBtn = await screen.findByRole('button', { name: /Propostas & Vendas/i });
