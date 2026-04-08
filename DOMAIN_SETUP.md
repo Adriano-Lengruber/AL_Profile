@@ -92,8 +92,11 @@ No seu repositório do GitHub, vá em **Settings > Secrets and variables > Actio
 1. Conecta via SSH na VPS.
 2. Navega até `~/AL_Profile`.
 3. Faz o `git pull origin master`.
-4. Reinicia os containers com `docker-compose -f docker-compose.blog.yml up -d --build`.
-5. Reconecta a rede do Nginx Proxy Manager se necessário.
+4. Salva o commit anterior para rollback automático.
+5. Atualiza o código e executa `docker-compose -f docker-compose.blog.yml up -d --build --remove-orphans` sem derrubar os containers antes da hora.
+6. Reconecta a rede do Nginx Proxy Manager se necessário.
+7. Valida frontend local, API local e domínio público.
+8. Se qualquer check falhar, volta automaticamente ao commit anterior e recompõe os containers.
 
 ### ✅ Procedimento seguro antes de atualizar a VPS
 
@@ -109,6 +112,15 @@ curl -I https://adriano-lengruber.com/
 ```
 
 Se algum desses checks já estiver falhando, não atualize nada antes de corrigir.
+
+### ✅ Garantias do deploy automático
+
+O workflow foi ajustado para evitar o cenário em que o repositório é atualizado, mas os containers ficam parados:
+
+1. Não executa mais `docker stop` e `docker rm` antes do build.
+2. Só substitui os containers durante o `up -d --build --remove-orphans`.
+3. Falhando o build ou qualquer health check, executa rollback automático para o commit anterior.
+4. O deploy só é considerado concluído quando `frontend`, `API` e domínio público respondem corretamente.
 
 ### 🚀 Atualização manual segura na VPS
 

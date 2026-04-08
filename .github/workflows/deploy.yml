@@ -5,6 +5,10 @@ on:
     branches:
       - master
 
+concurrency:
+  group: deploy-vps-production
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -16,42 +20,98 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Tentar encontrar o diretório correto (algumas VPS usam caminhos diferentes)
-            if [ -d "~/AL_Profile" ]; then
-              cd ~/AL_Profile
-            elif [ -d "/home/adriano/AL_Profile" ]; then
+            set -Eeuo pipefail
+
+            if [ -d "$HOME/AL_Profile/.git" ]; then
+              cd "$HOME/AL_Profile"
+            elif [ -d "/home/adriano/AL_Profile/.git" ]; then
               cd /home/adriano/AL_Profile
             else
-              echo "Diretório AL_Profile não encontrado! Tentando criar..."
-              mkdir -p ~/AL_Profile && cd ~/AL_Profile
-              git clone https://github.com/Adriano-Lengruber/AL_Profile.git . || true
+              mkdir -p "$HOME/AL_Profile"
+              cd "$HOME/AL_Profile"
+              if [ ! -d .git ]; then
+                git clone https://github.com/Adriano-Lengruber/AL_Profile.git .
+              fi
             fi
 
-            # Garantir que estamos na branch master e atualizados
-            git fetch origin master
-            git reset --hard origin/master
-            
-            # Limpeza resiliente (não falha se o container não existir)
-            docker stop al-profile-frontend al-profile-backend al-profile-mongodb 2>/dev/null || true
-            docker rm al-profile-frontend al-profile-backend al-profile-mongodb 2>/dev/null || true
-            
-            # Verificar se docker-compose ou 'docker compose' está disponível
+            PREVIOUS_COMMIT="$(git rev-parse HEAD 2>/dev/null || true)"
+
             COMPOSE_CMD="docker-compose"
-            if ! command -v docker-compose &> /dev/null; then
+            if ! command -v docker-compose >/dev/null 2>&1; then
               COMPOSE_CMD="docker compose"
             fi
-            
-            # Subir containers
-            $COMPOSE_CMD -f docker-compose.blog.yml up -d --build
-            
-            # Aguardar inicialização
-            sleep 10
-            
-            # Reconectar rede do Nginx Proxy Manager (NPM)
-            # O nome da rede padrão do compose é [nome_da_pasta]_al-profile-network
-            # Se a pasta for AL_Profile, o docker converte para minúsculo: al_profile_al-profile-network
+
+            rollback() {
+              if [ -n "${PREVIOUS_COMMIT:-}" ]; then
+                echo "--- ROLLBACK AUTOMATICO ---"
+                git reset --hard "$PREVIOUS_COMMIT"
+                $COMPOSE_CMD -f docker-compose.blog.yml up -d --build --remove-orphans || true
+                docker network connect al_profile_al-profile-network nginx-proxy-app-1 2>/dev/null || true
+              fi
+            }
+
+            run_healthcheck() {
+              local name="$1"
+              local url="$2"
+
+              for attempt in 1 2 3 4 5 6; do
+                if curl -fsSI "$url" >/dev/null; then
+                  echo "[$name] OK - tentativa $attempt"
+                  return 0
+                fi
+
+                echo "[$name] aguardando - tentativa $attempt"
+                sleep 5
+              done
+
+              echo "[$name] falhou"
+              return 1
+            }
+
+            git fetch origin master
+            git reset --hard origin/master
+
+            if [ ! -f docker-compose.blog.yml ]; then
+              echo "docker-compose.blog.yml nao encontrado"
+              rollback
+              exit 1
+            fi
+
+            if ! $COMPOSE_CMD -f docker-compose.blog.yml up -d --build --remove-orphans; then
+              rollback
+              exit 1
+            fi
+
             docker network connect al_profile_al-profile-network nginx-proxy-app-1 2>/dev/null || true
-            
-            # Verificação de Saúde
+
             echo "--- CONTAINERS ATIVOS ---"
             docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep al-profile
+
+            if ! docker ps --format "{{.Names}}" | grep -qx "al-profile-frontend"; then
+              docker logs --tail 120 al-profile-frontend || true
+              rollback
+              exit 1
+            fi
+
+            if ! docker ps --format "{{.Names}}" | grep -qx "al-profile-backend"; then
+              docker logs --tail 120 al-profile-backend || true
+              rollback
+              exit 1
+            fi
+
+            if ! run_healthcheck "frontend-local" "http://localhost:3003/"; then
+              docker logs --tail 120 al-profile-frontend || true
+              rollback
+              exit 1
+            fi
+
+            if ! run_healthcheck "api-local" "http://localhost:3005/api/posts"; then
+              docker logs --tail 120 al-profile-backend || true
+              rollback
+              exit 1
+            fi
+
+            if ! run_healthcheck "dominio-publico" "https://adriano-lengruber.com/"; then
+              rollback
+              exit 1
+            fi
