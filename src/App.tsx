@@ -6,7 +6,7 @@ import {
   ArrowRight, GitFork, Star, BookOpen, MessageCircle, Heart, Share2,
   User, LogIn, Send, Code2, Database, BarChart3, LayoutDashboard,
   Calculator, Eye, Building2, Cloud, Bot, Zap, Palette, GitBranch,
-  BrainCircuit, Wrench, Rocket, Users, Terminal, Cpu, CheckCircle2,
+  BrainCircuit, Wrench, Rocket, Users, Terminal, Cpu, CheckCircle2, Handshake,
   ChevronDown, ChevronLeft, ChevronRight, Calendar, FileDown, Award, TrendingUp, Blocks,
   CheckCheck, Sparkles, Activity, Instagram, Youtube, Server, Container, Workflow,
   Network, GitGraph, Box, HardDrive, CloudLightning, CloudFog, Table2, FileSpreadsheet,
@@ -14,6 +14,10 @@ import {
   CircleDot,
 } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
+import logoLibano from '../Imgs/Logos_Formacoes/logo_instituo-libano.png';
+import logoSoulCode from '../Imgs/Logos_Formacoes/soulcode.png';
+import logoUnig from '../Imgs/Logos_Formacoes/logo-da-unig.webp';
+import logoWall from '../Imgs/Logos_Formacoes/wall_escola_tcnica_logo.jpg';
 import BlogPage from './pages/BlogPage';
 import AdminDashboard from './pages/AdminDashboard';
 import ClientPortal from './pages/ClientPortal';
@@ -47,31 +51,31 @@ interface Skill {
 const experiences: Experience[] = [
   {
     id: 1, title: 'Consultor em Soluções Inteligentes & IA', company: 'adriano-lengruber.com',
-    period: 'Mar 2026 - Atual', location: 'Remoto / Brasil', current: true,
+    period: '2026 - Atual', location: 'Remoto / Brasil', current: true,
     description: 'Atuação dedicada à criação de soluções proprietárias para empresas e empreendedores, unindo automação, inteligência artificial, dados e desenvolvimento sob medida. Conduzo o projeto do diagnóstico à entrega final, com foco em eficiência operacional, escalabilidade e melhor relação entre investimento e resultado.',
     skills: ['IA Aplicada', 'Automação', 'Arquitetura de Soluções', 'Full-Stack', 'Consultoria'],
   },
   {
     id: 2, title: 'Fundador & Consultor de Tecnologia', company: 'SuperTech - Soluções em TI',
-    period: 'Jan 2010 - Mar 2026', location: 'Natividade, RJ',
+    period: '2010 - 2026', location: 'Natividade, RJ',
     description: 'Liderei uma operação própria de tecnologia com atendimento personalizado, desenvolvimento de softwares sob medida, manutenção de computadores e eletrônicos, marketing digital e relacionamento comercial. A experiência consolidou uma visão prática de ponta a ponta, da prospecção à entrega de soluções alinhadas às necessidades reais de cada cliente.',
     skills: ['Empreendedorismo', 'Suporte Técnico', 'Software Sob Medida', 'Marketing Digital', 'Relacionamento com Clientes'],
   },
   {
     id: 3, title: 'Engenheiro de Software Sênior', company: 'Global RJ Serviços',
-    period: 'Mar 2025 - Set 2025', location: 'Natividade, RJ',
+    period: '2025', location: 'Natividade, RJ',
     description: 'Atuei na construção de soluções orientadas a dados com Python, SQL e Power BI, cobrindo extração, tratamento, modelagem e disponibilização de informações para análise executiva. Também desenvolvi automações, rotinas de web scraping, dashboards de alta performance e entregas full stack com versionamento e deploy estruturados.',
     skills: ['Python', 'SQL', 'Power BI', 'DAX', 'ETL', 'Git', 'Full-Stack'],
   },
   {
     id: 4, title: 'Analista de Dados / Planejamento', company: 'Infotec Brasil',
-    period: 'Jul 2023 - Fev 2025', location: 'Macaé, RJ',
+    period: '2023 - 2025', location: 'Macaé, RJ',
     description: 'Atuei no contrato MC38, atendendo demandas da região de Imbetiba com extração de dados em SAP BW / SAP S/4HANA, processos completos de ETL, validação de consistência e construção de relatórios no Power BI. Também desenvolvi aplicações corporativas com Power Apps e automações com Power Automate para digitalizar rotinas e integrar informações em uma única solução de negócio.',
     skills: ['SAP BW', 'Power BI', 'DAX', 'Power Apps', 'Power Automate', 'ETL'],
   },
   {
     id: 5, title: 'Gerente Operacional', company: 'BIF BEEF - BCG IND. E COM.',
-    period: 'Abr 2014 - Set 2016', location: 'Itaperuna, RJ',
+    period: '2014 - 2016', location: 'Itaperuna, RJ',
     description: 'Fui responsável pela operação administrativa e logística, incluindo faturamento, controle financeiro, importação de pedidos, emissão de notas fiscais, roteirização de entregas e gestão de cadastros no ERP. Também atuei na negociação com fornecedores, supervisão comercial e administração da infraestrutura interna e dos equipamentos da empresa.',
     skills: ['Gestão Operacional', 'ERP', 'Logística', 'Financeiro', 'Gestão de Equipes'],
   },
@@ -113,19 +117,139 @@ const blogPosts: BlogPost[] = [
 ];
 
 const education = [
-  { title: 'Pós-graduação Lato Sensu', school: 'Faculdade Líbano', degree: 'Business Intelligence, Big Data e Analytics — Ciência de Dados', period: '2024 - 2025', description: 'Formação avançada em técnicas de Business Intelligence,big data e analytics com foco em ciência de dados. Aprendizado em machine learning, visualização de dados e ferramentas como Python, R e Power BI.' },
-  { title: 'Bootcamp', school: 'SoulCode Academy', degree: 'Analista de Dados', period: '2023', description: 'Bootcamp intensivo focado em análise de dados, SQL, Python, visualização de dados e business intelligence. Projetos práticos com ferramentas reais do mercado.' },
-  { title: 'Bacharel', school: 'Universidade Iguaçu - UNIG', degree: 'Sistemas de Informação', period: '2004 - 2007', description: 'Graduação em Sistemas de Informação com foco em desenvolvimento de software, banco de dados, análise de sistemas e gestão de tecnologia da informação.' },
-  { title: 'Técnico', school: 'Wall Escola Técnica', degree: 'Técnico em Mecatrônica', period: '2008 - 2010', description: 'Curso técnico focado em mecânica, eletrônica e informática industrial. Programação de controladores lógicos programmáveis (CLP), manutenção de sistemas automatizados e robótica.' },
+  {
+    title: 'Pós-graduação Lato Sensu',
+    school: 'Faculdade Líbano',
+    degree: 'Business Intelligence, Big Data e Analytics — Ciência de Dados',
+    period: '2024 - 2025',
+    description: 'Formação avançada em Business Intelligence, big data e analytics com aprofundamento em ciência de dados aplicada ao contexto corporativo.',
+    highlight: 'Especialização',
+    accent: 'from-[#0056D2]/85 via-[#0A2540]/80 to-cyber-black',
+    providerAccent: 'bg-[#0056D2]/15 text-[#6aa3ff]',
+    icon: <BrainCircuit size={24} />,
+    skills: ['BI', 'Big Data', 'Ciência de Dados'],
+    logo: logoLibano,
+  },
+  {
+    title: 'Bootcamp',
+    school: 'SoulCode Academy',
+    degree: 'Analista de Dados',
+    period: '2023',
+    description: 'Bootcamp intensivo com foco em análise de dados, SQL, Python, visualização e construção de soluções orientadas por métricas.',
+    highlight: 'Formação prática',
+    accent: 'from-[#F2C811]/85 via-[#614b03]/70 to-cyber-black',
+    providerAccent: 'bg-[#F2C811]/15 text-[#f6db5d]',
+    icon: <BarChart3 size={24} />,
+    skills: ['SQL', 'Python', 'Dashboards'],
+    logo: logoSoulCode,
+  },
+  {
+    title: 'Bacharel',
+    school: 'Universidade Iguaçu - UNIG',
+    degree: 'Sistemas de Informação',
+    period: '2004 - 2007',
+    description: 'Graduação voltada à base de desenvolvimento de software, banco de dados, análise de sistemas e fundamentos de tecnologia da informação.',
+    highlight: 'Graduação',
+    accent: 'from-[#1f6feb]/85 via-[#10203f]/80 to-cyber-black',
+    providerAccent: 'bg-[#1f6feb]/15 text-[#73a7ff]',
+    icon: <Code2 size={24} />,
+    skills: ['Software', 'Banco de Dados', 'Análise'],
+    logo: logoUnig,
+  },
+  {
+    title: 'Técnico',
+    school: 'Wall Escola Técnica',
+    degree: 'Técnico em Mecatrônica',
+    period: '2008 - 2010',
+    description: 'Curso técnico focado em mecânica, eletrônica e informática industrial. Programação de controladores lógicos programáveis (CLP), manutenção de sistemas automatizados e robótica.',
+    highlight: 'Base técnica',
+    accent: 'from-[#F97316]/85 via-[#431407]/80 to-cyber-black',
+    providerAccent: 'bg-[#F97316]/15 text-[#fdba74]',
+    icon: <Cpu size={24} />,
+    skills: ['Automação', 'CLP', 'Robótica'],
+    logo: logoWall,
+  },
 ];
 
 const certifications = [
-  { name: 'Power BI para Análise de Dados', provider: 'Microsoft', year: '2024' },
-  { name: 'Fundamentos de Python', provider: 'Python Institute', year: '2023' },
-  { name: 'Implementando Banco de Dados', provider: 'Microsoft', year: '2023' },
-  { name: 'Classificação e Tratamento da Informação', provider: 'ESC', year: '2023' },
-  { name: 'Data Science Fundamentals', provider: 'IBM', year: '2023' },
-  { name: 'Machine Learning Specialist', provider: 'Coursera', year: '2024' },
+  {
+    name: 'Google Data Analytics Professional Certificate',
+    provider: 'Google + Coursera',
+    format: 'Professional Certificate',
+    credentialId: 'K39K5TQURMN4',
+    credentialUrl: 'https://www.coursera.org/account/accomplishments/professional-cert/K39K5TQURMN4',
+    description: 'Formação completa em análise de dados com certificação reconhecida por Google e Coursera, cobrindo limpeza, tratamento, visualização e tomada de decisão orientada por dados.',
+    thumbnailUrl: 'https://s3.amazonaws.com/coursera/media/Grid_Coursera_Partners_updated.png',
+    accent: 'from-[#4285F4]/85 via-[#0F172A]/80 to-cyber-black',
+    providerAccent: 'bg-[#4285F4]/15 text-[#8db8ff]',
+    icon: <BarChart3 size={24} />,
+    skills: ['Google Data Analytics', 'Análise de Dados', 'Coursera'],
+  },
+  {
+    name: 'Azure AI Fundamentals',
+    provider: 'Microsoft',
+    format: 'Fundamentals',
+    credentialId: '4A1E4A6CC6AA62DF',
+    credentialUrl: 'https://learn.microsoft.com/api/credentials/share/en-us/AdrianoLengruber-5907/4A1E4A6CC6AA62DF?sharingId',
+    description: 'Certificação fundamental em IA aplicada com conceitos de machine learning, visão computacional, NLP e workloads de IA na Azure.',
+    thumbnailUrl: 'https://learn.microsoft.com/en-us/media/open-graph-image.png',
+    accent: 'from-[#0078D4]/85 via-[#0b2740]/80 to-cyber-black',
+    providerAccent: 'bg-[#0078D4]/15 text-[#7cc6ff]',
+    icon: <Cloud size={24} />,
+    skills: ['Azure AI', 'Cloud', 'Microsoft'],
+  },
+  {
+    name: 'Formação Power BI Analyst',
+    provider: 'DIO',
+    format: 'Bootcamp',
+    credentialId: '83CD0F9B',
+    credentialUrl: 'https://www.dio.me/certificate/83CD0F9B/share',
+    description: 'Trilha com foco em modelagem analítica, visualização de dados, métricas e storytelling com Power BI.',
+    thumbnailUrl: 'https://hermes.dio.me/certificates/cover/83CD0F9B.jpg',
+    accent: 'from-[#F2C811]/85 via-[#614b03]/70 to-cyber-black',
+    providerAccent: 'bg-[#F2C811]/15 text-[#f6db5d]',
+    icon: <LayoutDashboard size={24} />,
+    skills: ['Power BI', 'DAX', 'Analytics'],
+  },
+  {
+    name: 'Formação Python Developer',
+    provider: 'DIO',
+    format: 'Bootcamp',
+    credentialId: 'B0A2ABED',
+    credentialUrl: 'https://www.dio.me/certificate/B0A2ABED/share',
+    description: 'Formação orientada a desenvolvimento em Python com prática em lógica, sintaxe e construção de soluções reais.',
+    thumbnailUrl: 'https://hermes.dio.me/certificates/cover/B0A2ABED.jpg',
+    accent: 'from-[#1f6feb]/85 via-[#10203f]/80 to-cyber-black',
+    providerAccent: 'bg-[#1f6feb]/15 text-[#73a7ff]',
+    icon: <Code2 size={24} />,
+    skills: ['Python', 'APIs', 'Automação'],
+  },
+  {
+    name: 'Formação UX Designer',
+    provider: 'DIO',
+    format: 'Bootcamp',
+    credentialId: 'BBB4A04E',
+    credentialUrl: 'https://www.dio.me/certificate/BBB4A04E/share',
+    description: 'Percurso focado em experiência do usuário, interface, fluxo de navegação e decisões guiadas por usabilidade.',
+    thumbnailUrl: 'https://hermes.dio.me/certificates/cover/BBB4A04E.jpg',
+    accent: 'from-[#E07390]/85 via-[#411726]/80 to-cyber-black',
+    providerAccent: 'bg-[#E07390]/15 text-[#f2a6ba]',
+    icon: <Palette size={24} />,
+    skills: ['UX', 'UI', 'Jornada'],
+  },
+  {
+    name: 'Ética na Inteligência Artificial',
+    provider: 'SENAI-SP',
+    format: 'Curso Livre',
+    credentialId: '00042104/8184334',
+    credentialUrl: 'https://www.sp.senai.br/consulta-certificado?qrcode=00042104/8184334',
+    description: 'Curso com verificação pública voltado a fundamentos éticos, responsabilidade e uso consciente de IA em contexto profissional.',
+    completionLabel: 'Concluído em 04/08/2025 • 4h',
+    accent: 'from-[#D71920]/85 via-[#42090b]/80 to-cyber-black',
+    providerAccent: 'bg-[#D71920]/15 text-[#ff9b9f]',
+    icon: <CheckCircle2 size={24} />,
+    skills: ['Ética em IA', 'Governança', 'SENAI'],
+  },
 ];
 
 // ──────────────────────────────────────────────────────────────
@@ -311,10 +435,9 @@ function Hero() {
 // About
 // ──────────────────────────────────────────────────────────────
 function About() {
-  const yearsExp = new Date().getFullYear() - 2014;
   const stats = [
-    { icon: <Calendar size={22} className="text-primary" />, label: 'Anos de Exp.', value: `${yearsExp}+` },
-    { icon: <Wrench size={22} className="text-primary" />, label: 'Ferramentas', value: '15+' },
+    { icon: <Calendar size={22} className="text-primary" />, label: 'Anos de Exp.', value: '16+' },
+    { icon: <Handshake size={22} className="text-primary" />, label: 'Consultorias', value: '35' },
     { icon: <Rocket size={22} className="text-primary" />, label: 'Projetos', value: '50+' },
     { icon: <Users size={22} className="text-primary" />, label: 'Clientes', value: '20+' },
   ];
@@ -849,24 +972,6 @@ function Process() {
 function Resume() {
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'language': return 'bg-primary/15 text-primary';
-      case 'tool': return 'bg-cyber-steel/15 text-cyber-steel';
-      case 'cloud': return 'bg-cyber-emerald/15 text-cyber-emerald';
-      default: return 'bg-primary/10 text-primary/80';
-    }
-  };
-
-  const getBarColor = (category: string) => {
-    switch (category) {
-      case 'language': return 'bg-gradient-to-r from-cyber-gold to-cyber-amber';
-      case 'tool': return 'bg-gradient-to-r from-cyber-steel to-cyber-blue';
-      case 'cloud': return 'bg-gradient-to-r from-cyber-emerald to-teal-400';
-      default: return 'bg-gradient-to-r from-cyber-gold/70 to-cyber-amber/70';
-    }
-  };
-
   return (
     <section id="resume" className="py-24 relative">
       <div className="max-w-7xl mx-auto px-6">
@@ -881,8 +986,8 @@ function Resume() {
           <div className="absolute left-[18px] md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-cyber-gold via-cyber-gold to-cyber-gold md:-translate-x-1/2" />
           
           {experiences.map((exp, index) => {
-            const isFirst = index === 0;
             const isLeft = index % 2 === 0;
+            const isExpanded = expandedId === exp.id;
             
             return (
               <motion.div 
@@ -918,9 +1023,9 @@ function Resume() {
                     <span className="flex items-center gap-1"><Calendar size={12} /> {exp.period}</span>
                     <span className="flex items-center gap-1"><MapPin size={12} /> {exp.location}</span>
                   </div>
-                  <p className="text-muted-foreground text-sm leading-relaxed mb-4">{exp.description}</p>
+                  <p className={`text-muted-foreground text-sm leading-relaxed ${isExpanded ? 'mb-4' : 'line-clamp-2 mb-2'}`}>{exp.description}</p>
                   <AnimatePresence>
-                    {expandedId === exp.id && (
+                    {isExpanded && (
                       <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                         <div className="flex flex-wrap gap-2 pt-4 border-t border-white/10">
                           {exp.skills.map((skill) => (
@@ -931,8 +1036,8 @@ function Resume() {
                     )}
                   </AnimatePresence>
                   <button className="text-primary/70 text-xs flex items-center gap-1 mt-3 hover:text-primary transition-colors">
-                    {expandedId === exp.id ? 'Ver menos' : 'Ver mais'}
-                    <ChevronDown size={13} className={`transition-transform ${expandedId === exp.id ? 'rotate-180' : ''}`} />
+                    {isExpanded ? 'Ver menos' : 'Ver mais'}
+                    <ChevronDown size={13} className={`transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
                   </button>
                 </div>
               </motion.div>
@@ -956,7 +1061,7 @@ function Education() {
           <p className="text-muted-foreground max-w-2xl mx-auto">Minha jornada educacional construindo a base do conhecimento</p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
           {education.map((edu, index) => (
             <motion.div 
               key={edu.school} 
@@ -964,26 +1069,41 @@ function Education() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }} 
               transition={{ delay: index * 0.1 }}
-              className="glass rounded-xl p-6 hover:border-primary/25 transition-all duration-300"
+              className="glass rounded-2xl overflow-hidden border border-white/10 hover:border-primary/25 transition-all duration-300 h-full flex flex-col group"
             >
-              <div className="mb-4">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs text-primary font-medium">{edu.title}</p>
-                  <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <Calendar size={12} className="text-primary" />
-                    {edu.period}
-                  </span>
+              <div className={`relative h-40 bg-gradient-to-br ${edu.accent}`}>
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.18),transparent_42%)]" />
+                <div className="absolute inset-0 bg-gradient-to-t from-cyber-black via-cyber-black/30 to-transparent" />
+                <div className="relative h-full p-5 flex flex-col justify-between">
+                  <div className="flex items-start justify-between gap-4">
+                    <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${edu.providerAccent}`}>
+                      {edu.highlight}
+                    </span>
+                    <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center text-white">
+                      {edu.icon}
+                    </div>
+                  </div>
+                  <div className="flex items-end justify-between gap-4">
+                    <img src={edu.logo} alt={edu.school} className="h-10 max-w-[120px] object-contain rounded-lg bg-white/95 px-2 py-1" />
+                    <span className="inline-flex items-center gap-1.5 text-xs text-white/80">
+                      <Calendar size={12} className="text-primary" />
+                      {edu.period}
+                    </span>
+                  </div>
                 </div>
-                <h4 className="font-semibold text-lg">{edu.school}</h4>
               </div>
-              <p className="text-primary font-medium mb-2">{edu.degree}</p>
-              {'description' in edu && edu.description && (
-                <p className="text-muted-foreground text-sm leading-relaxed">{edu.description}</p>
-              )}
-              <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-white/10">
-                <span className="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-                  {edu.degree.split(' ')[0]}
-                </span>
+              <div className="p-6 flex flex-col flex-1">
+                <p className="text-sm uppercase tracking-[0.2em] text-primary mb-2">{edu.title}</p>
+                <h4 className="font-semibold text-lg mb-2">{edu.school}</h4>
+                <p className="text-foreground/90 font-medium mb-3">{edu.degree}</p>
+                <p className="text-muted-foreground text-sm leading-relaxed mb-5">{edu.description}</p>
+                <div className="mt-auto flex flex-wrap gap-2 pt-4 border-t border-white/10">
+                  {edu.skills.map((skill) => (
+                    <span key={skill} className="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
               </div>
             </motion.div>
           ))}
@@ -1018,25 +1138,68 @@ function Certifications() {
           <div className="overflow-hidden" ref={emblaRef}>
             <div className="flex gap-4">
               {certifications.map((cert, index) => (
-                <motion.div 
+                <motion.a 
                   key={cert.name}
                   initial={{ opacity: 0, scale: 0.95 }} 
                   whileInView={{ opacity: 1, scale: 1 }}
+                  whileHover={{ y: -6 }}
                   viewport={{ once: true }} 
                   transition={{ delay: index * 0.05 }}
-                  className="flex-shrink-0 w-72"
+                  href={cert.credentialUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-shrink-0 w-80"
                 >
-                  <div className="glass rounded-xl p-6 hover:border-primary/25 transition-all duration-300 h-full">
-                    <div className="w-12 h-12 rounded-xl bg-cyber-gold/10 flex items-center justify-center mb-4">
-                      <Award className="text-cyber-gold" size={24} />
+                  <div className="glass rounded-2xl overflow-hidden border border-white/10 hover:border-primary/25 transition-all duration-300 h-full flex flex-col group">
+                    <div className={`relative h-44 bg-gradient-to-br ${cert.accent}`}>
+                      {cert.thumbnailUrl ? (
+                        <>
+                          <img
+                            src={cert.thumbnailUrl}
+                            alt={cert.name}
+                            className="w-full h-full object-cover mix-blend-screen opacity-85 group-hover:scale-105 transition-transform duration-500"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-cyber-black via-cyber-black/25 to-transparent" />
+                        </>
+                      ) : (
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.18),transparent_40%)]" />
+                      )}
+                      <div className="absolute inset-x-0 bottom-0 p-5 flex items-end justify-between gap-4">
+                        <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold tracking-[0.18em] uppercase ${cert.providerAccent}`}>
+                          {cert.provider}
+                        </span>
+                        <span className="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-cyber-black/45 border border-white/10 text-white/85 backdrop-blur-sm">
+                          {cert.icon}
+                        </span>
+                      </div>
                     </div>
-                    <h4 className="font-semibold mb-2 line-clamp-2">{cert.name}</h4>
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>{cert.provider}</span>
-                      <span className="px-2 py-0.5 rounded-full bg-cyber-slate/50">{cert.year}</span>
+                    <div className="p-6 flex flex-col flex-1">
+                      <div className="flex items-center justify-between gap-3 mb-3">
+                        <span className="text-[11px] uppercase tracking-[0.22em] text-primary">{cert.format}</span>
+                        <span className="text-xs text-muted-foreground">Credencial verificada</span>
+                      </div>
+                      <h4 className="font-semibold mb-3 line-clamp-2">{cert.name}</h4>
+                      <p className="text-sm text-muted-foreground leading-relaxed mb-4">{cert.description}</p>
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {cert.skills.map((skill) => (
+                          <span key={skill} className="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="mt-auto space-y-4">
+                        <div className="rounded-xl bg-white/[0.03] border border-white/5 px-4 py-3">
+                          <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground mb-1">Credencial</p>
+                          <p className="text-sm font-medium text-foreground/90">{cert.completionLabel || `ID ${cert.credentialId}`}</p>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-primary font-medium">Ver certificado</span>
+                          <ExternalLink size={18} className="text-primary transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </motion.div>
+                </motion.a>
               ))}
             </div>
           </div>
