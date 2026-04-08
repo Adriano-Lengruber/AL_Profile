@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, Link, useLocation, useParams } from 'react-router-dom';
+import { Routes, Route, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Github, Linkedin, Mail, Phone, MapPin, ExternalLink, Menu, X,
-  ArrowRight, ArrowLeft, GitFork, Star, BookOpen, MessageCircle, Heart, Share2,
+  ArrowRight, GitFork, Star, BookOpen, MessageCircle, Heart, Share2,
   User, LogIn, Send, Code2, Database, BarChart3, LayoutDashboard,
   Calculator, Eye, Building2, Cloud, Bot, Zap, Palette, GitBranch,
   BrainCircuit, Wrench, Rocket, Users, Terminal, Cpu, CheckCircle2,
   ChevronDown, ChevronLeft, ChevronRight, Calendar, FileDown, Award, TrendingUp, Blocks,
   CheckCheck, Sparkles, Activity, Instagram, Youtube, Server, Container, Workflow,
   Network, GitGraph, Box, HardDrive, CloudLightning, CloudFog, Table2, FileSpreadsheet,
-  Variable, Warehouse, Kanban, Gauge, Hexagon, FileCode, Brackets, Globe, Handshake,
+  Variable, Warehouse, Kanban, Gauge, Hexagon, FileCode, Brackets, Globe,
   CircleDot,
 } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
@@ -47,31 +47,31 @@ interface Skill {
 const experiences: Experience[] = [
   {
     id: 1, title: 'Consultor em Soluções Inteligentes & IA', company: 'adriano-lengruber.com',
-    period: '2026 - Atual', location: 'Remoto / Brasil', current: true,
+    period: 'Mar 2026 - Atual', location: 'Remoto / Brasil', current: true,
     description: 'Atuação dedicada à criação de soluções proprietárias para empresas e empreendedores, unindo automação, inteligência artificial, dados e desenvolvimento sob medida. Conduzo o projeto do diagnóstico à entrega final, com foco em eficiência operacional, escalabilidade e melhor relação entre investimento e resultado.',
     skills: ['IA Aplicada', 'Automação', 'Arquitetura de Soluções', 'Full-Stack', 'Consultoria'],
   },
   {
     id: 2, title: 'Fundador & Consultor de Tecnologia', company: 'SuperTech - Soluções em TI',
-    period: '2010 - 2026', location: 'Natividade, RJ',
+    period: 'Jan 2010 - Mar 2026', location: 'Natividade, RJ',
     description: 'Liderei uma operação própria de tecnologia com atendimento personalizado, desenvolvimento de softwares sob medida, manutenção de computadores e eletrônicos, marketing digital e relacionamento comercial. A experiência consolidou uma visão prática de ponta a ponta, da prospecção à entrega de soluções alinhadas às necessidades reais de cada cliente.',
     skills: ['Empreendedorismo', 'Suporte Técnico', 'Software Sob Medida', 'Marketing Digital', 'Relacionamento com Clientes'],
   },
   {
     id: 3, title: 'Engenheiro de Software Sênior', company: 'Global RJ Serviços',
-    period: '2025', location: 'Natividade, RJ',
+    period: 'Mar 2025 - Set 2025', location: 'Natividade, RJ',
     description: 'Atuei na construção de soluções orientadas a dados com Python, SQL e Power BI, cobrindo extração, tratamento, modelagem e disponibilização de informações para análise executiva. Também desenvolvi automações, rotinas de web scraping, dashboards de alta performance e entregas full stack com versionamento e deploy estruturados.',
     skills: ['Python', 'SQL', 'Power BI', 'DAX', 'ETL', 'Git', 'Full-Stack'],
   },
   {
     id: 4, title: 'Analista de Dados / Planejamento', company: 'Infotec Brasil',
-    period: '2023 - 2025', location: 'Macaé, RJ',
+    period: 'Jul 2023 - Fev 2025', location: 'Macaé, RJ',
     description: 'Atuei no contrato MC38, atendendo demandas da região de Imbetiba com extração de dados em SAP BW / SAP S/4HANA, processos completos de ETL, validação de consistência e construção de relatórios no Power BI. Também desenvolvi aplicações corporativas com Power Apps e automações com Power Automate para digitalizar rotinas e integrar informações em uma única solução de negócio.',
     skills: ['SAP BW', 'Power BI', 'DAX', 'Power Apps', 'Power Automate', 'ETL'],
   },
   {
     id: 5, title: 'Gerente Operacional', company: 'BIF BEEF - BCG IND. E COM.',
-    period: '2014 - 2016', location: 'Itaperuna, RJ',
+    period: 'Abr 2014 - Set 2016', location: 'Itaperuna, RJ',
     description: 'Fui responsável pela operação administrativa e logística, incluindo faturamento, controle financeiro, importação de pedidos, emissão de notas fiscais, roteirização de entregas e gestão de cadastros no ERP. Também atuei na negociação com fornecedores, supervisão comercial e administração da infraestrutura interna e dos equipamentos da empresa.',
     skills: ['Gestão Operacional', 'ERP', 'Logística', 'Financeiro', 'Gestão de Equipes'],
   },
@@ -112,293 +112,20 @@ const blogPosts: BlogPost[] = [
   { id: 4, title: 'Introdução ao Power Platform', excerpt: 'Um guia completo para começar a utilizar Power Apps, Power Automate e Power BI na prática.', author: 'Adriano Lengruber', date: '28 Dez 2024', readTime: '12 min', likes: 156, comments: 28, tags: ['Power Platform', 'Low-Code', 'Microsoft'] },
 ];
 
-interface ConsultingService {
-  slug: string;
-  title: string;
-  audience: string;
-  hook: string;
-  description: string;
-  idealFor: string;
-  deliverable: string;
-  badges: string[];
-  features: string[];
-  detailPoints: string[];
-  outcomes: string[];
-  icon: React.ReactNode;
-  iconColor: string;
-  iconBg: string;
-  border: string;
-  cover: string;
-  timeline: string;
-  cta: string;
-  message: string;
-}
-
-const CONSULTING_SERVICES: ConsultingService[] = [
-  {
-    slug: 'workstations-pro-ia-dados',
-    title: 'Workstations Pro para IA & Dados',
-    audience: 'IA • Ciência de Dados • Criadores',
-    hook: 'Descubra a configuração certa antes de investir em hardware.',
-    description: 'Projeto estações de trabalho sob medida para quem precisa de desempenho real em IA, ciência de dados, criação de conteúdo e workloads intensivos. O foco é equilibrar performance, possibilidade de upgrade, confiabilidade e investimento inteligente.',
-    idealFor: 'Profissionais que precisam montar ou evoluir uma máquina realmente compatível com o seu perfil de uso.',
-    deliverable: 'Definição da configuração ideal, orientação de compra, checklist técnico e plano de evolução.',
-    badges: ['Alta Performance', 'GPU Ready', 'Setup Sob Medida'],
-    features: [
-      'Dimensionamento de CPU, GPU, RAM e armazenamento por perfil de uso',
-      'Planejamento térmico, consumo, upgrade e longevidade do equipamento',
-      'Configuração pensada para produtividade, estabilidade e custo-benefício',
-    ],
-    detailPoints: [
-      'Levantamento do tipo de workload, ferramentas e gargalos atuais antes de qualquer recomendação.',
-      'Escolha técnica de hardware com foco em desempenho real, estabilidade e margem de upgrade.',
-      'Plano final com configuração recomendada, alternativas viáveis e checklist de compra.',
-    ],
-    outcomes: [
-      'Compra mais segura e aderente ao uso real',
-      'Menos desperdício com peças superdimensionadas',
-      'Estrutura pronta para crescer sem refazer tudo',
-    ],
-    icon: <HardDrive size={24} />,
-    iconColor: 'text-cyber-gold',
-    iconBg: 'bg-cyber-gold/15',
-    border: 'hover:border-cyber-gold/30 hover:shadow-cyber-gold/10',
-    cover: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80',
-    timeline: 'Entrega consultiva em 2 a 5 dias',
-    cta: 'Ver detalhes',
-    message: 'Olá, Adriano. Quero falar sobre a consultoria Workstations Pro para IA & Dados.',
-  },
-  {
-    slug: 'vps-pessoal-ou-profissional',
-    title: 'VPS Pessoal ou Profissional',
-    audience: 'Cloud • Self-Hosted • Deploy',
-    hook: 'Estruture um servidor enxuto, seguro e realmente seu.',
-    description: 'Estruturo VPS sob medida para aplicações, automações, bots, sites, APIs ou ambientes privados, com configuração orientada ao objetivo do cliente. A entrega inclui transparência total, documentação operacional no próprio ambiente e transferência integral dos acessos.',
-    idealFor: 'Empresas e profissionais que querem infraestrutura enxuta, segura e pronta para uso sem depender de pacotes genéricos.',
-    deliverable: 'Servidor provisionado, stack configurada, segurança inicial aplicada e acessos totalmente em posse do cliente.',
-    badges: ['Linux', 'Docker', 'Acessos do Cliente'],
-    features: [
-      'Configuração precisa das aplicações escolhidas para o cenário de uso',
-      'Organização de usuários, domínios, SSL, backups e boas práticas de segurança',
-      'Entrega final com transparência sobre contas, logins e estrutura implantada',
-    ],
-    detailPoints: [
-      'Definição do desenho ideal da VPS conforme aplicação, tráfego, automação ou uso interno.',
-      'Provisionamento com stack, segurança inicial, domínio, SSL e estrutura operacional organizada.',
-      'Transferência dos acessos com clareza para que o ambiente continue sob domínio do cliente.',
-    ],
-    outcomes: [
-      'Mais autonomia sobre infraestrutura e acessos',
-      'Menos improviso técnico na publicação do ambiente',
-      'Base pronta para crescer com organização',
-    ],
-    icon: <Server size={24} />,
-    iconColor: 'text-cyan-400',
-    iconBg: 'bg-cyan-400/15',
-    border: 'hover:border-cyan-400/30 hover:shadow-cyan-400/10',
-    cover: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80',
-    timeline: 'Provisionamento inicial em 2 a 7 dias',
-    cta: 'Ver detalhes',
-    message: 'Olá, Adriano. Quero estruturar uma VPS pessoal ou profissional com você.',
-  },
-  {
-    slug: 'personal-developer',
-    title: 'Personal Developer',
-    audience: 'Produto Sob Medida • Full Stack',
-    hook: 'Tire a ideia do papel com tecnologia feita para o seu cenário.',
-    description: 'Consultoria e desenvolvimento do início ao fim para projetos personalizados, pensados especificamente para a realidade de uma pessoa, empresa ou gestor. A prioridade é construir a solução certa com a stack mais atual, sem perder de vista viabilidade, manutenção e retorno sobre o investimento.',
-    idealFor: 'Quem precisa tirar uma ideia do papel ou evoluir um processo com tecnologia feita sob medida.',
-    deliverable: 'Descoberta, arquitetura, implementação, validação e evolução contínua do projeto.',
-    badges: ['Sob Medida', 'IA Aplicada', 'Custo-Benefício'],
-    features: [
-      'Levantamento da necessidade real antes da escolha técnica',
-      'Desenvolvimento orientado a resultado, usabilidade e escalabilidade',
-      'Tecnologia atual com foco em sustentabilidade financeira do projeto',
-    ],
-    detailPoints: [
-      'Diagnóstico da dor, contexto operacional e prioridade de negócio antes de desenhar qualquer solução.',
-      'Arquitetura da stack mais adequada para começar certo e evoluir sem dívida técnica desnecessária.',
-      'Construção com validações frequentes para transformar visão em produto utilizável e sustentável.',
-    ],
-    outcomes: [
-      'Projeto alinhado à realidade e ao momento do negócio',
-      'Menos risco de construir algo sem uso prático',
-      'Caminho claro entre ideia, MVP e evolução contínua',
-    ],
-    icon: <Brackets size={24} />,
-    iconColor: 'text-cyber-emerald',
-    iconBg: 'bg-cyber-emerald/15',
-    border: 'hover:border-cyber-emerald/30 hover:shadow-cyber-emerald/10',
-    cover: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80',
-    timeline: 'Descoberta e arquitetura em até 7 dias',
-    cta: 'Ver detalhes',
-    message: 'Olá, Adriano. Quero conversar sobre um projeto sob medida com a consultoria Personal Developer.',
-  },
-  {
-    slug: 'bi-express-para-pmes',
-    title: 'BI Express para PMEs',
-    audience: 'Gestão • Comercial • Operação',
-    hook: 'Ganhe clareza rápida nos números mais críticos da operação.',
-    description: 'Uma frente pensada para gerar resultado rápido em empresas locais e regionais por meio de dashboards executivos, automações operacionais e organização dos indicadores essenciais. É uma porta de entrada de alto valor para negócios que precisam enxergar melhor suas operações e decidir com mais segurança.',
-    idealFor: 'Comércios, indústrias, distribuidores, clínicas e gestores que querem clareza nos números e ganho operacional.',
-    deliverable: 'Mapa de indicadores, painel executivo, rotina de atualização e recomendações práticas de melhoria.',
-    badges: ['Dashboard', 'KPIs', 'Quick Wins'],
-    features: [
-      'Estruturação de indicadores críticos para operação, comercial e financeiro',
-      'Painéis objetivos para acompanhamento e tomada de decisão',
-      'Automação de etapas repetitivas para reduzir retrabalho e ruído operacional',
-    ],
-    detailPoints: [
-      'Mapeamento do que realmente precisa ser acompanhado para decidir melhor e mais rápido.',
-      'Construção de painel executivo com foco em leitura simples, prioridade e ação prática.',
-      'Definição de rotina de atualização e próximos ganhos para a operação continuar evoluindo.',
-    ],
-    outcomes: [
-      'Mais visibilidade sobre desempenho e gargalos',
-      'Decisões menos intuitivas e mais orientadas por dados',
-      'Ganhos rápidos sem transformar o projeto em algo pesado',
-    ],
-    icon: <Gauge size={24} />,
-    iconColor: 'text-[#E07390]',
-    iconBg: 'bg-[#E07390]/15',
-    border: 'hover:border-[#E07390]/30 hover:shadow-[#E07390]/10',
-    cover: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
-    timeline: 'Primeiro painel em até 10 dias',
-    cta: 'Ver detalhes',
-    message: 'Olá, Adriano. Quero entender como funciona o BI Express para PMEs.',
-  },
-];
-
 const education = [
-  {
-    title: 'Pós-graduação Lato Sensu',
-    school: 'Faculdade Líbano',
-    degree: 'Business Intelligence, Big Data e Analytics — Ciência de Dados',
-    period: '2024 - 2025',
-    description: 'Formação avançada em Business Intelligence, big data e analytics com aprofundamento em ciência de dados aplicada ao contexto corporativo.',
-    highlight: 'Especialização',
-    accent: 'from-[#0056D2]/85 via-[#0A2540]/80 to-cyber-black',
-    providerAccent: 'bg-[#0056D2]/15 text-[#6aa3ff]',
-    icon: <BrainCircuit size={24} />,
-    skills: ['BI', 'Big Data', 'Ciência de Dados'],
-  },
-  {
-    title: 'Bootcamp',
-    school: 'SoulCode Academy',
-    degree: 'Analista de Dados',
-    period: '2023',
-    description: 'Bootcamp intensivo com foco em análise de dados, SQL, Python, visualização e construção de soluções orientadas por métricas.',
-    highlight: 'Formação prática',
-    accent: 'from-[#F2C811]/85 via-[#614b03]/70 to-cyber-black',
-    providerAccent: 'bg-[#F2C811]/15 text-[#f6db5d]',
-    icon: <BarChart3 size={24} />,
-    skills: ['SQL', 'Python', 'Dashboards'],
-  },
-  {
-    title: 'Bacharel',
-    school: 'Universidade Iguaçu - UNIG',
-    degree: 'Sistemas de Informação',
-    period: '2004 - 2007',
-    description: 'Graduação voltada à base de desenvolvimento de software, banco de dados, análise de sistemas e fundamentos de tecnologia da informação.',
-    highlight: 'Graduação',
-    accent: 'from-[#1f6feb]/85 via-[#10203f]/80 to-cyber-black',
-    providerAccent: 'bg-[#1f6feb]/15 text-[#73a7ff]',
-    icon: <Code2 size={24} />,
-    skills: ['Software', 'Banco de Dados', 'Análise'],
-  },
-  {
-    title: 'Técnico',
-    school: 'Wall Escola Técnica - Macaé/RJ',
-    degree: 'Técnico em Mecatrônica',
-    period: '2008 - 2010',
-    description: 'Base técnica em mecatrônica e tecnologia da informação, conectando eletrônica, automação e manutenção de sistemas industriais.',
-    highlight: 'Formação técnica',
-    accent: 'from-[#E07390]/85 via-[#411726]/80 to-cyber-black',
-    providerAccent: 'bg-[#E07390]/15 text-[#f2a6ba]',
-    icon: <Cpu size={24} />,
-    skills: ['Mecatrônica', 'Automação', 'TI'],
-  },
+  { title: 'Pós-graduação Lato Sensu', school: 'Faculdade Líbano', degree: 'Business Intelligence, Big Data e Analytics — Ciência de Dados', period: '2024 - 2025', description: 'Formação avançada em técnicas de Business Intelligence,big data e analytics com foco em ciência de dados. Aprendizado em machine learning, visualização de dados e ferramentas como Python, R e Power BI.' },
+  { title: 'Bootcamp', school: 'SoulCode Academy', degree: 'Analista de Dados', period: '2023', description: 'Bootcamp intensivo focado em análise de dados, SQL, Python, visualização de dados e business intelligence. Projetos práticos com ferramentas reais do mercado.' },
+  { title: 'Bacharel', school: 'Universidade Iguaçu - UNIG', degree: 'Sistemas de Informação', period: '2004 - 2007', description: 'Graduação em Sistemas de Informação com foco em desenvolvimento de software, banco de dados, análise de sistemas e gestão de tecnologia da informação.' },
+  { title: 'Técnico', school: 'Wall Escola Técnica', degree: 'Técnico em Mecatrônica', period: '2008 - 2010', description: 'Curso técnico focado em mecânica, eletrônica e informática industrial. Programação de controladores lógicos programmáveis (CLP), manutenção de sistemas automatizados e robótica.' },
 ];
 
 const certifications = [
-  {
-    name: 'Google Data Analytics Professional Certificate',
-    provider: 'Google + Coursera',
-    format: 'Professional Certificate',
-    credentialId: 'K39K5TQURMN4',
-    credentialUrl: 'https://www.coursera.org/account/accomplishments/professional-cert/K39K5TQURMN4',
-    description: 'Formação completa em análise de dados com certificação reconhecida por Google e Coursera, cobrindo limpeza, tratamento, visualização e tomada de decisão orientada por dados.',
-    thumbnailUrl: 'https://s3.amazonaws.com/coursera/media/Grid_Coursera_Partners_updated.png',
-    accent: 'from-[#4285F4]/85 via-[#0F172A]/80 to-cyber-black',
-    providerAccent: 'bg-[#4285F4]/15 text-[#8db8ff]',
-    icon: <BarChart3 size={24} />,
-    skills: ['Google Data Analytics', 'Análise de Dados', 'Coursera'],
-  },
-  {
-    name: 'Microsoft Certified: Conceitos básicos da IA do Azure',
-    provider: 'Microsoft Learn',
-    format: 'Certificação',
-    credentialId: 'f648454ae3c1c82',
-    credentialUrl: 'https://learn.microsoft.com/pt-br/users/adrianolengruber/credentials/f648454ae3c1c82?ref=https%3A%2F%2Fwww.linkedin.com%2F',
-    description: 'Credencial oficial validando fundamentos de inteligência artificial, serviços cognitivos e recursos de IA no ecossistema Azure.',
-    thumbnailUrl: 'https://learn.microsoft.com/en-us/media/open-graph-image.png',
-    accent: 'from-[#0078D4]/85 via-[#0b2740]/80 to-cyber-black',
-    providerAccent: 'bg-[#0078D4]/15 text-[#7cc6ff]',
-    icon: <Cloud size={24} />,
-    skills: ['Azure AI', 'Cloud', 'Microsoft'],
-  },
-  {
-    name: 'Formação Power BI Analyst',
-    provider: 'DIO',
-    format: 'Bootcamp',
-    credentialId: '83CD0F9B',
-    credentialUrl: 'https://www.dio.me/certificate/83CD0F9B/share',
-    description: 'Trilha com foco em modelagem analítica, visualização de dados, métricas e storytelling com Power BI.',
-    thumbnailUrl: 'https://hermes.dio.me/certificates/cover/83CD0F9B.jpg',
-    accent: 'from-[#F2C811]/85 via-[#614b03]/70 to-cyber-black',
-    providerAccent: 'bg-[#F2C811]/15 text-[#f6db5d]',
-    icon: <LayoutDashboard size={24} />,
-    skills: ['Power BI', 'DAX', 'Analytics'],
-  },
-  {
-    name: 'Formação Python Developer',
-    provider: 'DIO',
-    format: 'Bootcamp',
-    credentialId: 'B0A2ABED',
-    credentialUrl: 'https://www.dio.me/certificate/B0A2ABED/share',
-    description: 'Formação orientada a desenvolvimento em Python com prática em lógica, sintaxe e construção de soluções reais.',
-    thumbnailUrl: 'https://hermes.dio.me/certificates/cover/B0A2ABED.jpg',
-    accent: 'from-[#1f6feb]/85 via-[#10203f]/80 to-cyber-black',
-    providerAccent: 'bg-[#1f6feb]/15 text-[#73a7ff]',
-    icon: <Code2 size={24} />,
-    skills: ['Python', 'APIs', 'Automação'],
-  },
-  {
-    name: 'Formação UX Designer',
-    provider: 'DIO',
-    format: 'Bootcamp',
-    credentialId: 'BBB4A04E',
-    credentialUrl: 'https://www.dio.me/certificate/BBB4A04E/share',
-    description: 'Percurso focado em experiência do usuário, interface, fluxo de navegação e decisões guiadas por usabilidade.',
-    thumbnailUrl: 'https://hermes.dio.me/certificates/cover/BBB4A04E.jpg',
-    accent: 'from-[#E07390]/85 via-[#411726]/80 to-cyber-black',
-    providerAccent: 'bg-[#E07390]/15 text-[#f2a6ba]',
-    icon: <Palette size={24} />,
-    skills: ['UX', 'UI', 'Jornada'],
-  },
-  {
-    name: 'Ética na Inteligência Artificial',
-    provider: 'SENAI-SP',
-    format: 'Aperfeiçoamento Profissional',
-    credentialId: '00042104/8184334',
-    credentialUrl: 'https://www.sp.senai.br/consulta-certificado?qrcode=00042104/8184334',
-    description: 'Curso com verificação pública voltado a fundamentos éticos, responsabilidade e uso consciente de IA em contexto profissional.',
-    completionLabel: 'Concluído em 04/08/2025 • 4h',
-    accent: 'from-[#D71920]/85 via-[#42090b]/80 to-cyber-black',
-    providerAccent: 'bg-[#D71920]/15 text-[#ff9b9f]',
-    icon: <CheckCircle2 size={24} />,
-    skills: ['Ética em IA', 'Governança', 'SENAI'],
-  },
+  { name: 'Power BI para Análise de Dados', provider: 'Microsoft', year: '2024' },
+  { name: 'Fundamentos de Python', provider: 'Python Institute', year: '2023' },
+  { name: 'Implementando Banco de Dados', provider: 'Microsoft', year: '2023' },
+  { name: 'Classificação e Tratamento da Informação', provider: 'ESC', year: '2023' },
+  { name: 'Data Science Fundamentals', provider: 'IBM', year: '2023' },
+  { name: 'Machine Learning Specialist', provider: 'Coursera', year: '2024' },
 ];
 
 // ──────────────────────────────────────────────────────────────
@@ -430,7 +157,7 @@ function Navigation() {
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-cyber-black/72 backdrop-blur-2xl py-3 shadow-[0_16px_40px_rgba(2,6,23,0.34)]' : 'bg-transparent py-5'}`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'glass py-3 shadow-lg' : 'bg-transparent py-5'}`}
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         <a href="#home" className="font-heading text-xl font-bold text-gradient">AL</a>
@@ -464,7 +191,7 @@ function Navigation() {
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-cyber-black/88 backdrop-blur-2xl"
+            className="md:hidden glass border-t border-white/10"
           >
             <div className="px-6 py-4 space-y-4">
               {navItems.map((item) => (
@@ -535,13 +262,20 @@ function Hero() {
 
           <motion.div
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex flex-wrap items-center justify-center gap-4 mb-10"
+            className="flex flex-wrap items-center justify-center gap-4 mb-12"
           >
             <a href="#contact" className="inline-flex items-center gap-2 px-7 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-all duration-200 shadow-lg hover:shadow-primary/20">
-              Solicitar diagnóstico <ArrowRight size={18} />
+              Vamos conversar <ArrowRight size={18} />
             </a>
             <a href="#projects" className="inline-flex items-center gap-2 px-7 py-3 glass rounded-lg font-semibold hover:border-primary/30 transition-all duration-200">
               Ver projetos
+            </a>
+            <a
+              href="/cv-adriano-lengruber.pdf"
+              download
+              className="inline-flex items-center gap-2 px-7 py-3 border border-primary/30 rounded-lg font-semibold text-primary hover:bg-primary/10 transition-all duration-200"
+            >
+              <FileDown size={18} /> Download CV
             </a>
           </motion.div>
 
@@ -552,7 +286,7 @@ function Hero() {
             {[
               { href: 'https://github.com/Adriano-Lengruber', icon: <Github size={22} /> },
               { href: 'https://linkedin.com/in/adriano-lengruber', icon: <Linkedin size={22} /> },
-              { href: 'mailto:contato@adriano-lengruber.com', icon: <Mail size={22} /> },
+              { href: 'mailto:adrianolengruber@hotmail.com', icon: <Mail size={22} /> },
             ].map(({ href, icon }, i) => (
               <a key={i} href={href} target="_blank" rel="noopener noreferrer"
                 className="w-10 h-10 glass rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 transition-all duration-200">
@@ -577,9 +311,10 @@ function Hero() {
 // About
 // ──────────────────────────────────────────────────────────────
 function About() {
+  const yearsExp = new Date().getFullYear() - 2014;
   const stats = [
-    { icon: <Calendar size={22} className="text-primary" />, label: 'Anos de Exp.', value: '16+' },
-    { icon: <Handshake size={22} className="text-primary" />, label: 'Consultorias', value: '35' },
+    { icon: <Calendar size={22} className="text-primary" />, label: 'Anos de Exp.', value: `${yearsExp}+` },
+    { icon: <Wrench size={22} className="text-primary" />, label: 'Ferramentas', value: '15+' },
     { icon: <Rocket size={22} className="text-primary" />, label: 'Projetos', value: '50+' },
     { icon: <Users size={22} className="text-primary" />, label: 'Clientes', value: '20+' },
   ];
@@ -858,8 +593,85 @@ function Services() {
 }
 
 function SpecializedConsulting() {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'start' });
+
+  const consultingServices = [
+    {
+      title: 'Workstations Pro para IA & Dados',
+      audience: 'IA • Ciência de Dados • Criadores',
+      description: 'Projeto estações de trabalho sob medida para quem precisa de desempenho real em IA, ciência de dados, criação de conteúdo e workloads intensivos. O foco é equilibrar performance, possibilidade de upgrade, confiabilidade e investimento inteligente.',
+      idealFor: 'Profissionais que precisam montar ou evoluir uma máquina realmente compatível com o seu perfil de uso.',
+      deliverable: 'Definição da configuração ideal, orientação de compra, checklist técnico e plano de evolução.',
+      badges: ['Alta Performance', 'GPU Ready', 'Setup Sob Medida'],
+      features: [
+        'Dimensionamento de CPU, GPU, RAM e armazenamento por perfil de uso',
+        'Planejamento térmico, consumo, upgrade e longevidade do equipamento',
+        'Configuração pensada para produtividade, estabilidade e custo-benefício',
+      ],
+      icon: <HardDrive size={24} />,
+      iconColor: 'text-cyber-gold',
+      iconBg: 'bg-cyber-gold/15',
+      border: 'hover:border-cyber-gold/30 hover:shadow-cyber-gold/10',
+      cover: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80',
+    },
+    {
+      title: 'VPS Pessoal ou Profissional',
+      audience: 'Cloud • Self-Hosted • Deploy',
+      description: 'Estruturo VPS sob medida para aplicações, automações, bots, sites, APIs ou ambientes privados, com configuração orientada ao objetivo do cliente. A entrega inclui transparência total, documentação operacional no próprio ambiente e transferência integral dos acessos.',
+      idealFor: 'Empresas e profissionais que querem infraestrutura enxuta, segura e pronta para uso sem depender de pacotes genéricos.',
+      deliverable: 'Servidor provisionado, stack configurada, segurança inicial aplicada e acessos totalmente em posse do cliente.',
+      badges: ['Linux', 'Docker', 'Acessos do Cliente'],
+      features: [
+        'Configuração precisa das aplicações escolhidas para o cenário de uso',
+        'Organização de usuários, domínios, SSL, backups e boas práticas de segurança',
+        'Entrega final com transparência sobre contas, logins e estrutura implantada',
+      ],
+      icon: <Server size={24} />,
+      iconColor: 'text-cyan-400',
+      iconBg: 'bg-cyan-400/15',
+      border: 'hover:border-cyan-400/30 hover:shadow-cyan-400/10',
+      cover: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80',
+    },
+    {
+      title: 'Personal Developer',
+      audience: 'Produto Sob Medida • Full Stack',
+      description: 'Consultoria e desenvolvimento do início ao fim para projetos personalizados, pensados especificamente para a realidade de uma pessoa, empresa ou gestor. A prioridade é construir a solução certa com a stack mais atual, sem perder de vista viabilidade, manutenção e retorno sobre o investimento.',
+      idealFor: 'Quem precisa tirar uma ideia do papel ou evoluir um processo com tecnologia feita sob medida.',
+      deliverable: 'Descoberta, arquitetura, implementação, validação e evolução contínua do projeto.',
+      badges: ['Sob Medida', 'IA Aplicada', 'Custo-Benefício'],
+      features: [
+        'Levantamento da necessidade real antes da escolha técnica',
+        'Desenvolvimento orientado a resultado, usabilidade e escalabilidade',
+        'Tecnologia atual com foco em sustentabilidade financeira do projeto',
+      ],
+      icon: <Brackets size={24} />,
+      iconColor: 'text-cyber-emerald',
+      iconBg: 'bg-cyber-emerald/15',
+      border: 'hover:border-cyber-emerald/30 hover:shadow-cyber-emerald/10',
+      cover: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80',
+    },
+    {
+      title: 'BI Express para PMEs',
+      audience: 'Gestão • Comercial • Operação',
+      description: 'Uma frente pensada para gerar resultado rápido em empresas locais e regionais por meio de dashboards executivos, automações operacionais e organização dos indicadores essenciais. É uma porta de entrada de alto valor para negócios que precisam enxergar melhor suas operações e decidir com mais segurança.',
+      idealFor: 'Comércios, indústrias, distribuidores, clínicas e gestores que querem clareza nos números e ganho operacional.',
+      deliverable: 'Mapa de indicadores, painel executivo, rotina de atualização e recomendações práticas de melhoria.',
+      badges: ['Dashboard', 'KPIs', 'Quick Wins'],
+      features: [
+        'Estruturação de indicadores críticos para operação, comercial e financeiro',
+        'Painéis objetivos para acompanhamento e tomada de decisão',
+        'Automação de etapas repetitivas para reduzir retrabalho e ruído operacional',
+      ],
+      icon: <Gauge size={24} />,
+      iconColor: 'text-[#E07390]',
+      iconBg: 'bg-[#E07390]/15',
+      border: 'hover:border-[#E07390]/30 hover:shadow-[#E07390]/10',
+      cover: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
+    },
+  ];
+
   return (
-    <section id="specialized-consulting" className="py-24 relative bg-cyber-black/30 scroll-mt-24">
+    <section className="py-24 relative bg-cyber-black/30">
       <div className="max-w-7xl mx-auto px-6">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-medium tracking-[0.2em] uppercase mb-5">
@@ -868,257 +680,93 @@ function SpecializedConsulting() {
           </div>
           <h2 className="font-heading text-4xl font-bold mb-4">Consultorias <span className="text-gradient">Especializadas</span></h2>
           <p className="text-muted-foreground max-w-3xl mx-auto">Serviços com alta percepção de valor para atrair projetos rápidos, estratégicos e personalizados, do hardware à infraestrutura e ao software sob medida.</p>
-          <div className="flex flex-wrap items-center justify-center gap-3 mt-6 text-xs text-muted-foreground">
-            <span className="px-3 py-1.5 rounded-full border border-white/10 bg-white/5">Briefing inicial sem enrolação</span>
-            <span className="px-3 py-1.5 rounded-full border border-white/10 bg-white/5">Escopo alinhado à necessidade real</span>
-            <span className="px-3 py-1.5 rounded-full border border-white/10 bg-white/5">Contato direto para fechar rápido</span>
-          </div>
         </motion.div>
 
-        <div className="grid auto-rows-fr gap-4 md:grid-cols-2 2xl:grid-cols-4">
-          {CONSULTING_SERVICES.map((service, index) => (
-            <motion.div
-              key={service.slug}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.06 }}
-              className="h-full"
-            >
-              <div className={`glass rounded-2xl border border-white/10 p-5 transition-all duration-300 ${service.border} hover:-translate-y-1 h-full flex flex-col`}>
-                <div className="flex items-start justify-between gap-3 mb-4 min-h-[88px]">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2">{service.audience}</p>
-                    <h3 className="font-heading text-xl font-semibold leading-tight">{service.title}</h3>
-                  </div>
-                  <div className={`w-11 h-11 rounded-xl ${service.iconBg} flex items-center justify-center ${service.iconColor} shrink-0`}>
-                    {service.icon}
-                  </div>
-                </div>
+        <div className="relative">
+          <button
+            onClick={() => emblaApi?.scrollPrev()}
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-12 h-12 rounded-full glass items-center justify-center hover:bg-primary/15 hover:border-primary/25 transition-all hidden md:flex"
+          >
+            <ChevronLeft size={20} />
+          </button>
 
-                <p className="text-sm text-muted-foreground leading-relaxed min-h-[52px]">{service.hook}</p>
-
-                <div className="flex flex-wrap gap-2 mt-4 min-h-[52px] content-start">
-                  {service.badges.slice(0, 2).map((badge) => (
-                    <span key={badge} className="px-2.5 py-1 rounded-full border border-white/10 bg-white/5 text-[11px] text-white/80">
-                      {badge}
-                    </span>
-                  ))}
-                </div>
-
-                <p className="text-xs text-muted-foreground leading-relaxed mt-4 min-h-[88px]">
-                  <span className="text-foreground/90 font-medium">Ideal para:</span> {service.idealFor}
-                </p>
-
-                <Link
-                  to={`/consultorias/${service.slug}`}
-                  onClick={() => window.scrollTo(0, 0)}
-                  className="mt-auto inline-flex w-full items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-foreground rounded-xl font-semibold hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/20"
+          <div className="overflow-hidden" ref={emblaRef}>
+            <div className="flex gap-6">
+              {consultingServices.map((service, index) => (
+                <motion.div
+                  key={service.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.08 }}
+                  className="min-w-0 flex-[0_0_100%] md:flex-[0_0_calc(50%-12px)]"
                 >
-                  {service.cta}
-                  <ArrowRight size={16} />
-                </Link>
-              </div>
-            </motion.div>
-          ))}
+                  <div className={`glass rounded-2xl overflow-hidden border border-white/10 transition-all duration-300 ${service.border} hover:-translate-y-1 h-full`}>
+                    <div className="relative h-60">
+                      <div
+                        className="absolute inset-0 bg-cover bg-center scale-105 transition-transform duration-500"
+                        style={{ backgroundImage: `linear-gradient(135deg, rgba(5,8,12,0.2), rgba(5,8,12,0.75)), url(${service.cover})` }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-cyber-black via-cyber-black/30 to-transparent" />
+                      <div className="relative z-10 h-full p-6 flex flex-col justify-between">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex flex-wrap gap-2 max-w-[80%]">
+                            {service.badges.map((badge) => (
+                              <span key={badge} className="px-2.5 py-1 rounded-full bg-black/35 backdrop-blur-sm border border-white/15 text-[11px] font-medium text-white/90">
+                                {badge}
+                              </span>
+                            ))}
+                          </div>
+                          <div className={`w-12 h-12 rounded-xl ${service.iconBg} backdrop-blur-sm flex items-center justify-center ${service.iconColor}`}>
+                            {service.icon}
+                          </div>
+                        </div>
+
+                        <div>
+                          <p className="text-[11px] uppercase tracking-[0.25em] text-white/70 mb-2">{service.audience}</p>
+                          <h3 className="font-heading text-2xl font-semibold text-white">{service.title}</h3>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-6">
+                      <p className="text-muted-foreground leading-relaxed mb-5">{service.description}</p>
+
+                      <div className="grid sm:grid-cols-2 gap-4 mb-5">
+                        <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                          <p className="text-[11px] uppercase tracking-[0.2em] text-primary mb-2">Ideal para</p>
+                          <p className="text-sm text-foreground/85 leading-relaxed">{service.idealFor}</p>
+                        </div>
+                        <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                          <p className="text-[11px] uppercase tracking-[0.2em] text-primary mb-2">Entregáveis</p>
+                          <p className="text-sm text-foreground/85 leading-relaxed">{service.deliverable}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        {service.features.map((feature) => (
+                          <div key={feature} className="flex items-start gap-2 text-sm text-muted-foreground">
+                            <CheckCircle2 size={16} className={service.iconColor} />
+                            <span>{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          <button
+            onClick={() => emblaApi?.scrollNext()}
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-12 h-12 rounded-full glass items-center justify-center hover:bg-primary/15 hover:border-primary/25 transition-all hidden md:flex"
+          >
+            <ChevronRight size={20} />
+          </button>
         </div>
       </div>
     </section>
-  );
-}
-
-function ConsultingDetailPage() {
-  const { slug } = useParams();
-  const whatsappBase = 'https://wa.me/5521983300779';
-  const service = CONSULTING_SERVICES.find((item) => item.slug === slug);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [slug]);
-
-  if (!service) {
-    return (
-      <div className="min-h-screen bg-cyber-black text-white flex items-center justify-center px-6">
-        <div className="glass rounded-3xl border border-white/10 p-8 max-w-xl text-center">
-          <p className="text-sm uppercase tracking-[0.25em] text-muted-foreground mb-4">Consultoria não encontrada</p>
-          <h1 className="font-heading text-3xl font-bold mb-4">Essa página não está disponível.</h1>
-          <p className="text-muted-foreground leading-relaxed mb-6">Volte para a página inicial para escolher uma consultoria especializada e ver os detalhes corretos.</p>
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 px-5 py-3 bg-primary text-primary-foreground rounded-xl font-semibold hover:bg-primary/90 transition-all"
-          >
-            <ArrowLeft size={18} />
-            Voltar ao início
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-cyber-black text-white relative overflow-hidden">
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-24 left-1/4 w-80 h-80 bg-primary/8 rounded-full blur-3xl" />
-        <div className="absolute bottom-10 right-1/4 w-80 h-80 bg-cyber-gold/8 rounded-full blur-3xl" />
-      </div>
-
-      <header className="relative z-10 border-b border-white/6 backdrop-blur-xl bg-cyber-black/70">
-        <div className="max-w-6xl mx-auto px-6 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <Link to="/" className="inline-flex items-center gap-3">
-            <span className="font-heading text-xl font-bold text-gradient">AL</span>
-            <span className="text-sm text-muted-foreground">Consultorias Especializadas</span>
-          </Link>
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
-          >
-            <ArrowLeft size={16} />
-            Voltar para a landing
-          </Link>
-        </div>
-      </header>
-
-      <main className="relative z-10 max-w-6xl mx-auto px-6 py-10 md:py-14 space-y-6">
-        <section className="glass rounded-3xl border border-white/10 overflow-hidden">
-          <div
-            className="relative min-h-[260px] md:min-h-[320px]"
-            style={{ backgroundImage: `linear-gradient(160deg, rgba(5,8,12,0.12), rgba(5,8,12,0.72)), url(${service.cover})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-          >
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,7,18,0.74)_0%,rgba(3,7,18,0.58)_26%,rgba(3,7,18,0.72)_62%,rgba(3,7,18,0.98)_100%)]" />
-            <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-cyber-black/70 to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-cyber-black via-cyber-black/95 to-transparent" />
-            <div className="relative h-full p-6 md:p-8 xl:p-10 flex flex-col justify-between gap-6">
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div className="flex flex-wrap items-center gap-2.5 max-w-3xl">
-                  <span className="px-3 py-1 rounded-full border border-primary/40 bg-cyber-black/55 shadow-[0_8px_24px_rgba(0,0,0,0.28)] backdrop-blur-md text-primary text-[11px] uppercase tracking-[0.25em]">
-                    {service.audience}
-                  </span>
-                  {service.badges.map((badge) => (
-                    <span key={badge} className="px-3 py-1 rounded-full border border-white/20 bg-cyber-black/55 shadow-[0_8px_24px_rgba(0,0,0,0.24)] backdrop-blur-md text-[11px] text-white/95">
-                      {badge}
-                    </span>
-                  ))}
-                </div>
-                <div className={`w-14 h-14 rounded-2xl ${service.iconBg} bg-cyber-black/45 shadow-[0_12px_30px_rgba(0,0,0,0.28)] backdrop-blur-md flex items-center justify-center ${service.iconColor} shrink-0`}>
-                  {service.icon}
-                </div>
-              </div>
-
-              <div className="max-w-3xl rounded-2xl border border-white/10 bg-cyber-black/35 px-4 py-4 shadow-[0_14px_40px_rgba(0,0,0,0.22)] backdrop-blur-sm md:px-5">
-                <p className="text-[11px] uppercase tracking-[0.2em] text-white/80 mb-3">Visão geral</p>
-                <p className="text-base md:text-lg text-white leading-relaxed">{service.hook}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="relative -mt-1 bg-[linear-gradient(180deg,rgba(3,7,18,0.98)_0%,rgba(5,10,20,0.74)_100%)] p-6 md:p-8 xl:p-10">
-            <div className="grid gap-8 xl:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)] xl:items-start">
-              <div className="min-w-0">
-                <h1 className="font-heading text-4xl md:text-5xl font-bold leading-tight">{service.title}</h1>
-                <p className="text-muted-foreground mt-5 leading-relaxed max-w-3xl">{service.description}</p>
-              </div>
-
-              <div className="flex flex-wrap gap-3 xl:justify-end">
-                <a
-                  href={`${whatsappBase}?text=${encodeURIComponent(service.message)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-primary text-primary-foreground rounded-xl font-semibold hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/20"
-                >
-                  <MessageCircle size={18} />
-                  Falar sobre esta consultoria
-                </a>
-                <a
-                  href={`mailto:contato@adriano-lengruber.com?subject=${encodeURIComponent(service.title)}&body=${encodeURIComponent(`Olá, Adriano.\n\nTenho interesse na consultoria "${service.title}".`)}`}
-                  className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-white/10 hover:border-primary/30 hover:bg-primary/5 transition-all font-semibold"
-                >
-                  <Mail size={18} />
-                  Receber retorno por e-mail
-                </a>
-              </div>
-            </div>
-
-            <div className="grid gap-3 mt-8">
-              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.12)] md:grid md:grid-cols-[170px_minmax(0,1fr)] md:items-start md:gap-5 md:px-6 md:py-5">
-                <p className="text-[11px] uppercase tracking-[0.2em] text-primary mb-2">Ideal para</p>
-                <p className="text-sm text-foreground/85 leading-relaxed">{service.idealFor}</p>
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.12)] md:grid md:grid-cols-[170px_minmax(0,1fr)] md:items-start md:gap-5 md:px-6 md:py-5">
-                <p className="text-[11px] uppercase tracking-[0.2em] text-primary mb-2">Entregável</p>
-                <p className="text-sm text-foreground/85 leading-relaxed">{service.deliverable}</p>
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.12)] md:grid md:grid-cols-[170px_minmax(0,1fr)] md:items-start md:gap-5 md:px-6 md:py-5">
-                <p className="text-[11px] uppercase tracking-[0.2em] text-primary mb-2">Ritmo inicial</p>
-                <p className="text-sm text-foreground/85 leading-relaxed">{service.timeline}</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="glass rounded-3xl border border-white/10 p-8 md:p-10">
-          <h2 className="font-heading text-2xl font-bold mb-6">O que entra na consultoria</h2>
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {service.features.map((feature) => (
-              <div key={feature} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 md:px-5 md:py-5 flex items-start gap-3">
-                <CheckCircle2 size={18} className={`${service.iconColor} mt-0.5 shrink-0`} />
-                <p className="text-sm text-muted-foreground leading-relaxed">{feature}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="grid lg:grid-cols-2 gap-6">
-          <div className="glass rounded-3xl border border-white/10 p-8 md:p-10">
-            <h2 className="font-heading text-2xl font-bold mb-6">O que você tende a ganhar</h2>
-            <div className="grid gap-3">
-              {service.outcomes.map((outcome) => (
-                <div key={outcome} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 md:px-5">
-                  <p className="text-sm text-foreground/90 leading-relaxed">{outcome}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="glass rounded-3xl border border-white/10 p-8 md:p-10">
-            <h2 className="font-heading text-2xl font-bold mb-6">Como eu conduzo essa frente</h2>
-            <div className="grid gap-3">
-              {service.detailPoints.map((item, index) => (
-                <div key={item} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 md:px-5 md:py-4 md:grid md:grid-cols-[92px_minmax(0,1fr)] md:items-start md:gap-5">
-                  <p className="text-[11px] uppercase tracking-[0.2em] text-primary mb-2 md:mb-0">Etapa {index + 1}</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{item}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="glass rounded-3xl border border-white/10 p-8 md:p-10 text-center">
-          <p className="text-[11px] uppercase tracking-[0.25em] text-primary mb-4">Próximo passo</p>
-          <h2 className="font-heading text-3xl font-bold mb-4">Se essa consultoria faz sentido para o seu momento, vamos conversar.</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-8">Você explica o cenário, eu avalio a necessidade real e direciono a melhor forma de começar sem inflar escopo nem complicar a decisão.</p>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <a
-              href={`${whatsappBase}?text=${encodeURIComponent(service.message)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-3 bg-primary text-primary-foreground rounded-xl font-semibold hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/20"
-            >
-              <MessageCircle size={18} />
-              Quero falar agora
-            </a>
-            <Link
-              to="/#specialized-consulting"
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-white/10 hover:border-primary/30 hover:bg-primary/5 transition-all font-semibold"
-            >
-              <ArrowLeft size={18} />
-              Voltar para outras consultorias
-            </Link>
-          </div>
-        </section>
-
-        <Footer />
-      </main>
-    </div>
   );
 }
 
@@ -1201,6 +849,24 @@ function Process() {
 function Resume() {
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'language': return 'bg-primary/15 text-primary';
+      case 'tool': return 'bg-cyber-steel/15 text-cyber-steel';
+      case 'cloud': return 'bg-cyber-emerald/15 text-cyber-emerald';
+      default: return 'bg-primary/10 text-primary/80';
+    }
+  };
+
+  const getBarColor = (category: string) => {
+    switch (category) {
+      case 'language': return 'bg-gradient-to-r from-cyber-gold to-cyber-amber';
+      case 'tool': return 'bg-gradient-to-r from-cyber-steel to-cyber-blue';
+      case 'cloud': return 'bg-gradient-to-r from-cyber-emerald to-teal-400';
+      default: return 'bg-gradient-to-r from-cyber-gold/70 to-cyber-amber/70';
+    }
+  };
+
   return (
     <section id="resume" className="py-24 relative">
       <div className="max-w-7xl mx-auto px-6">
@@ -1211,11 +877,12 @@ function Resume() {
 
         {/* Experience - Timeline Simplificada para Mobile First */}
         <div className="relative pl-8 md:pl-0">
+          {/* Timeline line - left side on mobile, center on desktop - all gold */}
           <div className="absolute left-[18px] md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-cyber-gold via-cyber-gold to-cyber-gold md:-translate-x-1/2" />
           
           {experiences.map((exp, index) => {
+            const isFirst = index === 0;
             const isLeft = index % 2 === 0;
-            const isExpanded = expandedId === exp.id;
             
             return (
               <motion.div 
@@ -1226,12 +893,14 @@ function Resume() {
                 transition={{ delay: index * 0.1 }}
                 className={`relative mb-8 last:mb-0`}
               >
+                {/* Timeline dot - all gold, properly positioned */}
                 <div className={`absolute left-[-18px] md:left-1/2 top-6 md:-translate-x-1/2 z-10 w-4 h-4`}>
                   <div className={`w-full h-full rounded-full border-2 border-cyber-black bg-cyber-gold ${exp.current ? 'shadow-lg shadow-cyber-gold/50 animate-pulse' : ''}`} />
                 </div>
                 
+                {/* Card */}
                 <div className={`
-                  glass rounded-xl p-5 hover:border-primary/25 transition-all duration-300 cursor-pointer
+                  glass rounded-xl p-6 hover:border-primary/25 transition-all duration-300 cursor-pointer
                   ${isLeft ? 'md:w-[45%] md:mr-auto md:pr-8' : 'md:w-[45%] md:ml-auto md:pl-8'}
                 `} onClick={() => setExpandedId(expandedId === exp.id ? null : exp.id)}>
                   <div className="flex items-start justify-between mb-3">
@@ -1249,11 +918,9 @@ function Resume() {
                     <span className="flex items-center gap-1"><Calendar size={12} /> {exp.period}</span>
                     <span className="flex items-center gap-1"><MapPin size={12} /> {exp.location}</span>
                   </div>
-                  <p className={`text-muted-foreground text-sm leading-relaxed ${isExpanded ? 'mb-4' : 'line-clamp-2 mb-2'}`}>
-                    {exp.description}
-                  </p>
+                  <p className="text-muted-foreground text-sm leading-relaxed mb-4">{exp.description}</p>
                   <AnimatePresence>
-                    {isExpanded && (
+                    {expandedId === exp.id && (
                       <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                         <div className="flex flex-wrap gap-2 pt-4 border-t border-white/10">
                           {exp.skills.map((skill) => (
@@ -1263,9 +930,9 @@ function Resume() {
                       </motion.div>
                     )}
                   </AnimatePresence>
-                  <button className="text-primary/70 text-xs flex items-center gap-1 mt-2 hover:text-primary transition-colors">
-                    {isExpanded ? 'Ver menos' : 'Ver mais'}
-                    <ChevronDown size={13} className={`transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                  <button className="text-primary/70 text-xs flex items-center gap-1 mt-3 hover:text-primary transition-colors">
+                    {expandedId === exp.id ? 'Ver menos' : 'Ver mais'}
+                    <ChevronDown size={13} className={`transition-transform ${expandedId === exp.id ? 'rotate-180' : ''}`} />
                   </button>
                 </div>
               </motion.div>
@@ -1289,7 +956,7 @@ function Education() {
           <p className="text-muted-foreground max-w-2xl mx-auto">Minha jornada educacional construindo a base do conhecimento</p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           {education.map((edu, index) => (
             <motion.div 
               key={edu.school} 
@@ -1297,43 +964,26 @@ function Education() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }} 
               transition={{ delay: index * 0.1 }}
-              whileHover={{ y: -6 }}
-              className="glass rounded-2xl overflow-hidden border border-white/10 hover:border-primary/25 transition-all duration-300 h-full"
+              className="glass rounded-xl p-6 hover:border-primary/25 transition-all duration-300"
             >
-              <div className={`relative h-40 bg-gradient-to-br ${edu.accent} overflow-hidden`}>
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.18),transparent_42%)]" />
-                <div className="absolute inset-0 bg-gradient-to-t from-cyber-black via-cyber-black/30 to-transparent" />
-                <div className="relative h-full p-6 flex flex-col justify-between">
-                  <div className="flex items-start justify-between gap-4">
-                    <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${edu.providerAccent}`}>
-                      {edu.highlight}
-                    </span>
-                    <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center text-white">
-                      {edu.icon}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.2em] text-white/70 mb-2">{edu.title}</p>
-                    <h4 className="font-semibold text-xl leading-tight text-white">{edu.school}</h4>
-                  </div>
-                </div>
-              </div>
-              <div className="p-6">
-                <div className="flex items-center justify-between gap-3 mb-4">
-                  <p className="text-primary font-medium leading-snug">{edu.degree}</p>
-                  <span className="shrink-0 flex items-center gap-1.5 text-xs text-muted-foreground">
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs text-primary font-medium">{edu.title}</p>
+                  <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
                     <Calendar size={12} className="text-primary" />
                     {edu.period}
                   </span>
                 </div>
+                <h4 className="font-semibold text-lg">{edu.school}</h4>
+              </div>
+              <p className="text-primary font-medium mb-2">{edu.degree}</p>
+              {'description' in edu && edu.description && (
                 <p className="text-muted-foreground text-sm leading-relaxed">{edu.description}</p>
-                <div className="flex flex-wrap gap-2 mt-5 pt-4 border-t border-white/10">
-                  {edu.skills.map((skill) => (
-                    <span key={skill} className="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-                      {skill}
-                    </span>
-                  ))}
-                </div>
+              )}
+              <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-white/10">
+                <span className="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                  {edu.degree.split(' ')[0]}
+                </span>
               </div>
             </motion.div>
           ))}
@@ -1374,74 +1024,18 @@ function Certifications() {
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }} 
                   transition={{ delay: index * 0.05 }}
-                  className="flex-shrink-0 w-[320px]"
+                  className="flex-shrink-0 w-72"
                 >
-                  <motion.a
-                    href={cert.credentialUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    whileHover={{ y: -6 }}
-                    className="glass rounded-2xl overflow-hidden border border-white/10 hover:border-primary/25 transition-all duration-300 h-full flex flex-col group"
-                  >
-                    <div className={`relative h-44 bg-gradient-to-br ${cert.accent} overflow-hidden`}>
-                      {cert.thumbnailUrl ? (
-                        <>
-                          <img
-                            src={cert.thumbnailUrl}
-                            alt={cert.name}
-                            className="w-full h-full object-cover mix-blend-screen opacity-85 group-hover:scale-105 transition-transform duration-500"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-cyber-black via-cyber-black/25 to-transparent" />
-                        </>
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <Award className="text-white/70" size={56} strokeWidth={1.5} />
-                        </div>
-                      )}
-                      <div className="absolute top-4 left-4 right-4 flex items-start justify-between gap-3">
-                        <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold tracking-[0.18em] uppercase ${cert.providerAccent}`}>
-                          {cert.provider}
-                        </span>
-                        <span className="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-cyber-black/45 border border-white/10 text-white/85 backdrop-blur-sm">
-                          {cert.icon}
-                        </span>
-                      </div>
-                      <div className="absolute bottom-4 left-4 right-4">
-                        <span className="inline-flex rounded-full bg-cyber-black/55 px-3 py-1 text-[11px] font-medium text-white/85 backdrop-blur-sm">
-                          {cert.format}
-                        </span>
-                      </div>
+                  <div className="glass rounded-xl p-6 hover:border-primary/25 transition-all duration-300 h-full">
+                    <div className="w-12 h-12 rounded-xl bg-cyber-gold/10 flex items-center justify-center mb-4">
+                      <Award className="text-cyber-gold" size={24} />
                     </div>
-
-                    <div className="p-6 flex flex-col flex-1">
-                      <h4 className="font-semibold text-lg leading-snug mb-3 line-clamp-2 group-hover:text-primary transition-colors">
-                        {cert.name}
-                      </h4>
-                      <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 mb-5">
-                        {cert.description}
-                      </p>
-
-                      <div className="flex flex-wrap gap-2 mb-5">
-                        {cert.skills.map((skill) => (
-                          <span key={skill} className="px-2.5 py-1 rounded-full bg-cyber-slate/50 text-[11px] text-foreground/85">
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-
-                      <div className="mt-auto space-y-4">
-                        <div className="rounded-xl bg-white/[0.03] border border-white/5 px-4 py-3">
-                          <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground mb-1">Credencial</p>
-                          <p className="text-sm font-medium text-foreground/90">{cert.completionLabel || `ID ${cert.credentialId}`}</p>
-                        </div>
-
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-primary font-medium">Ver certificado</span>
-                          <ExternalLink size={18} className="text-primary transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
-                        </div>
-                      </div>
+                    <h4 className="font-semibold mb-2 line-clamp-2">{cert.name}</h4>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>{cert.provider}</span>
+                      <span className="px-2 py-0.5 rounded-full bg-cyber-slate/50">{cert.year}</span>
                     </div>
-                  </motion.a>
+                  </div>
                 </motion.div>
               ))}
             </div>
@@ -1694,44 +1288,22 @@ function Blog() {
 }
 // ──────────────────────────────────────────────────────────────
 function Contact() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    service: 'Consultoria geral',
-    budget: 'A definir',
-    urgency: 'Este mês',
-    preferredChannel: 'WhatsApp',
-    subject: '',
-    message: ''
-  });
+  const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
-    setTimeout(() => {
-      setSending(false);
-      setSent(true);
-      setFormData({
-        name: '',
-        email: '',
-        service: 'Consultoria geral',
-        budget: 'A definir',
-        urgency: 'Este mês',
-        preferredChannel: 'WhatsApp',
-        subject: '',
-        message: ''
-      });
-    }, 1500);
+    setTimeout(() => { setSending(false); setSent(true); setFormData({ name: '', email: '', subject: '', message: '' }); }, 1500);
     setTimeout(() => setSent(false), 5500);
   };
-  const up = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+  const up = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setFormData((prev) => ({ ...prev, [field]: e.target.value }));
 
   const contactInfo = [
-    { icon: <Mail size={22} className="text-primary" />, bg: 'bg-primary/10', label: 'Email', content: <a href="mailto:contato@adriano-lengruber.com" className="text-muted-foreground hover:text-primary transition-colors text-sm">contato@adriano-lengruber.com</a> },
+    { icon: <Mail size={22} className="text-primary" />, bg: 'bg-primary/10', label: 'Email', content: <a href="mailto:adrianolengruber@hotmail.com" className="text-muted-foreground hover:text-primary transition-colors text-sm">adrianolengruber@hotmail.com</a> },
     { icon: <Phone size={22} className="text-cyber-steel" />, bg: 'bg-cyber-steel/10', label: 'Telefone', content: <a href="tel:+5521983300779" className="text-muted-foreground hover:text-primary transition-colors text-sm">(21) 98330-0779</a> },
-    { icon: <MapPin size={22} className="text-cyber-emerald" />, bg: 'bg-cyber-emerald/10', label: 'Localização', content: <p className="text-muted-foreground text-sm">Natividade, Rio de Janeiro, Brasil</p> },
+    { icon: <MapPin size={22} className="text-cyber-emerald" />, bg: 'bg-cyber-emerald/10', label: 'Localização', content: <p className="text-muted-foreground text-sm">Itaperuna, Rio de Janeiro, Brasil</p> },
   ];
 
   return (
@@ -1744,17 +1316,13 @@ function Contact() {
 
         <div className="grid lg:grid-cols-2 gap-12 items-stretch">
           {/* Left side - Contact Info */}
-          <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="flex h-full flex-col">
-            <div className="space-y-4 lg:max-w-[30rem]">
-              {contactInfo.map(({ icon, bg, label, content }) => (
-                <div key={label} className="glass rounded-xl p-5 flex items-center gap-4">
-                  <div className={`w-11 h-11 rounded-xl ${bg} flex items-center justify-center flex-shrink-0`}>{icon}</div>
-                  <div><h3 className="font-semibold text-sm mb-0.5">{label}</h3>{content}</div>
-                </div>
-              ))}
-            </div>
-
-            <div className="flex-1" />
+          <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="space-y-4 flex flex-col justify-between">
+            {contactInfo.map(({ icon, bg, label, content }) => (
+              <div key={label} className="glass rounded-xl p-5 flex items-center gap-4">
+                <div className={`w-11 h-11 rounded-xl ${bg} flex items-center justify-center flex-shrink-0`}>{icon}</div>
+                <div><h3 className="font-semibold text-sm mb-0.5">{label}</h3>{content}</div>
+              </div>
+            ))}
 
             <div className="pt-4">
               <h3 className="font-semibold text-sm mb-4">Redes Sociais</h3>
@@ -1763,7 +1331,7 @@ function Contact() {
                   { href: 'https://github.com/Adriano-Lengruber', icon: <Github size={19} />, label: 'GitHub' },
                   { href: 'https://linkedin.com/in/adriano-lengruber', icon: <Linkedin size={19} />, label: 'LinkedIn' },
                   { href: 'https://instagram.com/supertech_solucoes_tecnologia', icon: <Instagram size={19} />, label: 'Instagram' },
-                  { href: 'https://wa.me/5521983300779', icon: <MessageCircle size={19} />, label: 'WhatsApp' },
+                  { href: 'https://wa.me/5522999999999', icon: <MessageCircle size={19} />, label: 'WhatsApp' },
                 ].map(({ href, icon, label }) => (
                   <a key={label} href={href} target="_blank" rel="noopener noreferrer"
                     className="w-11 h-11 glass rounded-xl flex items-center justify-center hover:bg-primary/15 hover:border-primary/25 hover:text-primary transition-all duration-200 text-muted-foreground">
@@ -1787,62 +1355,6 @@ function Contact() {
                       placeholder={placeholder} required />
                   </div>
                 ))}
-              </div>
-              <div className="grid md:grid-cols-2 gap-5">
-                <div>
-                  <label htmlFor="service" className="block text-sm font-medium mb-2 text-muted-foreground">Serviço de interesse</label>
-                  <select
-                    id="service"
-                    value={formData.service}
-                    onChange={up('service')}
-                    className="w-full px-4 py-3 rounded-lg bg-cyber-black/50 border border-white/10 focus:border-primary/50 focus:outline-none transition-colors text-sm"
-                  >
-                    {['Consultoria geral', 'Workstations Pro', 'VPS', 'Personal Developer', 'BI Express para PMEs'].map((option) => (
-                      <option key={option} value={option} className="bg-cyber-black">{option}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="budget" className="block text-sm font-medium mb-2 text-muted-foreground">Faixa de investimento</label>
-                  <select
-                    id="budget"
-                    value={formData.budget}
-                    onChange={up('budget')}
-                    className="w-full px-4 py-3 rounded-lg bg-cyber-black/50 border border-white/10 focus:border-primary/50 focus:outline-none transition-colors text-sm"
-                  >
-                    {['A definir', 'Até R$ 1 mil', 'R$ 1 mil a R$ 5 mil', 'R$ 5 mil a R$ 15 mil', 'Acima de R$ 15 mil'].map((option) => (
-                      <option key={option} value={option} className="bg-cyber-black">{option}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="grid md:grid-cols-2 gap-5">
-                <div>
-                  <label htmlFor="urgency" className="block text-sm font-medium mb-2 text-muted-foreground">Urgência</label>
-                  <select
-                    id="urgency"
-                    value={formData.urgency}
-                    onChange={up('urgency')}
-                    className="w-full px-4 py-3 rounded-lg bg-cyber-black/50 border border-white/10 focus:border-primary/50 focus:outline-none transition-colors text-sm"
-                  >
-                    {['Urgente', 'Esta semana', 'Este mês', 'Planejamento futuro'].map((option) => (
-                      <option key={option} value={option} className="bg-cyber-black">{option}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="preferredChannel" className="block text-sm font-medium mb-2 text-muted-foreground">Canal preferido</label>
-                  <select
-                    id="preferredChannel"
-                    value={formData.preferredChannel}
-                    onChange={up('preferredChannel')}
-                    className="w-full px-4 py-3 rounded-lg bg-cyber-black/50 border border-white/10 focus:border-primary/50 focus:outline-none transition-colors text-sm"
-                  >
-                    {['WhatsApp', 'Email', 'Ligação', 'Videochamada'].map((option) => (
-                      <option key={option} value={option} className="bg-cyber-black">{option}</option>
-                    ))}
-                  </select>
-                </div>
               </div>
               <div>
                 <label htmlFor="subject" className="block text-sm font-medium mb-2 text-muted-foreground">Assunto</label>
@@ -1906,34 +1418,12 @@ function Footer() {
   );
 }
 
-function HashScrollManager() {
-  const location = useLocation();
-
-  useEffect(() => {
-    if (!location.hash) return;
-
-    const targetId = location.hash.replace('#', '');
-    const runScroll = () => {
-      const target = document.getElementById(targetId);
-      if (target) {
-        target.scrollIntoView({ behavior: 'auto', block: 'start' });
-      }
-    };
-
-    const timeoutId = window.setTimeout(runScroll, 80);
-    return () => window.clearTimeout(timeoutId);
-  }, [location.pathname, location.hash]);
-
-  return null;
-}
-
 // ──────────────────────────────────────────────────────────────
 // App
 // ──────────────────────────────────────────────────────────────
 export default function App() {
   return (
     <AuthProvider>
-      <HashScrollManager />
       <Routes>
         <Route path="/" element={
           <div className="min-h-screen bg-cyber-black">
@@ -1954,7 +1444,6 @@ export default function App() {
           </div>
         } />
         <Route path="/blog" element={<BlogPage />} />
-        <Route path="/consultorias/:slug" element={<ConsultingDetailPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/admin" element={

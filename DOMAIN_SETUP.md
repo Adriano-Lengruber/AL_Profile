@@ -13,13 +13,9 @@ O arquivo docker-compose.blog.yml foi atualizado para incluir a rede do Nginx Pr
 ### Na VPS (Usuário: adriano), execute:
 
 ```bash
-# Parar os containers
 cd ~/AL_Profile
 docker-compose -f docker-compose.blog.yml down
-```
-
-# Recriar os containers com a nova rede
-docker-compose -f docker-compose.blog.yml up -d
+docker-compose -f docker-compose.blog.yml up -d --build
 ```
 
 ## Nginx Proxy Manager - Configuração
@@ -99,9 +95,98 @@ No seu repositório do GitHub, vá em **Settings > Secrets and variables > Actio
 4. Reinicia os containers com `docker-compose -f docker-compose.blog.yml up -d --build`.
 5. Reconecta a rede do Nginx Proxy Manager se necessário.
 
-### 🔍 Diagnóstico de Tela Branca (Se necessário)
+### ✅ Procedimento seguro antes de atualizar a VPS
 
-Se após o deploy a página continuar em branco:
+Sempre registre o estado estável antes de qualquer atualização:
+
+```bash
+ssh adriano@148.230.75.59
+cd ~/AL_Profile
+git rev-parse --short HEAD
+docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+curl -I http://localhost:3003/
+curl -I https://adriano-lengruber.com/
+```
+
+Se algum desses checks já estiver falhando, não atualize nada antes de corrigir.
+
+### 🚀 Atualização manual segura na VPS
+
+Quando for necessário atualizar manualmente, siga esta ordem:
+
+```bash
+ssh adriano@148.230.75.59
+cd ~/AL_Profile
+
+PREV_COMMIT=$(git rev-parse --short HEAD)
+echo "Commit estável atual: $PREV_COMMIT"
+
+git fetch origin master
+git reset --hard origin/master
+
+docker-compose -f docker-compose.blog.yml up -d --build
+docker network connect al_profile_al-profile-network nginx-proxy-app-1 2>/dev/null || true
+
+docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+curl -I http://localhost:3003/
+curl -I http://localhost:3005/api/posts
+curl -I https://adriano-lengruber.com/
+```
+
+Só considere a atualização concluída se os três `curl` responderem corretamente.
+
+### 🆘 Procedimento de emergência para 502 / Bad Gateway
+
+Se o Cloudflare mostrar erro 502, siga esta sequência:
+
+```bash
+ssh adriano@148.230.75.59
+cd ~/AL_Profile
+
+docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+docker logs --tail 80 al-profile-frontend
+docker logs --tail 80 al-profile-backend
+docker logs --tail 80 nginx-proxy-app-1
+
+docker network inspect al_profile_al-profile-network
+docker network connect al_profile_al-profile-network nginx-proxy-app-1 2>/dev/null || true
+
+curl -I http://localhost:3003/
+docker exec nginx-proxy-app-1 getent hosts al-profile-frontend
+curl -I https://adriano-lengruber.com/
+```
+
+Checklist rápido:
+
+1. `al-profile-frontend` precisa estar `Up`.
+2. `nginx-proxy-app-1` precisa estar conectado à rede `al_profile_al-profile-network`.
+3. `curl -I http://localhost:3003/` precisa retornar `200`.
+4. `docker exec nginx-proxy-app-1 getent hosts al-profile-frontend` precisa resolver o host.
+5. Só depois valide novamente o domínio público.
+
+### ⏪ Rollback imediato
+
+Se a nova versão derrubar o site, volte imediatamente ao último commit estável:
+
+```bash
+ssh adriano@148.230.75.59
+cd ~/AL_Profile
+
+git log --oneline -5
+git reset --hard <commit_estavel>
+
+docker-compose -f docker-compose.blog.yml up -d --build
+docker network connect al_profile_al-profile-network nginx-proxy-app-1 2>/dev/null || true
+
+curl -I http://localhost:3003/
+curl -I https://adriano-lengruber.com/
+```
+
+Após o rollback, reverta também a branch `master` no GitHub para evitar que o próximo deploy reaplique a versão problemática.
+
+### 🔍 Diagnóstico de tela branca ou indisponibilidade
+
+Se após o deploy a página continuar em branco ou indisponível:
 
 1.  **Inspecionar Console (F12)**: Verifique se há erros de carregamento de scripts (404 ou 500) ou erros de sintaxe JS.
 2.  **Verificar Logs na VPS**:
@@ -115,6 +200,18 @@ Se após o deploy a página continuar em branco:
 3.  **Confirmar nomes de containers**:
     ```bash
     docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+    ```
+4.  **Validar o frontend por dentro da VPS**:
+    ```bash
+    curl -I http://localhost:3003/
+    ```
+5.  **Validar resolução entre Nginx Proxy Manager e frontend**:
+    ```bash
+    docker exec nginx-proxy-app-1 getent hosts al-profile-frontend
+    ```
+6.  **Reconectar a rede do Nginx Proxy Manager se necessário**:
+    ```bash
+    docker network connect al_profile_al-profile-network nginx-proxy-app-1 2>/dev/null || true
     ```
 
 ---
