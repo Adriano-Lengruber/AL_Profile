@@ -15,6 +15,8 @@ Este repositório contém o ecossistema digital completo de **Adriano Lengruber*
 ### 1. 💎 Portal Pessoal ([adriano-lengruber.com](https://adriano-lengruber.com))
 Uma vitrine tecnológica de alta performance focada em branding pessoal e conversão.
 - **Visual Cyber/Gold**: Estética moderna com animações fluidas via Framer Motion.
+- **Identidade Visual Atualizada**: Navbar e áreas principais usando a logomarca oficial `LOGO01.png`.
+- **Navegação Refinada**: O item `Blog` da navbar aponta para a seção de blog da home, enquanto o CTA dourado leva para a página dedicada.
 - **Currículo Interativo**: Timeline de experiências, habilidades categorizadas e certificações.
 - **Portfólio de Projetos**: Integração com a API do GitHub para exibição de repositórios em tempo real.
 - **Experiência 3D**: Elementos interativos utilizando **Three.js** e **React Three Fiber**.
@@ -68,6 +70,18 @@ Isso iniciará:
 - **Frontend**: Acessível em [http://localhost:3003](http://localhost:3003)
 - **Backend**: Acessível via proxy em [http://localhost:3003/api](http://localhost:3003/api)
 - **MongoDB**: Banco de dados persistente.
+
+### Deploy seguro na VPS
+O deploy de produção agora usa a mesma rotina para atualização manual e automática, com:
+- limpeza de containers órfãos com nomes antigos do Compose;
+- subida em etapas (`mongodb` + `backend`, depois `frontend`);
+- rollback automático para o último commit estável se algum healthcheck falhar;
+- validação local e pública antes de concluir a atualização.
+
+```bash
+cd ~/AL_Profile
+bash scripts/vps-safe-deploy.sh
+```
 
 ### Arquitetura de Proxy
 O Frontend utiliza um proxy reverso configurado no Nginx (`nginx.conf`) para encaminhar todas as requisições `/api` para o container do Backend, resolvendo problemas de CORS nativamente.
@@ -142,6 +156,7 @@ node server/create-lengruber.cjs
 - `/server/index.js`: API e modelos Mongoose.
 - `/tests/`: Testes automatizados Playwright.
 - `docker-compose.blog.yml`: Orquestração de containers.
+- `/scripts/vps-safe-deploy.sh`: Rotina segura de deploy e rollback na VPS.
 - `nginx.conf`: Configuração do servidor e proxy.
 
 ---

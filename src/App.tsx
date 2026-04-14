@@ -14,6 +14,7 @@ import {
   CircleDot,
 } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
+import brandLogo from '../Imgs/Logos_Formacoes/LOGO01.png';
 import logoLibano from '../Imgs/Logos_Formacoes/logo_instituo-libano.png';
 import logoSoulCode from '../Imgs/Logos_Formacoes/soulcode.png';
 import logoUnig from '../Imgs/Logos_Formacoes/logo-da-unig.webp';
@@ -255,6 +256,18 @@ const certifications = [
 // ──────────────────────────────────────────────────────────────
 // Navigation
 // ──────────────────────────────────────────────────────────────
+function BrandMark({ className = 'h-11 w-auto md:h-12' }: { className?: string }) {
+  return (
+    <img
+      src={brandLogo}
+      alt="Adriano Lengruber"
+      className={className}
+      loading="eager"
+      decoding="async"
+    />
+  );
+}
+
 function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -273,7 +286,7 @@ function Navigation() {
     { name: 'Processo', href: '#process' },
     { name: 'Currículo', href: '#resume' },
     { name: 'Projetos', href: '#projects' },
-    { name: 'Blog', href: '/blog' },
+    { name: 'Blog', href: '#blog' },
     { name: 'Contato', href: '#contact' },
   ];
 
@@ -281,10 +294,12 @@ function Navigation() {
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'glass py-3 shadow-lg' : 'bg-transparent py-5'}`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-cyber-slate/28 py-3 backdrop-blur-2xl supports-[backdrop-filter]:bg-cyber-slate/22' : 'bg-transparent py-5'}`}
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-        <a href="#home" className="font-heading text-xl font-bold text-gradient">AL</a>
+        <a href="#home" className="flex items-center gap-3 shrink-0" aria-label="Voltar ao topo">
+          <BrandMark />
+        </a>
         <div className="hidden md:flex items-center justify-center gap-8 flex-1">
           {navItems.map((item) => (
             <a key={item.name} href={item.href} className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200 tracking-wide">
@@ -1564,7 +1579,7 @@ function Footer() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-6">
           <div className="flex items-center gap-3 self-center md:self-auto">
-            <span className="font-heading text-xl font-bold text-gradient">AL</span>
+            <BrandMark className="h-10 w-auto" />
             <span className="text-muted-foreground text-sm">© {new Date().getFullYear()} Adriano Lengruber</span>
           </div>
           <div className="flex items-center gap-4 md:gap-6 text-sm text-muted-foreground self-center md:self-auto">

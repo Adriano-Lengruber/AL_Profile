@@ -14,8 +14,7 @@ O arquivo docker-compose.blog.yml foi atualizado para incluir a rede do Nginx Pr
 
 ```bash
 cd ~/AL_Profile
-docker-compose -f docker-compose.blog.yml down
-docker-compose -f docker-compose.blog.yml up -d --build
+bash scripts/vps-safe-deploy.sh
 ```
 
 ## Nginx Proxy Manager - Configuração
@@ -90,13 +89,14 @@ No seu repositório do GitHub, vá em **Settings > Secrets and variables > Actio
 
 ### 📝 O que o workflow faz:
 1. Conecta via SSH na VPS.
-2. Navega até `~/AL_Profile`.
-3. Faz o `git pull origin master`.
+2. Atualiza o repositório local para `origin/master`.
+3. Executa `scripts/vps-safe-deploy.sh` na própria VPS.
 4. Salva o commit anterior para rollback automático.
-5. Atualiza o código e executa `docker-compose -f docker-compose.blog.yml up -d --build --remove-orphans` sem derrubar os containers antes da hora.
-6. Reconecta a rede do Nginx Proxy Manager se necessário.
-7. Valida frontend local, API local e domínio público.
-8. Se qualquer check falhar, volta automaticamente ao commit anterior e recompõe os containers.
+5. Remove containers órfãos antigos que costumam causar conflito de nomes no Compose.
+6. Sobe `mongodb` e `backend` primeiro, aguarda healthcheck, e só depois recria o `frontend`.
+7. Reconecta a rede do Nginx Proxy Manager se necessário.
+8. Valida frontend local, proxy local, API local e domínio público.
+9. Se qualquer check falhar, volta automaticamente ao commit anterior e recompõe a stack.
 
 ### ✅ Procedimento seguro antes de atualizar a VPS
 
@@ -117,10 +117,11 @@ Se algum desses checks já estiver falhando, não atualize nada antes de corrigi
 
 O workflow foi ajustado para evitar o cenário em que o repositório é atualizado, mas os containers ficam parados:
 
-1. Não executa mais `docker stop` e `docker rm` antes do build.
-2. Só substitui os containers durante o `up -d --build --remove-orphans`.
-3. Falhando o build ou qualquer health check, executa rollback automático para o commit anterior.
-4. O deploy só é considerado concluído quando `frontend`, `API` e domínio público respondem corretamente.
+1. Não executa mais `docker stop` e `docker rm` na stack inteira antes do build.
+2. Remove apenas containers órfãos problemáticos do Compose e mantém o rollback pronto.
+3. Recria a stack em etapas para evitar o frontend subir antes de o backend responder.
+4. Falhando o build ou qualquer health check, executa rollback automático para o commit anterior.
+5. O deploy só é considerado concluído quando `frontend`, `proxy`, `API` e domínio público respondem corretamente.
 
 ### 🚀 Atualização manual segura na VPS
 
@@ -129,23 +130,10 @@ Quando for necessário atualizar manualmente, siga esta ordem:
 ```bash
 ssh adriano@148.230.75.59
 cd ~/AL_Profile
-
-PREV_COMMIT=$(git rev-parse --short HEAD)
-echo "Commit estável atual: $PREV_COMMIT"
-
-git fetch origin master
-git reset --hard origin/master
-
-docker-compose -f docker-compose.blog.yml up -d --build
-docker network connect al_profile_al-profile-network nginx-proxy-app-1 2>/dev/null || true
-
-docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
-curl -I http://localhost:3003/
-curl -I http://localhost:3005/api/posts
-curl -I https://adriano-lengruber.com/
+bash scripts/vps-safe-deploy.sh
 ```
 
-Só considere a atualização concluída se os três `curl` responderem corretamente.
+Só considere a atualização concluída se o script terminar sem erro.
 
 ### 🆘 Procedimento de emergência para 502 / Bad Gateway
 
@@ -180,9 +168,8 @@ Se o `docker-compose` falhar com `No such image` ou tentar recriar containers co
 
 ```bash
 docker ps -a --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}" | grep al-profile
-docker-compose -f docker-compose.blog.yml rm -sf frontend backend || true
 docker rm -f <container_orfao> 2>/dev/null || true
-docker-compose -f docker-compose.blog.yml up -d frontend backend
+bash scripts/vps-safe-deploy.sh
 ```
 
 Esse erro acontece quando o Docker tenta recriar um container antigo preso a uma imagem que já foi removida localmente.
@@ -198,11 +185,7 @@ cd ~/AL_Profile
 git log --oneline -5
 git reset --hard <commit_estavel>
 
-docker-compose -f docker-compose.blog.yml up -d --build
-docker network connect al_profile_al-profile-network nginx-proxy-app-1 2>/dev/null || true
-
-curl -I http://localhost:3003/
-curl -I https://adriano-lengruber.com/
+bash scripts/vps-safe-deploy.sh
 ```
 
 Após o rollback, reverta também a branch `master` no GitHub para evitar que o próximo deploy reaplique a versão problemática.
@@ -244,3 +227,9 @@ Se após o deploy a página continuar em branco ou indisponível:
 Após configurar, verifique se:
 1. O site está acessível em: https://adriano-lengruber.com
 2. A API responde em: https://api.adriano-lengruber.com/api/posts
+
+## Atualizações recentes da interface
+
+- A navbar da home agora permanece translúcida no scroll, sem contorno perceptível.
+- O item `Blog` da navbar agora é uma âncora para a seção de blog da home.
+- A logomarca oficial `LOGO01.png` foi aplicada nas áreas principais do portfólio e do blog.

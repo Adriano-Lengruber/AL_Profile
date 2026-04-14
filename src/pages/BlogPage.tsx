@@ -8,6 +8,7 @@ import {
   Settings, Image, Tag, Clock, BarChart3
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import brandLogo from '../../Imgs/Logos_Formacoes/LOGO01.png';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
@@ -483,10 +484,19 @@ export default function BlogPage() {
       {/* Header */}
       <header className="glass border-b border-white/10 sticky top-0 z-50">
         <nav className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors">
-            <ArrowLeft size={18} className="md:w-5 md:h-5" />
-            <span className="hidden sm:inline">Voltar ao portfólio</span>
-            <span className="sm:hidden font-medium">Portfólio</span>
+          <Link to="/" className="flex items-center gap-3 text-primary hover:text-primary/80 transition-colors">
+            <img
+              src={brandLogo}
+              alt="Adriano Lengruber"
+              className="h-9 w-auto shrink-0 md:h-10"
+              loading="eager"
+              decoding="async"
+            />
+            <span className="inline-flex items-center gap-2">
+              <ArrowLeft size={18} className="md:w-5 md:h-5" />
+              <span className="hidden sm:inline">Voltar ao portfólio</span>
+              <span className="sm:hidden font-medium">Portfólio</span>
+            </span>
           </Link>
           
           {/* Mobile Menu Button */}
@@ -1300,7 +1310,14 @@ export default function BlogPage() {
 
       {/* Footer */}
       <footer className="py-8 border-t border-white/6 mt-12">
-        <div className="max-w-7xl mx-auto px-6 text-center text-muted-foreground text-sm">
+        <div className="max-w-7xl mx-auto px-6 text-center text-muted-foreground text-sm flex flex-col items-center gap-4">
+          <img
+            src={brandLogo}
+            alt="Adriano Lengruber"
+            className="h-12 w-auto"
+            loading="lazy"
+            decoding="async"
+          />
           <p>© {new Date().getFullYear()} Adriano Lengruber. Feito com precisão e tecnologia.</p>
         </div>
       </footer>
