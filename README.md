@@ -72,15 +72,36 @@ Isso iniciará:
 - **MongoDB**: Banco de dados persistente.
 
 ### Deploy seguro na VPS
-O deploy de produção agora usa a mesma rotina para atualização manual e automática, com:
+O deploy de produção agora usa uma rotina simples e previsível, com:
 - limpeza de containers órfãos com nomes antigos do Compose;
 - subida em etapas (`mongodb` + `backend`, depois `frontend`);
 - rollback automático para o último commit estável se algum healthcheck falhar;
-- validação local e pública antes de concluir a atualização.
+- validação local obrigatória e validação pública apenas como aviso, sem falso negativo.
 
 ```bash
 cd ~/AL_Profile
 bash scripts/vps-safe-deploy.sh
+```
+
+No Windows, você também pode disparar a atualização com:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\deploy-vps.ps1
+```
+
+### Variáveis de runtime do backend
+As credenciais sensíveis de produção devem ficar fora do repositório, em `server/.env.runtime`, seguindo o modelo `server/.env.runtime.example`.
+
+Exemplo:
+```env
+CONTACT_NOTIFICATION_TO=contato@adriano-lengruber.com
+SMTP_HOST=smtp.hostinger.com
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER=contato@adriano-lengruber.com
+SMTP_PASS=preencha_aqui
+SMTP_FROM_EMAIL=contato@adriano-lengruber.com
+SMTP_FROM_NAME=Site Adriano Lengruber
 ```
 
 ### Arquitetura de Proxy

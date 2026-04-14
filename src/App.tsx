@@ -3,7 +3,7 @@ import { Routes, Route, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Github, Linkedin, Mail, Phone, MapPin, ExternalLink, Menu, X,
-  ArrowRight, GitFork, Star, BookOpen, MessageCircle, Heart, Share2,
+  ArrowRight, GitFork, Star, BookOpen, Heart, Share2,
   User, LogIn, Send, Code2, Database, BarChart3, LayoutDashboard,
   Calculator, Eye, Building2, Cloud, Bot, Zap, Palette, GitBranch,
   BrainCircuit, Wrench, Rocket, Users, Terminal, Cpu, CheckCircle2, Handshake,
@@ -39,6 +39,21 @@ interface Repository {
 interface BlogPost {
   id: number; title: string; excerpt: string; author: string; date: string;
   readTime: string; likes: number; comments: number; tags: string[];
+}
+
+function WhatsAppIcon({ size = 20, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+      className={className}
+    >
+      <path d="M19.05 4.91A9.82 9.82 0 0 0 12.03 2C6.62 2 2.2 6.42 2.2 11.83c0 1.73.45 3.42 1.3 4.9L2 22l5.42-1.42a9.8 9.8 0 0 0 4.61 1.17h.01c5.41 0 9.83-4.42 9.83-9.83 0-2.62-1.02-5.08-2.82-6.99Zm-7.01 15.18h-.01a8.1 8.1 0 0 1-4.13-1.13l-.3-.18-3.22.85.86-3.14-.2-.32a8.08 8.08 0 0 1-1.24-4.34c0-4.48 3.65-8.13 8.14-8.13 2.17 0 4.21.84 5.74 2.38a8.04 8.04 0 0 1 2.38 5.75c0 4.49-3.65 8.14-8.02 8.26Zm4.46-6.08c-.24-.12-1.44-.71-1.67-.79-.22-.08-.39-.12-.55.12-.16.24-.63.79-.77.95-.14.16-.28.18-.52.06-.24-.12-1.02-.38-1.95-1.22-.72-.64-1.2-1.43-1.34-1.67-.14-.24-.01-.36.11-.48.1-.1.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.32-.75-1.81-.2-.48-.4-.41-.55-.42l-.47-.01c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.33.98 2.49c.12.16 1.69 2.58 4.09 3.62.57.24 1.01.39 1.36.5.57.18 1.09.15 1.5.09.46-.07 1.44-.59 1.64-1.15.2-.57.2-1.05.14-1.15-.06-.1-.22-.16-.46-.28Z" />
+    </svg>
+  );
 }
 
 export { };
@@ -415,7 +430,7 @@ function Hero() {
             {[
               { href: 'https://github.com/Adriano-Lengruber', icon: <Github size={22} /> },
               { href: 'https://linkedin.com/in/adriano-lengruber', icon: <Linkedin size={22} /> },
-              { href: 'mailto:adrianolengruber@hotmail.com', icon: <Mail size={22} /> },
+              { href: 'mailto:contato@adriano-lengruber.com', icon: <Mail size={22} /> },
             ].map(({ href, icon }, i) => (
               <a key={i} href={href} target="_blank" rel="noopener noreferrer"
                 className="w-10 h-10 glass rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 transition-all duration-200">
@@ -1456,7 +1471,7 @@ function Blog() {
 }
 // ──────────────────────────────────────────────────────────────
 function Contact() {
-  const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', whatsapp: '', subject: '', message: '' });
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [submitError, setSubmitError] = useState('');
@@ -1480,7 +1495,7 @@ function Contact() {
       }
 
       setSent(true);
-      setFormData({ name: '', email: '', subject: '', message: '' });
+      setFormData({ name: '', email: '', whatsapp: '', subject: '', message: '' });
       setTimeout(() => setSent(false), 5500);
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Nao foi possivel enviar sua mensagem agora.');
@@ -1492,9 +1507,9 @@ function Contact() {
     setFormData((prev) => ({ ...prev, [field]: e.target.value }));
 
   const contactInfo = [
-    { icon: <Mail size={22} className="text-primary" />, bg: 'bg-primary/10', label: 'Email', content: <a href="mailto:adrianolengruber@hotmail.com" className="text-muted-foreground hover:text-primary transition-colors text-sm">adrianolengruber@hotmail.com</a> },
+    { icon: <Mail size={22} className="text-primary" />, bg: 'bg-primary/10', label: 'Email', content: <a href="mailto:contato@adriano-lengruber.com" className="text-muted-foreground hover:text-primary transition-colors text-sm">contato@adriano-lengruber.com</a> },
     { icon: <Phone size={22} className="text-cyber-steel" />, bg: 'bg-cyber-steel/10', label: 'Telefone', content: <a href="tel:+5521983300779" className="text-muted-foreground hover:text-primary transition-colors text-sm">(21) 98330-0779</a> },
-    { icon: <MapPin size={22} className="text-cyber-emerald" />, bg: 'bg-cyber-emerald/10', label: 'Localização', content: <p className="text-muted-foreground text-sm">Itaperuna, Rio de Janeiro, Brasil</p> },
+    { icon: <MapPin size={22} className="text-cyber-emerald" />, bg: 'bg-cyber-emerald/10', label: 'Localização', content: <p className="text-muted-foreground text-sm">Natividade, Rio de Janeiro, Brasil</p> },
   ];
 
   return (
@@ -1521,8 +1536,8 @@ function Contact() {
                 {[
                   { href: 'https://github.com/Adriano-Lengruber', icon: <Github size={19} />, label: 'GitHub' },
                   { href: 'https://linkedin.com/in/adriano-lengruber', icon: <Linkedin size={19} />, label: 'LinkedIn' },
-                  { href: 'https://instagram.com/supertech_solucoes_tecnologia', icon: <Instagram size={19} />, label: 'Instagram' },
-                  { href: 'https://wa.me/5522999999999', icon: <MessageCircle size={19} />, label: 'WhatsApp' },
+                  { href: 'https://www.instagram.com/adriano_lengruber/', icon: <Instagram size={19} />, label: 'Instagram' },
+                  { href: 'https://wa.me/5521983300779', icon: <WhatsAppIcon size={19} />, label: 'WhatsApp' },
                 ].map(({ href, icon, label }) => (
                   <a key={label} href={href} target="_blank" rel="noopener noreferrer"
                     className="w-11 h-11 glass rounded-xl flex items-center justify-center hover:bg-primary/15 hover:border-primary/25 hover:text-primary transition-all duration-200 text-muted-foreground">
@@ -1546,6 +1561,12 @@ function Contact() {
                       placeholder={placeholder} required />
                   </div>
                 ))}
+              </div>
+              <div>
+                <label htmlFor="whatsapp" className="block text-sm font-medium mb-2 text-muted-foreground">WhatsApp</label>
+                <input type="tel" id="whatsapp" value={formData.whatsapp} onChange={up('whatsapp')}
+                  className="w-full px-4 py-3 rounded-lg bg-cyber-black/50 border border-white/10 focus:border-primary/50 focus:outline-none transition-colors text-sm"
+                  placeholder="(21) 98330-0779" required />
               </div>
               <div>
                 <label htmlFor="subject" className="block text-sm font-medium mb-2 text-muted-foreground">Assunto</label>

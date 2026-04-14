@@ -1,9 +1,7 @@
 name: Deploy to VPS
 
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch:
 
 concurrency:
   group: deploy-vps-production
@@ -35,8 +33,5 @@ jobs:
             else
               cd "$APP_DIR"
             fi
-
-            git fetch origin master
-            git reset --hard origin/master
 
             APP_DIR="$APP_DIR" PUBLIC_DOMAIN="https://adriano-lengruber.com" bash "$APP_DIR/scripts/vps-safe-deploy.sh"

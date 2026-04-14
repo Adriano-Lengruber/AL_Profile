@@ -3,6 +3,7 @@ const os = require('os');
 const crypto = require('crypto');
 const express = require('express');
 const mongoose = require('mongoose');
+const nodemailer = require('nodemailer');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -12,6 +13,14 @@ const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET || 'sua_chave_secreta_aqui';
 const ADMIN_OWNER_EMAIL = (process.env.ADMIN_OWNER_EMAIL || 'adrianolengruber@hotmail.com').trim().toLowerCase();
 const APP_URL = (process.env.APP_URL || '').trim();
+const CONTACT_NOTIFICATION_TO = (process.env.CONTACT_NOTIFICATION_TO || 'contato@adriano-lengruber.com').trim();
+const SMTP_HOST = (process.env.SMTP_HOST || '').trim();
+const SMTP_PORT = Number(process.env.SMTP_PORT || 465);
+const SMTP_SECURE = String(process.env.SMTP_SECURE || 'true').trim().toLowerCase() !== 'false';
+const SMTP_USER = (process.env.SMTP_USER || '').trim();
+const SMTP_PASS = process.env.SMTP_PASS || '';
+const SMTP_FROM_EMAIL = (process.env.SMTP_FROM_EMAIL || SMTP_USER || CONTACT_NOTIFICATION_TO).trim();
+const SMTP_FROM_NAME = (process.env.SMTP_FROM_NAME || 'Site Adriano Lengruber').trim();
 
 const PERMISSION_KEYS = [
   'dashboardView',
@@ -99,6 +108,85 @@ const ROLE_PERMISSIONS = {
 };
 
 const normalizeEmail = (value) => typeof value === 'string' ? value.trim().toLowerCase() : '';
+const normalizePhone = (value) => typeof value === 'string' ? value.trim() : '';
+const isSmtpConfigured = () => !!(SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASS && CONTACT_NOTIFICATION_TO);
+let smtpTransporter;
+
+const getSmtpTransporter = () => {
+  if (!smtpTransporter) {
+    smtpTransporter = nodemailer.createTransport({
+      host: SMTP_HOST,
+      port: SMTP_PORT,
+      secure: SMTP_SECURE,
+      auth: {
+        user: SMTP_USER,
+        pass: SMTP_PASS
+      }
+    });
+  }
+
+  return smtpTransporter;
+};
+
+const escapeHtml = (value = '') => String(value)
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#39;');
+
+const formatContactMessageHtml = ({ name, email, whatsapp, subject, message, createdAt }) => `
+  <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111827;">
+    <h2 style="margin-bottom: 16px;">Novo contato recebido pelo site</h2>
+    <p><strong>Nome:</strong> ${escapeHtml(name)}</p>
+    <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+    <p><strong>WhatsApp:</strong> ${escapeHtml(whatsapp)}</p>
+    <p><strong>Assunto:</strong> ${escapeHtml(subject)}</p>
+    <p><strong>Data:</strong> ${escapeHtml(new Date(createdAt).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }))}</p>
+    <hr style="margin: 24px 0; border: 0; border-top: 1px solid #e5e7eb;" />
+    <p style="white-space: pre-wrap;">${escapeHtml(message)}</p>
+  </div>
+`;
+
+const formatContactMessageText = ({ name, email, whatsapp, subject, message, createdAt }) => [
+  'Novo contato recebido pelo site',
+  '',
+  `Nome: ${name}`,
+  `Email: ${email}`,
+  `WhatsApp: ${whatsapp}`,
+  `Assunto: ${subject}`,
+  `Data: ${new Date(createdAt).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}`,
+  '',
+  'Mensagem:',
+  message
+].join('\n');
+
+const sendContactNotification = async (contactMessage) => {
+  if (!isSmtpConfigured()) {
+    return { sent: false, status: 'skipped', error: 'SMTP nao configurado.' };
+  }
+
+  try {
+    const transporter = getSmtpTransporter();
+
+    await transporter.sendMail({
+      from: `"${SMTP_FROM_NAME}" <${SMTP_FROM_EMAIL}>`,
+      to: CONTACT_NOTIFICATION_TO,
+      replyTo: `${contactMessage.name} <${contactMessage.email}>`,
+      subject: `[Site] Novo contato: ${contactMessage.subject}`,
+      text: formatContactMessageText(contactMessage),
+      html: formatContactMessageHtml(contactMessage)
+    });
+
+    return { sent: true, status: 'sent', error: '' };
+  } catch (error) {
+    return {
+      sent: false,
+      status: 'failed',
+      error: error instanceof Error ? error.message : 'Falha ao enviar notificacao por email.'
+    };
+  }
+};
 
 const sanitizePermissions = (permissions, role = 'viewer') => {
   const base = ROLE_PERMISSIONS[role] || EMPTY_PERMISSIONS;
@@ -122,30 +210,56 @@ app.post('/api/contact', async (req, res) => {
   try {
     const name = typeof req.body?.name === 'string' ? req.body.name.trim() : '';
     const email = normalizeEmail(req.body?.email);
+    const whatsapp = normalizePhone(req.body?.whatsapp);
     const subject = typeof req.body?.subject === 'string' ? req.body.subject.trim() : '';
     const message = typeof req.body?.message === 'string' ? req.body.message.trim() : '';
 
-    if (!name || !email || !subject || !message) {
-      return res.status(400).json({ error: 'Preencha nome, email, assunto e mensagem.' });
+    if (!name || !email || !whatsapp || !subject || !message) {
+      return res.status(400).json({ error: 'Preencha nome, email, WhatsApp, assunto e mensagem.' });
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ error: 'Informe um email valido.' });
     }
 
+    if (whatsapp.replace(/\D/g, '').length < 10) {
+      return res.status(400).json({ error: 'Informe um WhatsApp valido com DDD.' });
+    }
+
     if (message.length < 10) {
       return res.status(400).json({ error: 'A mensagem precisa ter pelo menos 10 caracteres.' });
     }
 
-    await ContactMessage.create({
+    const contactMessage = await ContactMessage.create({
       name,
       email,
+      whatsapp,
       subject,
       message,
       source: 'website'
     });
 
-    res.status(201).json({ ok: true, message: 'Mensagem recebida com sucesso.' });
+    const notificationResult = await sendContactNotification({
+      id: contactMessage._id.toString(),
+      name,
+      email,
+      whatsapp,
+      subject,
+      message,
+      createdAt: contactMessage.createdAt
+    });
+
+    await ContactMessage.findByIdAndUpdate(contactMessage._id, {
+      notificationStatus: notificationResult.status,
+      notificationError: notificationResult.error,
+      notifiedAt: notificationResult.sent ? new Date() : null
+    });
+
+    res.status(201).json({
+      ok: true,
+      message: 'Mensagem recebida com sucesso.',
+      emailNotificationSent: notificationResult.sent
+    });
   } catch (error) {
     res.status(500).json({ error: 'Erro ao registrar mensagem de contato.', details: error.message });
   }
@@ -196,10 +310,14 @@ const commentSchema = new mongoose.Schema({
 const contactMessageSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
   email: { type: String, required: true, trim: true, lowercase: true },
+  whatsapp: { type: String, required: true, trim: true },
   subject: { type: String, required: true, trim: true },
   message: { type: String, required: true, trim: true },
   source: { type: String, default: 'website' },
   status: { type: String, enum: ['new', 'read'], default: 'new' },
+  notificationStatus: { type: String, enum: ['pending', 'sent', 'failed', 'skipped'], default: 'pending' },
+  notificationError: { type: String, default: '' },
+  notifiedAt: { type: Date, default: null },
   createdAt: { type: Date, default: Date.now }
 });
 

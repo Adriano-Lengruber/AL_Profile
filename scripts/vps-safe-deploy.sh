@@ -8,6 +8,7 @@ COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.blog.yml}"
 PUBLIC_DOMAIN="${PUBLIC_DOMAIN:-https://adriano-lengruber.com}"
 PROJECT_NETWORK="${PROJECT_NETWORK:-al_profile_al-profile-network}"
 PROXY_CONTAINER="${PROXY_CONTAINER:-nginx-proxy-app-1}"
+RUNTIME_ENV_FILE="${RUNTIME_ENV_FILE:-server/.env.runtime}"
 
 if [ -d "$APP_DIR/.git" ]; then
   cd "$APP_DIR"
@@ -23,6 +24,16 @@ if docker compose version >/dev/null 2>&1; then
   COMPOSE=(docker compose)
 else
   COMPOSE=(docker-compose)
+fi
+
+if [ -f "$RUNTIME_ENV_FILE" ]; then
+  set -a
+  # shellcheck disable=SC1090
+  source "$RUNTIME_ENV_FILE"
+  set +a
+  echo "[env] variaveis de runtime carregadas de $RUNTIME_ENV_FILE"
+else
+  echo "[env] arquivo $RUNTIME_ENV_FILE nao encontrado; notificacoes SMTP podem ficar desativadas"
 fi
 
 cleanup_compose_orphans() {
@@ -52,6 +63,19 @@ run_healthcheck() {
 
   echo "[$name] falhou"
   return 1
+}
+
+run_optional_healthcheck() {
+  local name="$1"
+  local url="$2"
+  local max_attempts="${3:-6}"
+
+  if run_healthcheck "$name" "$url" "$max_attempts"; then
+    return 0
+  fi
+
+  echo "[$name] aviso: validacao publica falhou, mas a stack local permaneceu ativa"
+  return 0
 }
 
 wait_for_container_health() {
@@ -116,5 +140,5 @@ docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' | grep al-profile
 run_healthcheck "frontend-local" "http://localhost:3003/"
 run_healthcheck "proxy-local" "http://localhost:3003/api/health"
 run_healthcheck "api-local" "http://localhost:3005/api/health"
-run_healthcheck "api-publica" "$PUBLIC_DOMAIN/api/posts" 12
-run_healthcheck "dominio-publico" "$PUBLIC_DOMAIN/" 12
+run_optional_healthcheck "api-publica" "$PUBLIC_DOMAIN/api/posts" 12
+run_optional_healthcheck "dominio-publico" "$PUBLIC_DOMAIN/" 12

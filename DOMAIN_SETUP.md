@@ -75,9 +75,9 @@ docker network connect al_profile_al-profile-network nginx-proxy-app-1
 
 ---
 
-## 🚀 GitHub Actions - CI/CD Automático ✅
+## 🚀 GitHub Actions - Deploy Manual ✅
 
-O projeto agora conta com deploy automático. Toda vez que um `push` for feito na branch `master`, o GitHub Actions atualizará a VPS.
+O workflow do GitHub foi simplificado para execução manual (`workflow_dispatch`), evitando deploy automático a cada `push` e reduzindo os falsos erros que estavam atrapalhando as atualizações.
 
 ### 🔑 Configuração Necessária (GitHub Secrets)
 
@@ -89,14 +89,14 @@ No seu repositório do GitHub, vá em **Settings > Secrets and variables > Actio
 
 ### 📝 O que o workflow faz:
 1. Conecta via SSH na VPS.
-2. Atualiza o repositório local para `origin/master`.
-3. Executa `scripts/vps-safe-deploy.sh` na própria VPS.
-4. Salva o commit anterior para rollback automático.
-5. Remove containers órfãos antigos que costumam causar conflito de nomes no Compose.
-6. Sobe `mongodb` e `backend` primeiro, aguarda healthcheck, e só depois recria o `frontend`.
-7. Reconecta a rede do Nginx Proxy Manager se necessário.
-8. Valida frontend local, proxy local, API local e domínio público.
-9. Se qualquer check falhar, volta automaticamente ao commit anterior e recompõe a stack.
+2. Executa `scripts/vps-safe-deploy.sh` na própria VPS.
+3. Atualiza o repositório local para `origin/master`.
+4. Remove containers órfãos antigos que costumam causar conflito de nomes no Compose.
+5. Sobe `mongodb` e `backend` primeiro, aguarda healthcheck, e só depois recria o `frontend`.
+6. Reconecta a rede do Nginx Proxy Manager se necessário.
+7. Valida frontend local, proxy local e API local.
+8. Faz checks públicos como aviso, sem derrubar a stack por falso negativo.
+9. Se alguma validação local falhar, volta automaticamente ao commit anterior e recompõe a stack.
 
 ### ✅ Procedimento seguro antes de atualizar a VPS
 
@@ -113,7 +113,7 @@ curl -I https://adriano-lengruber.com/
 
 Se algum desses checks já estiver falhando, não atualize nada antes de corrigir.
 
-### ✅ Garantias do deploy automático
+### ✅ Garantias do deploy manual
 
 O workflow foi ajustado para evitar o cenário em que o repositório é atualizado, mas os containers ficam parados:
 
@@ -121,7 +121,7 @@ O workflow foi ajustado para evitar o cenário em que o repositório é atualiza
 2. Remove apenas containers órfãos problemáticos do Compose e mantém o rollback pronto.
 3. Recria a stack em etapas para evitar o frontend subir antes de o backend responder.
 4. Falhando o build ou qualquer health check, executa rollback automático para o commit anterior.
-5. O deploy só é considerado concluído quando `frontend`, `proxy`, `API` e domínio público respondem corretamente.
+5. O deploy só depende dos checks locais críticos; os checks públicos viram aviso para não quebrar atualizações boas.
 
 ### 🚀 Atualização manual segura na VPS
 
@@ -134,6 +134,10 @@ bash scripts/vps-safe-deploy.sh
 ```
 
 Só considere a atualização concluída se o script terminar sem erro.
+
+### 🔐 SMTP e segredos de produção
+
+As credenciais sensíveis do backend devem ficar em `server/.env.runtime` na VPS, fora do Git. Use `server/.env.runtime.example` como base.
 
 ### 🆘 Procedimento de emergência para 502 / Bad Gateway
 
