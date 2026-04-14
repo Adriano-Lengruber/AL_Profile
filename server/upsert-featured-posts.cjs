@@ -40,337 +40,346 @@ const oldSampleTitles = [
   'Dashboards que viram decisão'
 ];
 
+const legacyFeaturedTitles = [
+  'AI Agents em producao: arquitetura, guardrails e ROI no mundo real',
+  'Power BI, Copilot e camada semantica: como sair do dashboard e chegar a decisao',
+  'Data Engineering para IA: lakehouse, contratos de dados e observabilidade sem romantizacao'
+];
+
 const featuredPosts = [
   {
-    title: 'AI Agents em producao: arquitetura, guardrails e ROI no mundo real',
-    excerpt: 'Um guia pratico para desenhar agentes de IA que realmente entregam resultado: onde usar, como conectar ferramentas, que riscos controlar e como provar retorno para o negocio.',
+    title: 'AI Agents em produção: arquitetura, guardrails e ROI no mundo real',
+    excerpt: 'Um guia prático para desenhar agentes de IA que realmente entregam resultado, com arquitetura, limites de autonomia, métricas de operação e critérios concretos de retorno.',
     readTime: '14 min',
-    tags: ['AI Agents', 'Automacao', 'Governanca', 'ROI'],
-    createdAt: new Date('2026-04-14T18:10:00.000Z'),
-    content: `A maior mudanca de 2026 nao e simplesmente a popularizacao da IA generativa. O que esta realmente ganhando espaco nas empresas e a evolucao de assistentes que apenas respondem para agentes que observam contexto, planejam etapas, executam acoes e devolvem resultado operacional.
+    tags: ['AI Agents', 'Automação', 'Governança', 'ROI'],
+    createdAt: new Date('2026-04-11T14:20:00.000Z'),
+    imageUrl: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1200&q=80',
+    content: `A grande mudança de 2026 não é apenas a popularização da IA generativa. O que realmente está ganhando espaço nas empresas é a evolução de assistentes que só respondem para agentes que observam contexto, planejam etapas, executam ações e devolvem resultado operacional.
 
-Mas existe um erro recorrente: muita gente chama qualquer chatbot com prompt longo de "agente". Em producao, um agente de IA e um sistema composto por modelo, memoria, contexto, regras de decisao, ferramentas, observabilidade e limites claros de autonomia. Sem isso, o projeto vira apenas uma automacao fragil com risco alto de erro silencioso.
+Mas existe um erro recorrente: muita gente chama qualquer chatbot com prompt longo de "agente". Em produção, um agente de IA é um sistema composto por modelo, contexto, regras de decisão, ferramentas, observabilidade e limites claros de autonomia. Sem isso, o projeto vira apenas uma automação frágil com risco alto de erro silencioso.
 
-O primeiro ponto e entender quando vale usar AI Agents. Eles funcionam muito bem em fluxos com variacao moderada, alto custo humano de triagem e necessidade de decidir proximas acoes com base em contexto. Exemplos praticos:
+O primeiro ponto é entender quando vale usar AI Agents. Eles funcionam muito bem em fluxos com variação moderada, alto custo humano de triagem e necessidade de decidir próximas ações com base em contexto. Alguns exemplos práticos:
 
-- qualificacao comercial com enriquecimento de lead
+- qualificação comercial com enriquecimento de lead
 - triagem de chamados e abertura de tarefas
-- consolidacao de informacoes para atendimento
-- leitura de documentos com roteamento por criterio
-- acompanhamento de cobrancas, follow-up e operacao interna
+- consolidação de informações para atendimento
+- leitura de documentos com roteamento por critério
+- acompanhamento de cobranças, follow-up e operação interna
 
-Nem todo processo deve virar agente. Se a regra e fixa, previsivel e 100% deterministica, automacao classica quase sempre e melhor. O agente entra quando existe ambiguidade suficiente para justificar linguagem natural, classificacao contextual, priorizacao ou decisao assistida.
+Nem todo processo deve virar agente. Se a regra é fixa, previsível e 100% determinística, automação clássica quase sempre é melhor. O agente entra quando existe ambiguidade suficiente para justificar linguagem natural, classificação contextual, priorização ou decisão assistida.
 
-Uma arquitetura confiavel costuma ter seis camadas:
+Uma arquitetura confiável costuma ter seis camadas:
 
 1. Entrada estruturada
-O agente precisa receber dados limpos: formulario, webhook, CRM, e-mail, documento ou evento de sistema. Quanto melhor a entrada, menor o custo de raciocinio e menor a chance de resposta errada.
+O agente precisa receber dados limpos: formulário, webhook, CRM, e-mail, documento ou evento de sistema. Quanto melhor a entrada, menor o custo de raciocínio e menor a chance de resposta errada.
 
 2. Contexto
-Contexto nao e despejar tudo no prompt. E selecionar o que importa para aquela tarefa: regras do negocio, historico do cliente, status do projeto, politicas de atendimento, FAQ ou base documental.
+Contexto não é despejar tudo no prompt. É selecionar o que importa para aquela tarefa: regras do negócio, histórico do cliente, status do projeto, políticas de atendimento, FAQ ou base documental.
 
 3. Ferramentas
-Agente util executa acoes reais. Pode consultar API, criar item em board, atualizar CRM, buscar dados no banco, enviar e-mail, registrar resumo ou disparar uma automacao no n8n.
+Agente útil executa ações reais. Pode consultar API, criar item em board, atualizar CRM, buscar dados no banco, enviar e-mail, registrar resumo ou disparar uma automação no n8n.
 
-4. Politica de decisao
-Aqui entram os guardrails: quando pode responder sozinho, quando precisa pedir confirmacao, quando deve escalar para humano, quando deve bloquear a operacao.
+4. Política de decisão
+Aqui entram os guardrails: quando pode responder sozinho, quando precisa pedir confirmação, quando deve escalar para humano e quando deve bloquear a operação.
 
 5. Observabilidade
-Se voce nao registra entrada, decisao, ferramenta usada, tempo, custo e resultado, nao existe gestao do agente. Existe sorte.
+Se você não registra entrada, decisão, ferramenta usada, tempo, custo e resultado, não existe gestão do agente. Existe sorte.
 
-6. Revisao continua
-Agente em producao precisa de avaliacao periodica. Quais erros estao se repetindo? Em que etapa ele hesita? Quais dados estao faltando? Onde existe retrabalho humano?
+6. Revisão contínua
+Agente em produção precisa de avaliação periódica. Quais erros estão se repetindo? Em que etapa ele hesita? Quais dados estão faltando? Onde existe retrabalho humano?
 
-Guardrails sao o coracao do projeto. A empresa nao quebra porque o modelo "errou uma frase". Ela quebra quando o sistema toma uma decisao operacional ruim sem controle. Por isso, recomendo sempre uma matriz simples de risco:
+Guardrails são o coração do projeto. A empresa não quebra porque o modelo errou uma frase. Ela quebra quando o sistema toma uma decisão operacional ruim sem controle. Por isso, recomendo sempre uma matriz simples de risco:
 
-- baixo risco: responder pergunta frequente, resumir historico, classificar assunto
-- medio risco: sugerir prioridade, montar rascunho, recomendar proxima acao
-- alto risco: aprovar gasto, alterar contrato, excluir dado, enviar mensagem sensivel, assumir compromisso comercial
+- baixo risco: responder pergunta frequente, resumir histórico, classificar assunto
+- médio risco: sugerir prioridade, montar rascunho, recomendar próxima ação
+- alto risco: aprovar gasto, alterar contrato, excluir dado, enviar mensagem sensível, assumir compromisso comercial
 
-Quanto maior o risco, menor a autonomia. Em muitos casos, o melhor desenho nao e "agente autonomo", mas sim "agente copiloto com confirmacao humana".
+Quanto maior o risco, menor a autonomia. Em muitos casos, o melhor desenho não é "agente autônomo", mas sim "agente copiloto com confirmação humana".
 
-Outro ponto critico e memoria. Nem todo agente precisa de memoria de longo prazo. Em muitos cenarios, basta contexto transacional da tarefa atual. Salvar memoria irrelevante aumenta custo, confusao e risco de vazamento de informacao. A regra pratica e: persista somente o que melhora decisoes futuras.
+Outro ponto crítico é memória. Nem todo agente precisa de memória de longo prazo. Em muitos cenários, basta o contexto transacional da tarefa atual. Salvar memória irrelevante aumenta custo, confusão e risco de vazamento de informação. A regra prática é: persista somente o que melhora decisões futuras.
 
-Para medir ROI, evite metricas vagas como "ficou mais moderno" ou "a equipe gostou". O que importa e impacto operacional:
+Para medir ROI, evite métricas vagas como "ficou mais moderno" ou "a equipe gostou". O que importa é impacto operacional:
 
 - tempo economizado por processo
 - volume absorvido sem aumento de equipe
-- reducao de SLA
+- redução de SLA
 - menos erro manual
 - mais leads qualificados
 - mais tarefas resolvidas na primeira passagem
 
-Uma formula simples ajuda:
+Uma fórmula simples ajuda:
 
-ROI operacional = (horas economizadas + receita adicional + perdas evitadas - custo de operacao) / custo de operacao
+ROI operacional = (horas economizadas + receita adicional + perdas evitadas - custo de operação) / custo de operação
 
-Se o agente custa R$ 2.000 por mes e economiza 80 horas de um time cujo custo efetivo medio e R$ 50/h, ele ja entrega R$ 4.000 em ganho bruto de capacidade, sem contar efeito em velocidade, qualidade e receita.
+Se o agente custa R$ 2.000 por mês e economiza 80 horas de um time cujo custo efetivo médio é R$ 50/h, ele já entrega R$ 4.000 em ganho bruto de capacidade, sem contar efeito em velocidade, qualidade e receita.
 
-Na pratica, os melhores projetos de agentes seguem um caminho incremental:
+Na prática, os melhores projetos de agentes seguem um caminho incremental:
 
 Fase 1: copiloto interno
-O agente le contexto, sugere classificacao, produz resumo e recomenda acao.
+O agente lê contexto, sugere classificação, produz resumo e recomenda ação.
 
-Fase 2: execucao supervisionada
+Fase 2: execução supervisionada
 O agente executa tarefas de baixo risco com log completo.
 
 Fase 3: autonomia seletiva
 Somente fluxos maduros e bem observados ganham autonomia parcial.
 
-Fase 4: orchestracao multiagente
+Fase 4: orquestração multiagente
 Diferentes agentes assumem subtarefas, mas ainda com regras claras de passagem e auditoria.
 
-Se eu tivesse que resumir em uma frase: AI Agent bom nao e o que "parece inteligente", mas o que opera dentro de um desenho seguro, mensuravel e util para o negocio. O futuro pertence a quem transformar IA em processo confiavel, nao em demo impressionante.
+Se eu tivesse que resumir em uma frase: AI Agent bom não é o que "parece inteligente", mas o que opera dentro de um desenho seguro, mensurável e útil para o negócio. O futuro pertence a quem transformar IA em processo confiável, não em demo impressionante.
 
-Checklist final para qualquer implantacao:
+Checklist final para qualquer implantação:
 
 - problema real e frequente
 - dados de entrada minimamente organizados
-- ferramenta ou acao clara no fim do fluxo
-- criterio explicito de escalonamento humano
-- logs e metricas de desempenho
-- revisao quinzenal no inicio da operacao
+- ferramenta ou ação clara no fim do fluxo
+- critério explícito de escalonamento humano
+- logs e métricas de desempenho
+- revisão quinzenal no início da operação
 
-Se esses seis itens existirem, o projeto ja comeca no terreno certo.`
+Se esses seis itens existirem, o projeto já começa no terreno certo.`
   },
   {
-    title: 'Power BI, Copilot e camada semantica: como sair do dashboard e chegar a decisao',
-    excerpt: 'Relatorio bonito nao basta. Este artigo mostra como combinar modelagem, DAX, camada semantica e recursos de IA para transformar Power BI em plataforma de decisao, e nao apenas de visualizacao.',
+    title: 'Power BI, Copilot e camada semântica: como sair do dashboard e chegar à decisão',
+    excerpt: 'Relatório bonito não basta. Este artigo mostra como combinar modelagem, DAX, camada semântica e recursos de IA para transformar Power BI em plataforma de decisão, e não apenas de visualização.',
     readTime: '13 min',
     tags: ['Power BI', 'Copilot', 'Business Intelligence', 'DAX'],
-    createdAt: new Date('2026-04-14T18:05:00.000Z'),
-    content: `Um dos maiores problemas em BI nao e falta de painel. E excesso de painel. Empresas acumulam dashboards, paginas, filtros, graficos e indicadores, mas continuam sem clareza sobre qual numero orientar, que decisao tomar e quem deve agir depois da leitura.
+    createdAt: new Date('2026-04-02T10:35:00.000Z'),
+    imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80',
+    content: `Um dos maiores problemas em BI não é falta de painel. É excesso de painel. Empresas acumulam dashboards, páginas, filtros, gráficos e indicadores, mas continuam sem clareza sobre qual número orientar, que decisão tomar e quem deve agir depois da leitura.
 
-Em 2026, o salto de maturidade em Business Intelligence passa por tres pilares: camada semantica bem desenhada, metricas confiaveis e interfaces mais naturais de exploracao, incluindo experiencias com Copilot. O ponto principal, porem, continua sendo o mesmo: sem modelo certo, nao existe IA que salve o relatorio.
+Em 2026, o salto de maturidade em Business Intelligence passa por três pilares: camada semântica bem desenhada, métricas confiáveis e interfaces mais naturais de exploração, incluindo experiências com Copilot. O ponto principal, porém, continua sendo o mesmo: sem modelo certo, não existe IA que salve o relatório.
 
-Vamos comecar pela camada semantica. Em termos simples, ela e a traducao do negocio para uma estrutura analitica consistente. Em vez de cada usuario reinventar calculos, nomes e filtros, a empresa centraliza definicoes: o que e faturamento liquido, o que conta como cliente ativo, como medir churn, como definir margem, como separar meta realizada de pipeline.
+Vamos começar pela camada semântica. Em termos simples, ela é a tradução do negócio para uma estrutura analítica consistente. Em vez de cada usuário reinventar cálculos, nomes e filtros, a empresa centraliza definições: o que é faturamento líquido, o que conta como cliente ativo, como medir churn, como definir margem e como separar meta realizada de pipeline.
 
-Quando a camada semantica e fraca, acontecem sintomas conhecidos:
+Quando a camada semântica é fraca, aparecem sintomas conhecidos:
 
-- duas areas mostram numeros diferentes para a mesma pergunta
-- o usuario perde tempo validando o relatorio antes de interpretar
+- duas áreas mostram números diferentes para a mesma pergunta
+- o usuário perde tempo validando o relatório antes de interpretar
 - cada dashboard vira uma ilha
 - o time de dados vira suporte infinito de ajuste de medida
 
-Por outro lado, quando a camada semantica esta madura, o Power BI deixa de ser um conjunto de paginas e passa a funcionar como produto analitico.
+Por outro lado, quando a camada semântica está madura, o Power BI deixa de ser um conjunto de páginas e passa a funcionar como produto analítico.
 
-Os cinco fundamentos de uma base forte sao:
+Os cinco fundamentos de uma base forte são:
 
 1. Modelo dimensional coerente
-Fatos e dimensoes bem definidos ainda sao a espinha dorsal do desempenho e da interpretacao. Nao adianta querer IA se a modelagem mistura granularidades ou replica logica em visual.
+Fatos e dimensões bem definidos ainda são a espinha dorsal do desempenho e da interpretação. Não adianta querer IA se a modelagem mistura granularidades ou replica lógica em visual.
 
 2. Medidas oficiais
-Tudo o que for estrategico deve estar encapsulado em medidas versionadas, revisadas e nomeadas com linguagem de negocio.
+Tudo o que for estratégico deve estar encapsulado em medidas versionadas, revisadas e nomeadas com linguagem de negócio.
 
-3. Dicionario de metricas
-Cada KPI precisa responder: o que mede, como calcula, com que frequencia atualiza, quem e dono e que decisao suporta.
+3. Dicionário de métricas
+Cada KPI precisa responder: o que mede, como calcula, com que frequência atualiza, quem é dono e que decisão suporta.
 
 4. Hierarquia de consumo
-Executivo precisa decisao. Gestor precisa diagnostico. Operacao precisa acao. O mesmo dado nao deve ser apresentado da mesma forma para todos.
+Executivo precisa de decisão. Gestor precisa de diagnóstico. Operação precisa de ação. O mesmo dado não deve ser apresentado da mesma forma para todos.
 
-5. Governanca de publicacao
-Sem padrao de workspace, homologacao, permissao e ownership, o ambiente vira desorganizado rapidamente.
+5. Governança de publicação
+Sem padrão de workspace, homologação, permissão e ownership, o ambiente vira desorganizado rapidamente.
 
-E onde entra o Copilot? O valor dele nao esta em "fazer graficos sozinho". O valor esta em reduzir atrito entre pergunta e insight. Quando o modelo esta preparado, recursos conversacionais ajudam a:
+E onde entra o Copilot? O valor dele não está em "fazer gráficos sozinho". O valor está em reduzir atrito entre pergunta e insight. Quando o modelo está preparado, recursos conversacionais ajudam a:
 
-- resumir variacoes relevantes
-- sugerir exploracoes
-- montar formulas iniciais
+- resumir variações relevantes
+- sugerir explorações
+- montar fórmulas iniciais
 - acelerar descoberta de anomalias
-- reduzir dependencia de navegacao manual complexa
+- reduzir dependência de navegação manual complexa
 
-Mas existe um ponto que pouca gente fala: Copilot nao substitui criterio analitico. Ele acelera exploracao, nao substitui modelagem, governanca e interpretacao.
+Mas existe um ponto que pouca gente fala: Copilot não substitui critério analítico. Ele acelera exploração, não substitui modelagem, governança e interpretação.
 
-Um erro comum e tentar usar IA sobre um relatorio desorganizado. O resultado costuma ser resposta plausivel, mas pouco confiavel. A ordem certa e:
+Um erro comum é tentar usar IA sobre um relatório desorganizado. O resultado costuma ser plausível, mas pouco confiável. A ordem certa é:
 
 primeiro organizar o dado
-depois consolidar metricas
+depois consolidar métricas
 depois desenhar a jornada de leitura
-so entao aplicar recursos de IA para acelerar consumo
+só então aplicar recursos de IA para acelerar consumo
 
-Se o objetivo e decisao, seu dashboard precisa responder quatro perguntas sem esforco:
+Se o objetivo é decisão, seu dashboard precisa responder quatro perguntas sem esforço:
 
 - o que aconteceu?
 - por que aconteceu?
 - onde agir primeiro?
-- qual a proxima melhor acao?
+- qual é a próxima melhor ação?
 
-Grande parte dos paineis para na primeira pergunta. Alguns chegam na segunda. Poucos ajudam de verdade na terceira e na quarta. E exatamente nessa passagem que BI de alto nivel se diferencia.
+Grande parte dos painéis para na primeira pergunta. Alguns chegam na segunda. Poucos ajudam de verdade na terceira e na quarta. É exatamente nessa passagem que BI de alto nível se diferencia.
 
 Veja um exemplo simples de estrutura:
 
-Nivel 1: visao executiva
-Poucos indicadores, tendencia, comparativo com meta, alertas e resumo de variacao.
+Nível 1: visão executiva
+Poucos indicadores, tendência, comparativo com meta, alertas e resumo de variação.
 
-Nivel 2: diagnostico gerencial
-Analise por canal, produto, equipe, regiao, carteira ou etapa do funil.
+Nível 2: diagnóstico gerencial
+Análise por canal, produto, equipe, região, carteira ou etapa do funil.
 
-Nivel 3: acao operacional
-Lista priorizada de itens criticos, clientes em risco, pedidos atrasados, contratos sem renovacao, contas a receber vencidas.
+Nível 3: ação operacional
+Lista priorizada de itens críticos, clientes em risco, pedidos atrasados, contratos sem renovação e contas a receber vencidas.
 
-Quando voce conecta esses niveis, o BI para de ser "painel para olhar" e vira "sistema para agir".
+Quando você conecta esses níveis, o BI para de ser "painel para olhar" e vira "sistema para agir".
 
-No DAX, a recomendacao mais pratica e fugir do improviso. Medida de negocio precisa ser clara, nomeada e testada. Algumas boas praticas:
+No DAX, a recomendação mais prática é fugir do improviso. Medida de negócio precisa ser clara, nomeada e testada. Algumas boas práticas:
 
 - separar medida base de medida derivada
-- evitar logica repetida em multiplos visuais
-- usar nomes compreensiveis pelo negocio
-- documentar filtros implicitos
-- testar cenarios de borda
+- evitar lógica repetida em múltiplos visuais
+- usar nomes compreensíveis pelo negócio
+- documentar filtros implícitos
+- testar cenários de borda
 
-Outro tema essencial em 2026 e desempenho. Ambientes com Direct Lake, modelos grandes e consultas cada vez mais conversacionais exigem disciplina. Se o relatorio demora, a confianca cai. Alguns cuidados:
+Outro tema essencial em 2026 é desempenho. Ambientes com Direct Lake, modelos grandes e consultas cada vez mais conversacionais exigem disciplina. Se o relatório demora, a confiança cai. Alguns cuidados:
 
 - reduzir colunas inutilizadas
 - preservar granularidade correta
 - evitar medidas excessivamente iterativas sem necessidade
-- padronizar chaves e calendario
-- revisar visualizacoes que fazem consultas pesadas sem ganho real
+- padronizar chaves e calendário
+- revisar visualizações que fazem consultas pesadas sem ganho real
 
-Agora, a parte estrategica: o melhor dashboard nao e o mais bonito. E o que diminui reuniao improdutiva, reduz debate sobre numero errado e acelera resposta do negocio. Se o time passa meia hora discutindo de onde veio o dado, o problema nao esta no grafico; esta na arquitetura de informacao.
+Agora, a parte estratégica: o melhor dashboard não é o mais bonito. É o que diminui reunião improdutiva, reduz debate sobre número errado e acelera resposta do negócio. Se o time passa meia hora discutindo de onde veio o dado, o problema não está no gráfico; está na arquitetura de informação.
 
-Uma implementacao madura de Power BI hoje precisa combinar:
+Uma implementação madura de Power BI hoje precisa combinar:
 
-- engenharia de dados confiavel na origem
-- modelagem analitica limpa
-- metricas bem governadas
-- experiencia de consumo orientada a decisao
-- IA como aceleradora, nao como muleta
+- engenharia de dados confiável na origem
+- modelagem analítica limpa
+- métricas bem governadas
+- experiência de consumo orientada à decisão
+- IA como aceleradora, não como muleta
 
-Se voce quiser avaliar o nivel de maturidade do seu BI, faca este teste:
+Se você quiser avaliar o nível de maturidade do seu BI, faça este teste:
 
-1. Existe uma definicao oficial para os KPIs mais importantes?
-2. Dois usuarios diferentes chegam ao mesmo numero?
+1. Existe uma definição oficial para os KPIs mais importantes?
+2. Dois usuários diferentes chegam ao mesmo número?
 3. O painel aponta prioridade ou apenas mostra volume?
 4. O time confia nos dados sem precisar validar toda semana?
-5. O gestor sabe o que fazer depois de abrir o relatorio?
+5. O gestor sabe o que fazer depois de abrir o relatório?
 
-Se a resposta for "nao" para varios itens, o proximo passo nao e criar mais visual. E reorganizar a base semantica.
+Se a resposta for "não" para vários itens, o próximo passo não é criar mais visual. É reorganizar a base semântica.
 
-No fim, BI excelente nao e sobre ver mais dados. E sobre reduzir ambiguidade para decidir melhor. E e por isso que Power BI, DAX e Copilot so entregam valor maximo quando trabalham em cima de uma camada semantica pensada como ativo estrategico do negocio.`
+No fim, BI excelente não é sobre ver mais dados. É sobre reduzir ambiguidade para decidir melhor. E é por isso que Power BI, DAX e Copilot só entregam valor máximo quando trabalham em cima de uma camada semântica pensada como ativo estratégico do negócio.`
   },
   {
-    title: 'Data Engineering para IA: lakehouse, contratos de dados e observabilidade sem romantizacao',
-    excerpt: 'IA boa depende de dado confiavel. Entenda como estruturar pipelines, qualidade, camada semantica tecnica e monitoramento para suportar analytics e agentes de IA sem apagar incendio todo dia.',
+    title: 'Data Engineering para IA: lakehouse, contratos de dados e observabilidade sem romantização',
+    excerpt: 'IA boa depende de dado confiável. Entenda como estruturar pipelines, qualidade, contratos de dados e monitoramento para suportar analytics e agentes de IA sem apagar incêndio todo dia.',
     readTime: '15 min',
     tags: ['Data Engineering', 'ETL', 'Lakehouse', 'Observabilidade'],
-    createdAt: new Date('2026-04-14T18:00:00.000Z'),
-    content: `Toda empresa quer usar IA, mas poucas estao preparadas para a conversa menos glamourosa e mais importante do projeto: engenharia de dados. Sem pipeline confiavel, documentacao minima, contratos de dado e monitoramento, a IA vira apenas uma camada cara em cima de informacao inconsistente.
+    createdAt: new Date('2026-03-18T09:15:00.000Z'),
+    imageUrl: 'https://images.unsplash.com/photo-1518186285589-2f7649de83e0?auto=format&fit=crop&w=1200&q=80',
+    content: `Toda empresa quer usar IA, mas poucas estão preparadas para a conversa menos glamourosa e mais importante do projeto: engenharia de dados. Sem pipeline confiável, documentação mínima, contratos de dado e monitoramento, a IA vira apenas uma camada cara em cima de informação inconsistente.
 
-Em 2026, a pressa para colocar modelos e agentes em producao esta fazendo muita organizacao descobrir da pior forma que analytics e IA nao escalam sobre planilhas soltas, nomes ambiguos, fontes contraditorias e ETL improvisado.
+Em 2026, a pressa para colocar modelos e agentes em produção está fazendo muita organização descobrir, da pior forma, que analytics e IA não escalam sobre planilhas soltas, nomes ambíguos, fontes contraditórias e ETL improvisado.
 
-O primeiro conceito que precisa ficar claro e este: dado para IA nao e apenas volume. E disponibilidade com contexto, consistencia e rastreabilidade.
+O primeiro conceito que precisa ficar claro é este: dado para IA não é apenas volume. É disponibilidade com contexto, consistência e rastreabilidade.
 
-Quando a base e ruim, os sintomas aparecem rapido:
+Quando a base é ruim, os sintomas aparecem rápido:
 
-- respostas contraditorias entre sistemas
-- relatorios que mudam sem explicacao
+- respostas contraditórias entre sistemas
+- relatórios que mudam sem explicação
 - prompts cada vez maiores para compensar falta de estrutura
-- agente que decide com base em informacao vencida
+- agente que decide com base em informação vencida
 - time operacional desconfiando de tudo
 
-Por isso, engenharia de dados moderna precisa ser vista como sistema de confianca. E tres componentes ganharam protagonismo:
+Por isso, engenharia de dados moderna precisa ser vista como sistema de confiança. E três componentes ganharam protagonismo:
 
-1. Lakehouse pragmatica
-O valor da abordagem lakehouse nao esta no hype. Esta em aproximar flexibilidade de armazenamento e consumo analitico com menos friccao entre ingestao, transformacao e exploracao. O ponto principal nao e "ter lakehouse", mas ter camadas claras.
+1. Lakehouse pragmática
+O valor da abordagem lakehouse não está no hype. Está em aproximar flexibilidade de armazenamento e consumo analítico com menos fricção entre ingestão, transformação e exploração. O ponto principal não é "ter lakehouse", mas ter camadas claras.
 
 Uma estrutura simples e eficaz:
 
-- bronze: dado bruto, historico, sem embelezamento
-- silver: dado tratado, padronizado, deduplicado, validado
-- gold: tabelas prontas para negocio, BI e produtos de dados
+- bronze: dado bruto, histórico, sem embelezamento
+- silver: dado tratado, padronizado, deduplicado e validado
+- gold: tabelas prontas para negócio, BI e produtos de dados
 
-Se voce mistura tudo na mesma camada, perde auditoria. Se exagera na complexidade cedo demais, trava entrega. O ideal e maturidade incremental.
+Se você mistura tudo na mesma camada, perde auditoria. Se exagera na complexidade cedo demais, trava a entrega. O ideal é maturidade incremental.
 
 2. Contratos de dados
-Contrato de dados e um acordo explicito sobre formato, significado, frequencia, ownership e expectativa de qualidade de uma fonte. Em outras palavras: o produtor deixa de jogar dado para o consumidor "se virar".
+Contrato de dados é um acordo explícito sobre formato, significado, frequência, ownership e expectativa de qualidade de uma fonte. Em outras palavras: o produtor deixa de jogar dado para o consumidor se virar.
 
-Um contrato minimamente util deve dizer:
+Um contrato minimamente útil deve dizer:
 
-- qual tabela ou evento sera entregue
-- quais campos sao obrigatorios
+- qual tabela ou evento será entregue
+- quais campos são obrigatórios
 - tipo e formato esperado
-- regra de atualizacao
-- limite aceitavel de nulos, duplicidade e atraso
-- dono tecnico e dono de negocio
+- regra de atualização
+- limite aceitável de nulos, duplicidade e atraso
+- dono técnico e dono de negócio
 
-Sem contrato, cada mudanca na origem quebra varios consumidores em cadeia.
+Sem contrato, cada mudança na origem quebra vários consumidores em cadeia.
 
 3. Observabilidade
-Monitorar so "job rodou ou falhou" nao basta mais. Pipeline pode terminar com sucesso e ainda assim entregar lixo. Observabilidade de dados precisa olhar:
+Monitorar só "job rodou ou falhou" não basta mais. Pipeline pode terminar com sucesso e ainda assim entregar lixo. Observabilidade de dados precisa olhar:
 
-- freshness: o dado chegou no horario esperado?
+- freshness: o dado chegou no horário esperado?
 - volume: chegou muito menos ou muito mais que o normal?
 - schema: algum campo mudou sem alinhamento?
-- distribuicao: os valores se comportam como esperado?
+- distribuição: os valores se comportam como esperado?
 - lineage: quem depende dessa tabela?
 
 Esse tipo de visibilidade reduz tempo de descoberta, evita erro silencioso e muda a postura do time de reativa para preventiva.
 
-Agora, a parte pratica: como montar uma base que aguente BI e IA ao mesmo tempo?
+Agora, a parte prática: como montar uma base que aguente BI e IA ao mesmo tempo?
 
-Passo 1: mapear sistemas criticos
-Nao comece querendo integrar tudo. Escolha as fontes que sustentam receita, operacao, atendimento ou decisao executiva.
+Passo 1: mapear sistemas críticos
+Não comece querendo integrar tudo. Escolha as fontes que sustentam receita, operação, atendimento ou decisão executiva.
 
 Passo 2: definir chave e granularidade
-Boa parte do caos analitico vem de tabelas sem chave clara ou misturando niveis diferentes no mesmo dataset.
+Boa parte do caos analítico vem de tabelas sem chave clara ou misturando níveis diferentes no mesmo dataset.
 
-Passo 3: estabelecer testes minimos
-Exemplos: unicidade, nao nulo, referencia valida, range esperado, atraso maximo.
+Passo 3: estabelecer testes mínimos
+Exemplos: unicidade, não nulo, referência válida, range esperado e atraso máximo.
 
 Passo 4: padronizar nomenclatura e datas
-Campo inconsistente gera retrabalho desnecessario em SQL, BI e aplicacoes.
+Campo inconsistente gera retrabalho desnecessário em SQL, BI e aplicações.
 
-Passo 5: versionar transformacoes
-Se a logica muda, isso precisa ser rastreavel. Engenharia madura nao vive de ajuste invisivel em producao.
+Passo 5: versionar transformações
+Se a lógica muda, isso precisa ser rastreável. Engenharia madura não vive de ajuste invisível em produção.
 
-Passo 6: separar consumo operacional de analitico
-Nem toda tabela transacional deve ser consultada diretamente por dashboard, relatorio ou agente.
+Passo 6: separar consumo operacional de analítico
+Nem toda tabela transacional deve ser consultada diretamente por dashboard, relatório ou agente.
 
-Um tema negligenciado e custo. Pipelines ruins nao so quebram mais: eles custam mais. Query pesada, retrabalho manual, reconciliação constante, armazenamento sem criterio e incidentes frequentes comem margem de forma silenciosa. E por isso que "organizar dados" nao e apenas tema tecnico. E agenda financeira.
+Um tema negligenciado é custo. Pipelines ruins não só quebram mais: eles custam mais. Query pesada, retrabalho manual, reconciliação constante, armazenamento sem critério e incidentes frequentes comem margem de forma silenciosa. É por isso que organizar dados não é apenas tema técnico. É agenda financeira.
 
-Quando entra IA generativa ou agentes, a exigencia aumenta. O modelo precisa de contexto confiavel. Se a fonte estiver atrasada ou mal descrita, a resposta pode ate soar convincente, mas sera operacionalmente perigosa. Em outras palavras: qualidade de dado vira controle de risco da IA.
+Quando entra IA generativa ou agentes, a exigência aumenta. O modelo precisa de contexto confiável. Se a fonte estiver atrasada ou mal descrita, a resposta pode até soar convincente, mas será operacionalmente perigosa. Em outras palavras: qualidade de dado vira controle de risco da IA.
 
 Uma boa arquitetura para empresas em crescimento costuma combinar:
 
-- ingestao automatizada por APIs, banco, arquivos ou webhooks
-- transformacao padronizada em camadas
-- storage preparado para historico e reprocessamento
-- tabelas analiticas orientadas a negocio
-- exposicao controlada para BI, APIs e agentes
+- ingestão automatizada por APIs, banco, arquivos ou webhooks
+- transformação padronizada em camadas
+- storage preparado para histórico e reprocessamento
+- tabelas analíticas orientadas a negócio
+- exposição controlada para BI, APIs e agentes
 
-No dia a dia, alguns habitos fazem enorme diferenca:
+No dia a dia, alguns hábitos fazem enorme diferença:
 
 - cada pipeline tem dono
-- cada tabela importante tem descricao
+- cada tabela importante tem descrição
 - incidentes relevantes viram aprendizado permanente
 - anomalias geram alerta antes de virar erro no dashboard
-- mudancas na origem passam por comunicacao minima
+- mudanças na origem passam por comunicação mínima
 
-Se voce esta em uma operacao menor, nao precisa esperar stack perfeita para agir. E totalmente possivel comecar bem usando Python, SQL, jobs agendados, logs consistentes e alguns testes simples. O que importa e disciplina de desenho, nao fetiche por ferramenta.
+Se você está em uma operação menor, não precisa esperar stack perfeita para agir. É totalmente possível começar bem usando Python, SQL, jobs agendados, logs consistentes e alguns testes simples. O que importa é disciplina de desenho, não fetiche por ferramenta.
 
-Um bom time de dados hoje precisa equilibrar tres compromissos:
+Um bom time de dados hoje precisa equilibrar três compromissos:
 
 velocidade para entregar
 clareza para sustentar
 qualidade para escalar
 
-Quando um desses lados domina sozinho, surgem distorcoes. So velocidade gera bagunca. So controle gera lentidao. So qualidade teorica sem entrega gera irrelevancia.
+Quando um desses lados domina sozinho, surgem distorções. Só velocidade gera bagunça. Só controle gera lentidão. Só qualidade teórica sem entrega gera irrelevância.
 
-Se eu tivesse que deixar um framework rapido para avaliar maturidade, seria este:
+Se eu tivesse que deixar um framework rápido para avaliar maturidade, seria este:
 
-Nivel 1 - artesanal
-Extracoes manuais, ajustes frequentes, baixa confianca.
+Nível 1 - artesanal
+Extrações manuais, ajustes frequentes e baixa confiança.
 
-Nivel 2 - automatizado sem governanca
+Nível 2 - automatizado sem governança
 Jobs existem, mas quebram com facilidade e dependem de conhecimento concentrado.
 
-Nivel 3 - confiavel para BI
-Camadas mais claras, metricas oficiais, menos divergencia.
+Nível 3 - confiável para BI
+Camadas mais claras, métricas oficiais e menos divergência.
 
-Nivel 4 - pronto para IA operacional
-Observabilidade, contratos, lineage e contexto confiavel para agentes e copilotos.
+Nível 4 - pronto para IA operacional
+Observabilidade, contratos, lineage e contexto confiável para agentes e copilotos.
 
-No fim, engenharia de dados nao aparece tanto quanto um dashboard bonito ou um agente que fala bem. Mas e ela que decide se o sistema entrega valor com consistencia ou se vira mais uma promessa fraca. Quem organiza dado primeiro constroi vantagem real depois.`
+No fim, engenharia de dados não aparece tanto quanto um dashboard bonito ou um agente que fala bem. Mas é ela que decide se o sistema entrega valor com consistência ou se vira mais uma promessa fraca. Quem organiza dado primeiro constrói vantagem real depois.`
   }
 ];
 
@@ -382,7 +391,11 @@ async function run() {
     throw new Error('Nenhum usuario encontrado para associar os posts.');
   }
 
-  const postsToDelete = await Post.find({ title: { $in: oldSampleTitles } }, { _id: 1 });
+  const titlesToDelete = [...oldSampleTitles, ...legacyFeaturedTitles].filter(
+    (title) => !featuredPosts.some((post) => post.title === title)
+  );
+
+  const postsToDelete = await Post.find({ title: { $in: titlesToDelete } }, { _id: 1 });
   const deleteIds = postsToDelete.map((post) => post._id);
 
   if (deleteIds.length > 0) {
@@ -395,7 +408,6 @@ async function run() {
       { title: post.title },
       {
         ...post,
-        imageUrl: '',
         author: owner._id,
         authorName: owner.username || 'Adriano Lengruber',
         authorAvatar: owner.avatar || '',

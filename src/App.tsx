@@ -24,11 +24,13 @@ import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import AdminDashboard from './pages/AdminDashboard';
 import ClientPortal from './pages/ClientPortal';
+import SpecializedConsultingPage from './pages/SpecializedConsultingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import { AuthProvider } from './hooks/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { useAuth } from './hooks/useAuth';
+import { getSpecializedConsultingService, specializedConsultingServices } from './data/specializedConsulting';
 
 interface Experience {
   id: number; title: string; company: string; period: string;
@@ -81,7 +83,7 @@ const experiences: Experience[] = [
   },
   {
     id: 3, title: 'Engenheiro de Software Sênior', company: 'Global RJ Serviços',
-    period: '2025', location: 'Natividade, RJ',
+    period: '2025', location: 'Macaé, RJ',
     description: 'Atuei na construção de soluções orientadas a dados com Python, SQL e Power BI, cobrindo extração, tratamento, modelagem e disponibilização de informações para análise executiva. Também desenvolvi automações, rotinas de web scraping, dashboards de alta performance e entregas full stack com versionamento e deploy estruturados.',
     skills: ['Python', 'SQL', 'Power BI', 'DAX', 'ETL', 'Git', 'Full-Stack'],
   },
@@ -208,7 +210,7 @@ const certifications = [
     provider: 'Microsoft',
     format: 'Fundamentals',
     credentialId: '4A1E4A6CC6AA62DF',
-    credentialUrl: 'https://learn.microsoft.com/api/credentials/share/en-us/AdrianoLengruber-5907/4A1E4A6CC6AA62DF?sharingId',
+    credentialUrl: 'https://learn.microsoft.com/api/credentials/share/en-us/AdrianoLengruber/F648454AE3C1C82?sharingId=B67723CE0F8D690D',
     description: 'Certificação fundamental em IA aplicada com conceitos de machine learning, visão computacional, NLP e workloads de IA na Azure.',
     thumbnailUrl: 'https://learn.microsoft.com/en-us/media/open-graph-image.png',
     accent: 'from-[#0078D4]/85 via-[#0b2740]/80 to-cyber-black',
@@ -739,81 +741,14 @@ function Services() {
 
 function SpecializedConsulting() {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'start' });
-
-  const consultingServices = [
-    {
-      title: 'Workstations Pro para IA & Dados',
-      audience: 'IA • Ciência de Dados • Criadores',
-      description: 'Projeto estações de trabalho sob medida para quem precisa de desempenho real em IA, ciência de dados, criação de conteúdo e workloads intensivos. O foco é equilibrar performance, possibilidade de upgrade, confiabilidade e investimento inteligente.',
-      idealFor: 'Profissionais que precisam montar ou evoluir uma máquina realmente compatível com o seu perfil de uso.',
-      deliverable: 'Definição da configuração ideal, orientação de compra, checklist técnico e plano de evolução.',
-      badges: ['Alta Performance', 'GPU Ready', 'Setup Sob Medida'],
-      features: [
-        'Dimensionamento de CPU, GPU, RAM e armazenamento por perfil de uso',
-        'Planejamento térmico, consumo, upgrade e longevidade do equipamento',
-        'Configuração pensada para produtividade, estabilidade e custo-benefício',
-      ],
-      icon: <HardDrive size={24} />,
-      iconColor: 'text-cyber-gold',
-      iconBg: 'bg-cyber-gold/15',
-      border: 'hover:border-cyber-gold/30 hover:shadow-cyber-gold/10',
-      cover: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80',
-    },
-    {
-      title: 'VPS Pessoal ou Profissional',
-      audience: 'Cloud • Self-Hosted • Deploy',
-      description: 'Estruturo VPS sob medida para aplicações, automações, bots, sites, APIs ou ambientes privados, com configuração orientada ao objetivo do cliente. A entrega inclui transparência total, documentação operacional no próprio ambiente e transferência integral dos acessos.',
-      idealFor: 'Empresas e profissionais que querem infraestrutura enxuta, segura e pronta para uso sem depender de pacotes genéricos.',
-      deliverable: 'Servidor provisionado, stack configurada, segurança inicial aplicada e acessos totalmente em posse do cliente.',
-      badges: ['Linux', 'Docker', 'Acessos do Cliente'],
-      features: [
-        'Configuração precisa das aplicações escolhidas para o cenário de uso',
-        'Organização de usuários, domínios, SSL, backups e boas práticas de segurança',
-        'Entrega final com transparência sobre contas, logins e estrutura implantada',
-      ],
-      icon: <Server size={24} />,
-      iconColor: 'text-cyan-400',
-      iconBg: 'bg-cyan-400/15',
-      border: 'hover:border-cyan-400/30 hover:shadow-cyan-400/10',
-      cover: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80',
-    },
-    {
-      title: 'Personal Developer',
-      audience: 'Produto Sob Medida • Full Stack',
-      description: 'Consultoria e desenvolvimento do início ao fim para projetos personalizados, pensados especificamente para a realidade de uma pessoa, empresa ou gestor. A prioridade é construir a solução certa com a stack mais atual, sem perder de vista viabilidade, manutenção e retorno sobre o investimento.',
-      idealFor: 'Quem precisa tirar uma ideia do papel ou evoluir um processo com tecnologia feita sob medida.',
-      deliverable: 'Descoberta, arquitetura, implementação, validação e evolução contínua do projeto.',
-      badges: ['Sob Medida', 'IA Aplicada', 'Custo-Benefício'],
-      features: [
-        'Levantamento da necessidade real antes da escolha técnica',
-        'Desenvolvimento orientado a resultado, usabilidade e escalabilidade',
-        'Tecnologia atual com foco em sustentabilidade financeira do projeto',
-      ],
-      icon: <Brackets size={24} />,
-      iconColor: 'text-cyber-emerald',
-      iconBg: 'bg-cyber-emerald/15',
-      border: 'hover:border-cyber-emerald/30 hover:shadow-cyber-emerald/10',
-      cover: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80',
-    },
-    {
-      title: 'BI Express para PMEs',
-      audience: 'Gestão • Comercial • Operação',
-      description: 'Uma frente pensada para gerar resultado rápido em empresas locais e regionais por meio de dashboards executivos, automações operacionais e organização dos indicadores essenciais. É uma porta de entrada de alto valor para negócios que precisam enxergar melhor suas operações e decidir com mais segurança.',
-      idealFor: 'Comércios, indústrias, distribuidores, clínicas e gestores que querem clareza nos números e ganho operacional.',
-      deliverable: 'Mapa de indicadores, painel executivo, rotina de atualização e recomendações práticas de melhoria.',
-      badges: ['Dashboard', 'KPIs', 'Quick Wins'],
-      features: [
-        'Estruturação de indicadores críticos para operação, comercial e financeiro',
-        'Painéis objetivos para acompanhamento e tomada de decisão',
-        'Automação de etapas repetitivas para reduzir retrabalho e ruído operacional',
-      ],
-      icon: <Gauge size={24} />,
-      iconColor: 'text-[#E07390]',
-      iconBg: 'bg-[#E07390]/15',
-      border: 'hover:border-[#E07390]/30 hover:shadow-[#E07390]/10',
-      cover: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
-    },
-  ];
+  const consultingServices = specializedConsultingServices.map((service) => ({
+    ...service,
+    icon:
+      service.iconKey === 'workstation' ? <HardDrive size={24} /> :
+        service.iconKey === 'vps' ? <Server size={24} /> :
+          service.iconKey === 'developer' ? <Brackets size={24} /> :
+            <Gauge size={24} />,
+  }));
 
   return (
     <section className="py-24 relative bg-cyber-black/30">
@@ -848,10 +783,12 @@ function SpecializedConsulting() {
                 >
                   <div className={`glass rounded-2xl overflow-hidden border border-white/10 transition-all duration-300 ${service.border} hover:-translate-y-1 h-full`}>
                     <div className="relative h-60">
-                      <div
-                        className="absolute inset-0 bg-cover bg-center scale-105 transition-transform duration-500"
-                        style={{ backgroundImage: `linear-gradient(135deg, rgba(5,8,12,0.2), rgba(5,8,12,0.75)), url(${service.cover})` }}
-                      />
+                      <Link to={`/consultorias/${service.slug}`} className="absolute inset-0 block group" aria-label={`Abrir ${service.title}`}>
+                        <div
+                          className="absolute inset-0 bg-cover bg-center scale-105 transition-transform duration-500 group-hover:scale-110"
+                          style={{ backgroundImage: `linear-gradient(135deg, rgba(5,8,12,0.2), rgba(5,8,12,0.75)), url(${service.cover})` }}
+                        />
+                      </Link>
                       <div className="absolute inset-0 bg-gradient-to-t from-cyber-black via-cyber-black/30 to-transparent" />
                       <div className="relative z-10 h-full p-6 flex flex-col justify-between">
                         <div className="flex items-start justify-between gap-4">
@@ -883,7 +820,7 @@ function SpecializedConsulting() {
                           <p className="text-sm text-foreground/85 leading-relaxed">{service.idealFor}</p>
                         </div>
                         <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                          <p className="text-[11px] uppercase tracking-[0.2em] text-primary mb-2">Entregáveis</p>
+                          <p className="text-[11px] uppercase tracking-[0.2em] text-primary mb-2">Entregavel</p>
                           <p className="text-sm text-foreground/85 leading-relaxed">{service.deliverable}</p>
                         </div>
                       </div>
@@ -895,6 +832,25 @@ function SpecializedConsulting() {
                             <span>{feature}</span>
                           </div>
                         ))}
+                      </div>
+
+                      <div className="grid sm:grid-cols-2 gap-3 mt-6">
+                        <Link
+                          to={`/consultorias/${service.slug}`}
+                          className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+                        >
+                          Ver pagina
+                          <ArrowRight size={16} />
+                        </Link>
+                        <a
+                          href={`https://wa.me/5521983300779?text=${encodeURIComponent(`Ola, Adriano. Quero conversar sobre a consultoria "${service.title}".`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/10 px-4 py-3 text-sm font-semibold text-muted-foreground hover:text-foreground hover:border-primary/30 transition-colors"
+                        >
+                          <WhatsAppIcon size={16} />
+                          WhatsApp
+                        </a>
                       </div>
                     </div>
                   </div>
@@ -1083,7 +1039,7 @@ function Education() {
           <p className="text-muted-foreground max-w-2xl mx-auto">Minha jornada educacional construindo a base do conhecimento</p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-5 max-w-5xl mx-auto">
           {education.map((edu, index) => (
             <motion.div 
               key={edu.school} 
@@ -1091,34 +1047,40 @@ function Education() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }} 
               transition={{ delay: index * 0.1 }}
-              className="glass rounded-2xl overflow-hidden border border-white/10 hover:border-primary/25 transition-all duration-300 h-full flex flex-col group"
+              className="glass rounded-2xl border border-white/10 hover:border-primary/25 transition-all duration-300 h-full p-5 md:p-6 group"
             >
-              <div className={`relative h-40 bg-gradient-to-br ${edu.accent}`}>
+              <div className={`relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br ${edu.accent} p-4 mb-5`}>
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.18),transparent_42%)]" />
-                <div className="absolute inset-0 bg-gradient-to-t from-cyber-black via-cyber-black/30 to-transparent" />
-                <div className="relative h-full p-5 flex flex-col justify-between">
-                  <div className="flex items-start justify-between gap-4">
-                    <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${edu.providerAccent}`}>
+                <div className="absolute inset-0 bg-gradient-to-t from-cyber-black via-cyber-black/20 to-transparent" />
+                <div className="relative flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <span className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-medium ${edu.providerAccent}`}>
                       {edu.highlight}
                     </span>
-                    <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center text-white">
-                      {edu.icon}
-                    </div>
+                    <p className="text-[11px] uppercase tracking-[0.22em] text-white/75 mt-4 mb-2">{edu.title}</p>
+                    <h4 className="font-semibold text-lg text-white leading-snug">{edu.school}</h4>
                   </div>
-                  <div className="flex items-end justify-between gap-4">
-                    <img src={edu.logo} alt={edu.school} className="h-10 max-w-[120px] object-contain rounded-lg bg-white/95 px-2 py-1" />
-                    <span className="inline-flex items-center gap-1.5 text-xs text-white/80">
-                      <Calendar size={12} className="text-primary" />
-                      {edu.period}
-                    </span>
+                  <div className="w-11 h-11 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center text-white flex-shrink-0">
+                    {edu.icon}
                   </div>
                 </div>
               </div>
-              <div className="p-6 flex flex-col flex-1">
-                <p className="text-sm uppercase tracking-[0.2em] text-primary mb-2">{edu.title}</p>
-                <h4 className="font-semibold text-lg mb-2">{edu.school}</h4>
-                <p className="text-foreground/90 font-medium mb-3">{edu.degree}</p>
-                <p className="text-muted-foreground text-sm leading-relaxed mb-5">{edu.description}</p>
+
+              <div className="flex items-center justify-between gap-4 mb-4">
+                <p className="text-foreground/90 font-medium text-sm md:text-base">{edu.degree}</p>
+                <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground flex-shrink-0">
+                  <Calendar size={12} className="text-primary" />
+                  {edu.period}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3 mb-4">
+                <img src={edu.logo} alt={edu.school} className="h-9 max-w-[110px] object-contain rounded-lg bg-white/95 px-2 py-1" />
+                <div className="h-px flex-1 bg-white/10" />
+              </div>
+
+              <div className="flex flex-col flex-1">
+                <p className="text-muted-foreground text-sm leading-relaxed mb-4">{edu.description}</p>
                 <div className="mt-auto flex flex-wrap gap-2 pt-4 border-t border-white/10">
                   {edu.skills.map((skill) => (
                     <span key={skill} className="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
@@ -1479,6 +1441,24 @@ function Contact() {
   const [submitError, setSubmitError] = useState('');
   const API_URL = import.meta.env.VITE_API_URL || '/api';
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const serviceSlug = params.get('service');
+    if (!serviceSlug) return;
+
+    const service = getSpecializedConsultingService(serviceSlug);
+    if (!service) return;
+
+    setFormData((prev) => {
+      if (prev.subject || prev.message) return prev;
+      return {
+        ...prev,
+        subject: `Interesse em ${service.title}`,
+        message: `Ola, Adriano. Quero conversar sobre a consultoria "${service.title}". Meu contexto inicial e: `,
+      };
+    });
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError('');
@@ -1513,6 +1493,9 @@ function Contact() {
     { icon: <Phone size={22} className="text-cyber-steel" />, bg: 'bg-cyber-steel/10', label: 'Telefone', content: <a href="tel:+5521983300779" className="text-muted-foreground hover:text-primary transition-colors text-sm">(21) 98330-0779</a> },
     { icon: <MapPin size={22} className="text-cyber-emerald" />, bg: 'bg-cyber-emerald/10', label: 'Localização', content: <p className="text-muted-foreground text-sm">Natividade, Rio de Janeiro, Brasil</p> },
   ];
+  const selectedService = typeof window !== 'undefined'
+    ? getSpecializedConsultingService(new URLSearchParams(window.location.search).get('service') || '')
+    : undefined;
 
   return (
     <section id="contact" className="py-24 relative">
@@ -1553,6 +1536,12 @@ function Contact() {
           {/* Right side - Form */}
           <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="glass rounded-xl p-8 space-y-6 flex flex-col">
             <form onSubmit={handleSubmit} className="space-y-5">
+              {selectedService && (
+                <div className="rounded-lg border border-primary/20 bg-primary/8 px-4 py-3">
+                  <p className="text-xs uppercase tracking-[0.2em] text-primary mb-1">Consultoria selecionada</p>
+                  <p className="text-sm text-foreground/90">Formulario preparado para <span className="font-semibold">{selectedService.title}</span>.</p>
+                </div>
+              )}
               <div className="grid md:grid-cols-2 gap-5">
                 {[{ id: 'name', label: 'Nome', type: 'text', placeholder: 'Seu nome' },
                 { id: 'email', label: 'Email', type: 'email', placeholder: 'seu@email.com' }].map(({ id, label, type, placeholder }) => (
@@ -1665,6 +1654,7 @@ export default function App() {
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/privacidade" element={<PrivacyPage />} />
         <Route path="/termos" element={<TermsPage />} />
+        <Route path="/consultorias/:slug" element={<SpecializedConsultingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/admin" element={
