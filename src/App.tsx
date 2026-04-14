@@ -371,6 +371,13 @@ function Navigation() {
 function Hero() {
   const [typedText, setTypedText] = useState('');
   const [roleIndex, setRoleIndex] = useState(0);
+  const heroSignals = [
+    { icon: <Bot size={18} className="text-primary" />, label: 'IA aplicada a operacao', detail: 'Agentes, copilotos e automacoes com objetivo claro.' },
+    { icon: <Workflow size={18} className="text-cyber-emerald" />, label: 'Fluxos sob medida', detail: 'Processos redesenhados para reduzir retrabalho e ruido.' },
+    { icon: <BarChart3 size={18} className="text-cyber-steel" />, label: 'Dados para decisao', detail: 'Dashboards e inteligencia executiva orientados ao negocio.' },
+    { icon: <Server size={18} className="text-cyan-400" />, label: 'Entrega ponta a ponta', detail: 'Da arquitetura ao deploy com base tecnica consistente.' },
+  ];
+  const heroPills = ['IA aplicada', 'Automacao inteligente', 'BI & Analytics', 'Software sob medida'];
 
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
@@ -390,57 +397,156 @@ function Hero() {
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyber-gold/8 rounded-full blur-3xl animate-glow" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-cyber-steel/6 rounded-full blur-3xl animate-glow" style={{ animationDelay: '1.5s' }} />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-cyber-emerald/4 rounded-full blur-3xl" />
+        <div className="absolute right-[10%] top-[18%] w-56 h-56 border border-primary/10 rounded-full" />
+        <div className="absolute right-[13%] top-[21%] w-40 h-40 border border-white/5 rounded-full" />
         {/* Subtle grid */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(212,168,83,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(212,168,83,0.025)_1px,transparent_1px)] bg-[size:60px_60px]" />
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-32 relative z-10">
-        <div className="text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-heading text-5xl md:text-7xl font-bold mb-6 tracking-tight"
-          >
-            Adriano <span className="text-gradient">Lengruber</span>
-          </motion.h1>
+        <div className="grid lg:grid-cols-[1.02fr_0.98fr] gap-14 xl:gap-20 items-center">
+          <div className="text-center lg:text-left">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-medium tracking-[0.2em] uppercase mb-6"
+            >
+              <Sparkles size={14} />
+              IA, Dados e Automacao
+            </motion.div>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-xl md:text-2xl text-muted-foreground mb-6 h-10 font-light"
-          >
-            <span className="text-foreground/90">{typedText}</span>
-            <span className="animate-pulse text-primary">|</span>
-          </motion.p>
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}
+              className="font-heading text-5xl md:text-7xl font-bold mb-6 tracking-tight"
+            >
+              Adriano <span className="text-gradient">Lengruber</span>
+            </motion.h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-lg text-muted-foreground max-w-4xl mx-auto mb-10 leading-relaxed"
-          >
-            Transformando dados em soluções inteligentes. Especialista em automação e IA, crio soluções com tecnologias de ponta que impulsionam a evolução de empresas e empreendedores de todos os portes.
-          </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-xl md:text-2xl text-muted-foreground mb-6 h-10 font-light"
+            >
+              <span className="text-foreground/90">{typedText}</span>
+              <span className="animate-pulse text-primary">|</span>
+            </motion.p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex flex-wrap items-center justify-center gap-4 mb-12"
-          >
-            <a href="#contact" className="inline-flex items-center gap-2 px-7 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-all duration-200 shadow-lg hover:shadow-primary/20">
-              Vamos conversar <ArrowRight size={18} />
-            </a>
-          </motion.div>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}
+              className="text-lg text-muted-foreground max-w-3xl mx-auto lg:mx-0 mb-8 leading-relaxed"
+            >
+              Transformando dados em soluções inteligentes. Especialista em automação e IA, crio soluções com tecnologias de ponta que impulsionam a evolução de empresas e empreendedores de todos os portes.
+            </motion.p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.5 }}
-            className="flex items-center justify-center gap-6"
-          >
-            {[
-              { href: 'https://github.com/Adriano-Lengruber', icon: <Github size={22} /> },
-              { href: 'https://linkedin.com/in/adriano-lengruber', icon: <Linkedin size={22} /> },
-              { href: 'mailto:contato@adriano-lengruber.com', icon: <Mail size={22} /> },
-            ].map(({ href, icon }, i) => (
-              <a key={i} href={href} target="_blank" rel="noopener noreferrer"
-                className="w-10 h-10 glass rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 transition-all duration-200">
-                {icon}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.35 }}
+              className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mb-10"
+            >
+              {heroPills.map((pill) => (
+                <span key={pill} className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs text-muted-foreground">
+                  <CircleDot size={12} className="text-primary" />
+                  {pill}
+                </span>
+              ))}
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }}
+              className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-10"
+            >
+              <a href="#contact" className="inline-flex items-center gap-2 px-7 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-all duration-200 shadow-lg hover:shadow-primary/20">
+                Vamos conversar <ArrowRight size={18} />
               </a>
-            ))}
+              <a href="#services" className="inline-flex items-center gap-2 px-7 py-3 rounded-lg border border-white/10 bg-white/5 text-foreground hover:border-primary/30 hover:text-primary transition-all duration-200">
+                Ver consultorias
+              </a>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.5 }}
+              className="flex items-center justify-center lg:justify-start gap-6"
+            >
+              {[
+                { href: 'https://github.com/Adriano-Lengruber', icon: <Github size={22} /> },
+                { href: 'https://linkedin.com/in/adriano-lengruber', icon: <Linkedin size={22} /> },
+                { href: 'mailto:contato@adriano-lengruber.com', icon: <Mail size={22} /> },
+              ].map(({ href, icon }, i) => (
+                <a key={i} href={href} target="_blank" rel="noopener noreferrer"
+                  className="w-10 h-10 glass rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 transition-all duration-200">
+                  {icon}
+                </a>
+              ))}
+            </motion.div>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.2 }}
+            className="relative w-full max-w-xl mx-auto"
+          >
+            <motion.div
+              animate={{ y: [0, -8, 0] }}
+              transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+              className="relative glass rounded-[30px] border border-primary/15 p-6 md:p-7 overflow-hidden glow"
+            >
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(212,168,83,0.15),transparent_35%)]" />
+              <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.05),transparent_40%)]" />
+              <div className="relative">
+                <div className="flex items-center justify-between gap-4 mb-6">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.26em] text-primary mb-2">Painel de atuação</p>
+                    <h3 className="font-heading text-2xl font-semibold">Soluções orientadas a resultado</h3>
+                  </div>
+                  <div className="w-12 h-12 rounded-2xl border border-primary/20 bg-primary/10 flex items-center justify-center text-primary">
+                    <Activity size={20} />
+                  </div>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                  {heroSignals.map((signal) => (
+                    <div key={signal.label} className="rounded-2xl border border-white/10 bg-cyber-black/35 px-4 py-4">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+                          {signal.icon}
+                        </div>
+                        <p className="text-sm font-medium">{signal.label}</p>
+                      </div>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{signal.detail}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-cyber-black/35 px-5 py-5">
+                  <div className="flex items-center justify-between gap-4 mb-4">
+                    <p className="text-xs uppercase tracking-[0.24em] text-primary">Fluxo consultivo</p>
+                    <span className="text-xs text-muted-foreground">Diagnostico ate a entrega</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    {['Diagnostico', 'Arquitetura', 'Evolucao'].map((step, index) => (
+                      <div key={step} className="rounded-xl border border-white/10 bg-white/5 px-3 py-4 text-center">
+                        <p className="text-[11px] uppercase tracking-[0.2em] text-primary/80 mb-2">0{index + 1}</p>
+                        <p className="text-sm font-medium">{step}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              animate={{ y: [0, 10, 0], x: [0, -4, 0] }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+              className="hidden md:flex absolute -top-5 -right-4 rounded-2xl border border-primary/15 bg-cyber-black/75 backdrop-blur-xl px-4 py-3 items-center gap-3"
+            >
+              <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse" />
+              <span className="text-sm text-foreground/90">Projetos com IA aplicada</span>
+            </motion.div>
+
+            <motion.div
+              animate={{ y: [0, -10, 0], x: [0, 4, 0] }}
+              transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
+              className="hidden md:flex absolute -bottom-5 -left-5 rounded-2xl border border-white/10 bg-cyber-black/80 backdrop-blur-xl px-4 py-3 items-center gap-3"
+            >
+              <Workflow size={16} className="text-cyber-emerald" />
+              <span className="text-sm text-muted-foreground">Do insight ao deploy</span>
+            </motion.div>
           </motion.div>
         </div>
       </div>
@@ -1047,40 +1153,44 @@ function Education() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }} 
               transition={{ delay: index * 0.1 }}
-              className="glass rounded-2xl border border-white/10 hover:border-primary/25 transition-all duration-300 h-full p-5 md:p-6 group"
+              className="glass rounded-2xl border border-white/10 hover:border-primary/25 transition-all duration-300 h-full p-5 md:p-6 group flex flex-col"
             >
-              <div className={`relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br ${edu.accent} p-4 mb-5`}>
+              <div className={`relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br ${edu.accent} p-4 mb-5 min-h-[148px] flex flex-col`}>
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.18),transparent_42%)]" />
                 <div className="absolute inset-0 bg-gradient-to-t from-cyber-black via-cyber-black/20 to-transparent" />
                 <div className="relative flex items-start justify-between gap-4">
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <span className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-medium ${edu.providerAccent}`}>
                       {edu.highlight}
                     </span>
-                    <p className="text-[11px] uppercase tracking-[0.22em] text-white/75 mt-4 mb-2">{edu.title}</p>
-                    <h4 className="font-semibold text-lg text-white leading-snug">{edu.school}</h4>
                   </div>
                   <div className="w-11 h-11 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center text-white flex-shrink-0">
                     {edu.icon}
                   </div>
                 </div>
+                <div className="relative mt-auto pt-6">
+                  <p className="text-[11px] uppercase tracking-[0.22em] text-white/75 mb-2">{edu.title}</p>
+                  <h4 className="font-semibold text-lg text-white leading-snug min-h-[56px] flex items-end">{edu.school}</h4>
+                </div>
               </div>
 
-              <div className="flex items-center justify-between gap-4 mb-4">
-                <p className="text-foreground/90 font-medium text-sm md:text-base">{edu.degree}</p>
+              <div className="grid grid-cols-[1fr_auto] items-start gap-4 min-h-[60px] mb-4">
+                <p className="text-foreground/90 font-medium text-sm md:text-base leading-snug">{edu.degree}</p>
                 <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground flex-shrink-0">
                   <Calendar size={12} className="text-primary" />
                   {edu.period}
                 </span>
               </div>
 
-              <div className="flex items-center gap-3 mb-4">
-                <img src={edu.logo} alt={edu.school} className="h-9 max-w-[110px] object-contain rounded-lg bg-white/95 px-2 py-1" />
+              <div className="flex items-center gap-3 h-12 mb-4">
+                <div className="h-10 w-[118px] rounded-lg bg-white/95 px-2 py-1 flex items-center justify-center flex-shrink-0">
+                  <img src={edu.logo} alt={edu.school} className="max-h-8 max-w-[96px] object-contain" />
+                </div>
                 <div className="h-px flex-1 bg-white/10" />
               </div>
 
               <div className="flex flex-col flex-1">
-                <p className="text-muted-foreground text-sm leading-relaxed mb-4">{edu.description}</p>
+                <p className="text-muted-foreground text-sm leading-relaxed mb-4 min-h-[96px]">{edu.description}</p>
                 <div className="mt-auto flex flex-wrap gap-2 pt-4 border-t border-white/10">
                   {edu.skills.map((skill) => (
                     <span key={skill} className="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">

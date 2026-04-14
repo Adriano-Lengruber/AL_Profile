@@ -137,19 +137,27 @@ export default function SpecializedConsultingPage() {
         </section>
 
         <section className="py-20">
-          <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-[1.3fr_0.7fr] gap-8 items-start">
-            <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="glass rounded-3xl border border-white/10 p-8 md:p-10">
-              <p className="text-xs uppercase tracking-[0.3em] text-primary mb-4">Como eu conduzo</p>
-              <h2 className="font-heading text-3xl font-bold mb-6">Entrega orientada ao contexto real do cliente</h2>
-              <div className="space-y-4">
-                {service.features.map((feature) => (
-                  <div key={feature} className="flex items-start gap-3">
-                    <CheckCircle2 size={18} className={`mt-1 flex-shrink-0 ${service.iconColor}`} />
-                    <p className="text-muted-foreground leading-relaxed">{feature}</p>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
+          <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-[1.05fr_0.95fr] gap-8 items-start">
+            <div className="space-y-8">
+              <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="glass rounded-3xl border border-white/10 p-8 md:p-10">
+                <p className="text-xs uppercase tracking-[0.3em] text-primary mb-4">Como eu conduzo</p>
+                <h2 className="font-heading text-3xl font-bold mb-6">Entrega orientada ao contexto real do cliente</h2>
+                <div className="space-y-4">
+                  {service.features.map((feature) => (
+                    <div key={feature} className="flex items-start gap-3">
+                      <CheckCircle2 size={18} className={`mt-1 flex-shrink-0 ${service.iconColor}`} />
+                      <p className="text-muted-foreground leading-relaxed">{feature}</p>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+
+              <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="glass rounded-3xl border border-white/10 p-8 md:p-10">
+                <p className="text-xs uppercase tracking-[0.3em] text-primary mb-4">{service.miniCaseTitle}</p>
+                <h2 className="font-heading text-3xl font-bold mb-4">Onde essa consultoria costuma gerar valor primeiro</h2>
+                <p className="text-muted-foreground leading-relaxed">{service.miniCaseDescription}</p>
+              </motion.div>
+            </div>
 
             <motion.aside initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="space-y-6">
               <div className="glass rounded-3xl border border-white/10 p-8">
@@ -171,31 +179,22 @@ export default function SpecializedConsultingPage() {
                   ))}
                 </div>
               </div>
-            </motion.aside>
-          </div>
-        </section>
-
-        <section className="pb-20">
-          <div className="max-w-7xl mx-auto px-6 mb-8">
-            <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="grid lg:grid-cols-[0.95fr_1.05fr] gap-8">
-              <div className="glass rounded-3xl border border-white/10 p-8 md:p-10">
-                <p className="text-xs uppercase tracking-[0.3em] text-primary mb-4">{service.miniCaseTitle}</p>
-                <h2 className="font-heading text-3xl font-bold mb-4">Onde essa consultoria costuma gerar valor primeiro</h2>
-                <p className="text-muted-foreground leading-relaxed">{service.miniCaseDescription}</p>
-              </div>
               <div className="glass rounded-3xl border border-white/10 p-8 md:p-10">
                 <p className="text-xs uppercase tracking-[0.3em] text-primary mb-4">Indicadores de impacto</p>
-                <div className="grid sm:grid-cols-3 gap-4">
-                  {service.miniCaseMetrics.map((metric) => (
-                    <div key={metric} className="rounded-2xl border border-white/10 bg-white/5 px-5 py-6">
+                <div className="grid sm:grid-cols-3 lg:grid-cols-1 gap-4">
+                  {service.miniCaseMetrics.map((metric, index) => (
+                    <div key={metric} className="rounded-2xl border border-white/10 bg-white/5 px-5 py-5">
+                      <p className="text-[11px] uppercase tracking-[0.24em] text-primary/80 mb-2">Sinal {index + 1}</p>
                       <p className="text-sm font-medium leading-relaxed">{metric}</p>
                     </div>
                   ))}
                 </div>
               </div>
-            </motion.div>
+            </motion.aside>
           </div>
+        </section>
 
+        <section className="pb-20">
           <div className="max-w-7xl mx-auto px-6">
             <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="glass rounded-3xl border border-white/10 p-8 md:p-10">
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
