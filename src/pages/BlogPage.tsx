@@ -1319,6 +1319,10 @@ export default function BlogPage() {
             decoding="async"
           />
           <p>© {new Date().getFullYear()} Adriano Lengruber. Feito com precisão e tecnologia.</p>
+          <div className="flex items-center gap-5">
+            <Link to="/privacidade" className="hover:text-primary transition-colors">Privacidade</Link>
+            <Link to="/termos" className="hover:text-primary transition-colors">Termos</Link>
+          </div>
         </div>
       </footer>
     </div>

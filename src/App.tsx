@@ -20,6 +20,8 @@ import logoSoulCode from '../Imgs/Logos_Formacoes/soulcode.png';
 import logoUnig from '../Imgs/Logos_Formacoes/logo-da-unig.webp';
 import logoWall from '../Imgs/Logos_Formacoes/wall_escola_tcnica_logo.jpg';
 import BlogPage from './pages/BlogPage';
+import PrivacyPage from './pages/PrivacyPage';
+import TermsPage from './pages/TermsPage';
 import AdminDashboard from './pages/AdminDashboard';
 import ClientPortal from './pages/ClientPortal';
 import Login from './pages/Login';
@@ -459,7 +461,7 @@ function About() {
     { icon: <Calendar size={22} className="text-primary" />, label: 'Anos de Exp.', value: '16+' },
     { icon: <Handshake size={22} className="text-primary" />, label: 'Consultorias', value: '35' },
     { icon: <Rocket size={22} className="text-primary" />, label: 'Projetos', value: '50+' },
-    { icon: <Users size={22} className="text-primary" />, label: 'Clientes', value: '20+' },
+    { icon: <Users size={22} className="text-primary" />, label: 'Clientes', value: '60+' },
   ];
 
   // Tech stack logos for carousel
@@ -1622,8 +1624,8 @@ function Footer() {
             <span className="text-muted-foreground text-sm">© {new Date().getFullYear()} Adriano Lengruber</span>
           </div>
           <div className="flex items-center gap-4 md:gap-6 text-sm text-muted-foreground self-center md:self-auto">
-            <a href="#" className="hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded px-1">Privacidade</a>
-            <a href="#" className="hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded px-1">Termos</a>
+            <Link to="/privacidade" className="hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded px-1">Privacidade</Link>
+            <Link to="/termos" className="hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded px-1">Termos</Link>
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground self-center md:self-auto">
             <Code2 size={13} className="text-primary/60" />
@@ -1661,6 +1663,8 @@ export default function App() {
           </div>
         } />
         <Route path="/blog" element={<BlogPage />} />
+        <Route path="/privacidade" element={<PrivacyPage />} />
+        <Route path="/termos" element={<TermsPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/admin" element={
