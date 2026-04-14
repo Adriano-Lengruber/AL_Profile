@@ -38,8 +38,9 @@ reconnect_proxy_network() {
 run_healthcheck() {
   local name="$1"
   local url="$2"
+  local max_attempts="${3:-6}"
 
-  for attempt in 1 2 3 4 5 6; do
+  for attempt in $(seq 1 "$max_attempts"); do
     if curl -fsS "$url" >/dev/null; then
       echo "[$name] OK - tentativa $attempt"
       return 0
@@ -115,5 +116,5 @@ docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' | grep al-profile
 run_healthcheck "frontend-local" "http://localhost:3003/"
 run_healthcheck "proxy-local" "http://localhost:3003/api/health"
 run_healthcheck "api-local" "http://localhost:3005/api/health"
-run_healthcheck "api-publica" "$PUBLIC_DOMAIN/api/posts"
-run_healthcheck "dominio-publico" "$PUBLIC_DOMAIN/"
+run_healthcheck "api-publica" "$PUBLIC_DOMAIN/api/posts" 12
+run_healthcheck "dominio-publico" "$PUBLIC_DOMAIN/" 12
