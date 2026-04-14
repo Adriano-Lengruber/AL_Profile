@@ -406,16 +406,6 @@ function Hero() {
             <a href="#contact" className="inline-flex items-center gap-2 px-7 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-all duration-200 shadow-lg hover:shadow-primary/20">
               Vamos conversar <ArrowRight size={18} />
             </a>
-            <a href="#projects" className="inline-flex items-center gap-2 px-7 py-3 glass rounded-lg font-semibold hover:border-primary/30 transition-all duration-200">
-              Ver projetos
-            </a>
-            <a
-              href="/cv-adriano-lengruber.pdf"
-              download
-              className="inline-flex items-center gap-2 px-7 py-3 border border-primary/30 rounded-lg font-semibold text-primary hover:bg-primary/10 transition-all duration-200"
-            >
-              <FileDown size={18} /> Download CV
-            </a>
           </motion.div>
 
           <motion.div
@@ -1469,11 +1459,34 @@ function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
-  const handleSubmit = (e: React.FormEvent) => {
+  const [submitError, setSubmitError] = useState('');
+  const API_URL = import.meta.env.VITE_API_URL || '/api';
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError('');
     setSending(true);
-    setTimeout(() => { setSending(false); setSent(true); setFormData({ name: '', email: '', subject: '', message: '' }); }, 1500);
-    setTimeout(() => setSent(false), 5500);
+
+    try {
+      const response = await fetch(`${API_URL}/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        throw new Error(payload?.error || 'Nao foi possivel enviar sua mensagem agora.');
+      }
+
+      setSent(true);
+      setFormData({ name: '', email: '', subject: '', message: '' });
+      setTimeout(() => setSent(false), 5500);
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'Nao foi possivel enviar sua mensagem agora.');
+    } finally {
+      setSending(false);
+    }
   };
   const up = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setFormData((prev) => ({ ...prev, [field]: e.target.value }));
@@ -1546,6 +1559,11 @@ function Contact() {
                   className="w-full px-4 py-3 rounded-lg bg-cyber-black/50 border border-white/10 focus:border-primary/50 focus:outline-none transition-colors resize-none text-sm"
                   placeholder="Sua mensagem..." required />
               </div>
+              {submitError && (
+                <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                  {submitError}
+                </div>
+              )}
               {sent ? (
                 <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
                   className="w-full flex flex-col items-center gap-3 py-6 text-center">

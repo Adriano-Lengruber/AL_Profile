@@ -118,6 +118,39 @@ app.get('/api/health', (_req, res) => {
   res.json({ ok: true });
 });
 
+app.post('/api/contact', async (req, res) => {
+  try {
+    const name = typeof req.body?.name === 'string' ? req.body.name.trim() : '';
+    const email = normalizeEmail(req.body?.email);
+    const subject = typeof req.body?.subject === 'string' ? req.body.subject.trim() : '';
+    const message = typeof req.body?.message === 'string' ? req.body.message.trim() : '';
+
+    if (!name || !email || !subject || !message) {
+      return res.status(400).json({ error: 'Preencha nome, email, assunto e mensagem.' });
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ error: 'Informe um email valido.' });
+    }
+
+    if (message.length < 10) {
+      return res.status(400).json({ error: 'A mensagem precisa ter pelo menos 10 caracteres.' });
+    }
+
+    await ContactMessage.create({
+      name,
+      email,
+      subject,
+      message,
+      source: 'website'
+    });
+
+    res.status(201).json({ ok: true, message: 'Mensagem recebida com sucesso.' });
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao registrar mensagem de contato.', details: error.message });
+  }
+});
+
 // Conectar ao MongoDB
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/al-profile-blog';
 
@@ -160,9 +193,20 @@ const commentSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+const contactMessageSchema = new mongoose.Schema({
+  name: { type: String, required: true, trim: true },
+  email: { type: String, required: true, trim: true, lowercase: true },
+  subject: { type: String, required: true, trim: true },
+  message: { type: String, required: true, trim: true },
+  source: { type: String, default: 'website' },
+  status: { type: String, enum: ['new', 'read'], default: 'new' },
+  createdAt: { type: Date, default: Date.now }
+});
+
 const User = mongoose.model('User', userSchema);
 const Post = mongoose.model('Post', postSchema);
 const Comment = mongoose.model('Comment', commentSchema);
+const ContactMessage = mongoose.model('ContactMessage', contactMessageSchema);
 
 // --- Novos Modelos para o Admin Work OS ---
 
