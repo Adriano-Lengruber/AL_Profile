@@ -26,11 +26,14 @@ else
   COMPOSE=(docker-compose)
 fi
 
+COMPOSE_ENV_ARGS=()
+
 if [ -f "$RUNTIME_ENV_FILE" ]; then
   set -a
   # shellcheck disable=SC1090
   source "$RUNTIME_ENV_FILE"
   set +a
+  COMPOSE_ENV_ARGS=(--env-file "$RUNTIME_ENV_FILE")
   echo "[env] variaveis de runtime carregadas de $RUNTIME_ENV_FILE"
 else
   echo "[env] arquivo $RUNTIME_ENV_FILE nao encontrado; notificacoes SMTP podem ficar desativadas"
@@ -100,10 +103,10 @@ wait_for_container_health() {
 deploy_stack() {
   cleanup_compose_orphans
 
-  "${COMPOSE[@]}" -f "$COMPOSE_FILE" up -d --build mongodb backend
+  "${COMPOSE[@]}" "${COMPOSE_ENV_ARGS[@]}" -f "$COMPOSE_FILE" up -d --build mongodb backend
   wait_for_container_health "al-profile-backend"
 
-  "${COMPOSE[@]}" -f "$COMPOSE_FILE" up -d --build --no-deps frontend
+  "${COMPOSE[@]}" "${COMPOSE_ENV_ARGS[@]}" -f "$COMPOSE_FILE" up -d --build --no-deps frontend
   wait_for_container_health "al-profile-frontend"
 
   reconnect_proxy_network
