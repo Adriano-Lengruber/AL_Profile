@@ -3,6 +3,21 @@ import { AuthContext, type User } from './auth-context';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
+const parseApiResponse = async (res: Response) => {
+  const contentType = res.headers.get('content-type') || '';
+
+  if (contentType.includes('application/json')) {
+    return res.json();
+  }
+
+  const text = await res.text();
+  throw new Error(
+    text.startsWith('<')
+      ? 'A API administrativa está indisponível no momento. Tente novamente em instantes.'
+      : text || 'Resposta inválida da API'
+  );
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
@@ -20,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           });
 
           if (res.ok) {
-            const userData = await res.json();
+            const userData = await parseApiResponse(res);
             setUser(userData);
             setToken(storedToken);
           } else {
@@ -48,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       body: JSON.stringify({ email, password })
     });
 
-    const data = await res.json();
+    const data = await parseApiResponse(res);
 
     if (!res.ok) {
       throw new Error(data.error || 'Erro ao fazer login');
@@ -68,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       body: JSON.stringify({ username, email, password })
     });
 
-    const data = await res.json();
+    const data = await parseApiResponse(res);
 
     if (!res.ok) {
       throw new Error(data.error || 'Erro ao criar conta');

@@ -114,6 +114,10 @@ const getBaseAppUrl = (req) => APP_URL || req.headers.origin || `${req.protocol}
 app.use(cors());
 app.use(express.json());
 
+app.get('/api/health', (_req, res) => {
+  res.json({ ok: true });
+});
+
 // Conectar ao MongoDB
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/al-profile-blog';
 
