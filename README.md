@@ -78,6 +78,11 @@ O deploy de produção agora usa uma rotina simples e previsível, com:
 - rollback automático para o último commit estável se algum healthcheck falhar;
 - validação local obrigatória e validação pública apenas como aviso, sem falso negativo.
 
+Fluxo operacional recomendado:
+- `push` em `master` com alterações relevantes de aplicação ou deploy aciona o workflow `Deploy to VPS` no GitHub Actions;
+- `workflow_dispatch` continua disponível para reexecutar manualmente pelo GitHub quando necessário;
+- `scripts/deploy-vps.ps1` permanece como atalho auxiliar para operação manual a partir de um terminal com acesso SSH direto.
+
 ```bash
 cd ~/AL_Profile
 bash scripts/vps-safe-deploy.sh
@@ -88,6 +93,8 @@ No Windows, você também pode disparar a atualização com:
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\deploy-vps.ps1
 ```
+
+Se a sessão local não conseguir abrir SSH, o caminho canônico para produção passa a ser o workflow do GitHub Actions, que usa os segredos `SSH_HOST`, `SSH_USER` e `SSH_PRIVATE_KEY`.
 
 ### Variáveis de runtime do backend
 As credenciais sensíveis de produção devem ficar fora do repositório, em `server/.env.runtime`, seguindo o modelo `server/.env.runtime.example`.

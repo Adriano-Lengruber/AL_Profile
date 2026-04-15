@@ -10,6 +10,17 @@ O DNS já está configurado:
 ## Docker Compose - Atualização ✅
 O arquivo docker-compose.blog.yml foi atualizado para incluir a rede do Nginx Proxy Manager.
 
+## Fluxo recomendado de deploy ✅
+
+O fluxo principal de produção passa a ser:
+
+1. `git push origin master`
+2. GitHub Actions executa o workflow `Deploy to VPS`
+3. O workflow conecta na VPS via `appleboy/ssh-action` usando os segredos do repositório
+4. A VPS executa `scripts/vps-safe-deploy.sh`
+
+O caminho `scripts/deploy-vps.ps1` continua válido como operação manual, mas não deve ser o único mecanismo de publicação.
+
 ### Na VPS (Usuário: adriano), execute:
 
 ```bash
@@ -98,6 +109,11 @@ No seu repositório do GitHub, vá em **Settings > Secrets and variables > Actio
 8. Faz checks públicos como aviso, sem derrubar a stack por falso negativo.
 9. Se alguma validação local falhar, volta automaticamente ao commit anterior e recompõe a stack.
 
+### ▶️ Quando o workflow executa
+
+- Automaticamente em `push` para `master` quando há mudanças relevantes de aplicação, infraestrutura ou scripts de deploy.
+- Manualmente por `workflow_dispatch`, para reprocessar um deploy sem criar novo commit.
+
 ### ✅ Procedimento seguro antes de atualizar a VPS
 
 Sempre registre o estado estável antes de qualquer atualização:
@@ -112,6 +128,16 @@ curl -I https://adriano-lengruber.com/
 ```
 
 Se algum desses checks já estiver falhando, não atualize nada antes de corrigir.
+
+### ✅ Procedimento padrão daqui em diante
+
+Para evitar repetir o problema de depender de uma sessão local específica:
+
+1. Validar localmente.
+2. Fazer `commit`.
+3. Fazer `git push origin master`.
+4. Acompanhar o workflow `Deploy to VPS` no GitHub Actions.
+5. Só usar `scripts/deploy-vps.ps1` quando for realmente necessário executar o deploy manual fora do GitHub.
 
 ### ✅ Garantias do deploy manual
 

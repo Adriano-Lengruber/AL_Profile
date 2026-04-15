@@ -1,6 +1,24 @@
 name: Deploy to VPS
 
 on:
+  push:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/deploy.yml'
+      - 'scripts/**'
+      - 'src/**'
+      - 'server/**'
+      - 'Imgs/**'
+      - 'public/**'
+      - 'docker-compose.blog.yml'
+      - 'Dockerfile'
+      - 'nginx.conf'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'pnpm-lock.yaml'
+      - 'vite.config.ts'
+      - 'tsconfig*.json'
   workflow_dispatch:
 
 concurrency:
@@ -10,6 +28,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
       - name: Deploying via SSH
         uses: appleboy/ssh-action@master
@@ -17,6 +36,8 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          timeout: 60s
+          command_timeout: 30m
           script: |
             set -Eeuo pipefail
             APP_DIR="$HOME/AL_Profile"
